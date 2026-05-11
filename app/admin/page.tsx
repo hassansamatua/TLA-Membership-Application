@@ -111,12 +111,12 @@ export default function AdminPage() {
     <div>
       {/* Welcome Section */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-green-700 to-green-600 rounded-2xl p-8 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-              <p className="text-blue-100 text-lg">Welcome back, {user.name}!</p>
-              <p className="text-blue-200 text-sm mt-1">Here's what's happening with your TLA membership system today</p>
+              <p className="text-white-100 text-lg">Welcome back, {user.name}!</p>
+              <p className="text-white-200 text-sm mt-1">Here's what's happening with your TLA membership system today</p>
             </div>
             <div className="hidden lg:block">
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 text-center">
@@ -132,16 +132,16 @@ export default function AdminPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-          <div className="h-2 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+          <div className="h-2 bg-green-900 "></div>
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Total Users</p>
-                <p className="text-3xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{stats.totalUsers}</p>
+                <p className="text-3xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">{stats.totalUsers}</p>
                 <p className="text-xs text-gray-500 mt-1">Registered members</p>
               </div>
-              <div className="p-4 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
-                <FiUsers className="h-6 w-6 text-blue-600" />
+              <div className="p-4 bg-blue-100 rounded-xl group-hover:bg-green-200 transition-colors">
+                <FiUsers className="h-6 w-6 text-black-600" />
               </div>
             </div>
           </div>

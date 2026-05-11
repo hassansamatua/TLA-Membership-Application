@@ -226,10 +226,10 @@ export default function MembershipCard({
         {/* Logo Image without background */}
         <image
           href="/logo.png"
-          x="-20"
-          y="-20"
-          width="130"
-          height="130"
+          x="9"
+          y="4"
+          width="70"
+          height="70"
           preserveAspectRatio="xMidYMid meet"
         />
         

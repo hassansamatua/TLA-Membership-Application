@@ -172,7 +172,7 @@ export default function MemberManagementPage() {
     <div>
       {/* Header Section */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-green-700 to-green-500 rounded-2xl p-8 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">Member Management</h1>
@@ -181,7 +181,7 @@ export default function MemberManagementPage() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1">
                   <span className="text-sm font-medium">Total: {users.length}</span>
                 </div>
-                <div className="bg-green-400/30 backdrop-blur-sm rounded-lg px-3 py-1">
+                <div className="bg-green-900/30 backdrop-blur-sm rounded-lg px-3 py-1">
                   <span className="text-sm font-medium">Active: {tabCounts.approved}</span>
                 </div>
                 <div className="bg-yellow-400/30 backdrop-blur-sm rounded-lg px-3 py-1">
