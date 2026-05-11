@@ -1,0 +1,6 @@
+<!-- Simple SVG placeholder for profile pictures -->
+<svg width="90" height="90" xmlns="http://www.w3.org/2000/svg">
+  <rect width="90" height="90" fill="#10b981" rx="8"/>
+  <circle cx="45" cy="35" r="15" fill="white"/>
+  <ellipse cx="45" cy="65" rx="20" ry="15" fill="white"/>
+</svg>

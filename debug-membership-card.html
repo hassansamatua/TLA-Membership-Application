@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Membership Card Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .card-container { margin: 20px 0; }
+        img { max-width: 200px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Membership Card Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h2>Step 1: Check if images exist</h2>
+        <div id="image-check"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Step 2: Test displayed card</h2>
+        <div class="card-container">
+            <div id="membership-card-element" style="width: 336px; height: 212px; position: relative;">
+                <!-- SVG-based card design -->
+                <svg width="336" height="212" xmlns="http://www.w3.org/2000/svg" style="position: absolute; inset: 0; border-radius: 16px; overflow: hidden;">
+                    <defs>
+                        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#2d3e50" />
+                            <stop offset="50%" stop-color="#34495e" />
+                            <stop offset="100%" stop-color="#1a252f" />
+                        </linearGradient>
+                        <linearGradient id="greenAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#10b981" />
+                            <stop offset="100%" stop-color="#059669" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Main background -->
+                    <rect width="336" height="212" fill="url(#bgGradient)" rx="16" ry="16"/>
+                    
+                    <!-- Top header bar -->
+                    <rect width="336" height="50" fill="rgba(16, 185, 129, 0.2)" rx="16" ry="16"/>
+                    
+                    <!-- Logo Image -->
+                    <image id="logo-image" href="/logo (3).png" x="-20" y="-20" width="130" height="130" preserveAspectRatio="xMidYMid meet"/>
+                    
+                    <!-- Organization name -->
+                    <text x="190" y="30" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">TANZANIA LIBRARY AND</text>
+                    <text x="190" y="50" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">INFORMATION ASSOCIATION</text>
+                    <text x="175" y="70" font-family="Arial" font-size="10" fill="#10b981" text-anchor="middle" font-weight="600">(TLA)</text>
+                    
+                    <!-- Profile picture area -->
+                    <g>
+                        <rect x="233" y="67" width="90" height="90" fill="none" rx="8" ry="8"/>
+                        <image id="profile-image" href="/uploads/profile-pictures/user_25.jpg" x="233" y="67" width="90" height="90" rx="8" ry="8" preserveAspectRatio="xMidYMid slice"/>
+                    </g>
+                    
+                    <!-- Member name -->
+                    <text x="20" y="95" font-family="Arial, sans-serif" font-size="8" fill="#10b981" font-weight="700" letter-spacing="1">MEMBER NAME</text>
+                    <text x="20" y="115" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white">Hassan Samatua</text>
+                    
+                    <!-- Membership number -->
+                    <text x="20" y="130" font-family="Arial, sans-serif" font-size="8" fill="#10b981" font-weight="700" letter-spacing="0.5">MEMBERSHIP No</text>
+                    <text x="20" y="150" font-family="monospace" font-size="14" font-weight="bold" fill="white" letter-spacing="2">TLA2670492</text>
+                    
+                    <!-- Membership type -->
+                    <text x="20" y="170" font-family="Arial, sans-serif" font-size="7" fill="#10b981" font-weight="700">TYPE</text>
+                    <text x="20" y="185" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">PROFESSIONAL</text>
+                    
+                    <!-- Phone number -->
+                    <text x="165" y="170" font-family="Arial, sans-serif" font-size="7" fill="#10b981" font-weight="700" text-anchor="end">PHONE</text>
+                    <text x="201" y="185" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="white" text-anchor="end">+255 712 345 678</text>
+                    
+                    <!-- Bottom accent bar -->
+                    <rect y="192" width="336" height="20" fill="rgba(16, 185, 129, 0.15)"/>
+                    <text x="16" y="205" font-family="Arial, sans-serif" font-size="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • TLA</text>
+                </svg>
+            </div>
+        </div>
+        <div id="card-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Step 3: Test html2canvas capture</h2>
+        <button onclick="testCapture()">Test Capture</button>
+        <div id="capture-result"></div>
+        <canvas id="capture-canvas" style="border: 1px solid black; margin-top: 10px;"></canvas>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Step 1: Check if images exist
+        async function checkImages() {
+            const container = document.getElementById('image-check');
+            const testUrls = [
+                '/logo (3).png',
+                '/uploads/profile-pictures/user_25.jpg',
+                '/public/uploads/profile-pictures/user_25.jpg',
+                'http://localhost:3000/logo (3).png',
+                'http://localhost:3000/uploads/profile-pictures/user_25.jpg'
+            ];
+            
+            container.innerHTML = '<h3>Testing Image URLs:</h3>';
+            
+            for (const url of testUrls) {
+                const div = document.createElement('div');
+                div.style.marginBottom = '10px';
+                div.style.padding = '10px';
+                div.style.border = '1px solid #ddd';
+                
+                const title = document.createElement('h4');
+                title.textContent = url;
+                div.appendChild(title);
+                
+                const img = document.createElement('img');
+                img.style.maxWidth = '100px';
+                img.style.maxHeight = '100px';
+                img.style.border = '1px solid red';
+                
+                img.onload = () => {
+                    const status = document.createElement('span');
+                    status.textContent = ' ✅ LOADED';
+                    status.style.color = 'green';
+                    div.appendChild(status);
+                };
+                
+                img.onerror = () => {
+                    const status = document.createElement('span');
+                    status.textContent = ' ❌ FAILED';
+                    status.style.color = 'red';
+                    div.appendChild(status);
+                };
+                
+                img.src = url;
+                div.appendChild(img);
+                container.appendChild(div);
+            }
+        }
+        
+        // Step 2: Check card status
+        function checkCardStatus() {
+            const statusDiv = document.getElementById('card-status');
+            const logoImg = document.getElementById('logo-image');
+            const profileImg = document.getElementById('profile-image');
+            
+            statusDiv.innerHTML = '<h3>Card Image Status:</h3>';
+            
+            // Check logo
+            const logoStatus = document.createElement('div');
+            logoStatus.innerHTML = `<strong>Logo:</strong> ${logoImg ? 'Element found' : 'Element not found'}`;
+            if (logoImg) {
+                logoStatus.innerHTML += `<br>Natural size: ${logoImg.naturalWidth}x${logoImg.naturalHeight}`;
+                logoStatus.innerHTML += `<br>Complete: ${logoImg.complete}`;
+            }
+            statusDiv.appendChild(logoStatus);
+            
+            // Check profile picture
+            const profileStatus = document.createElement('div');
+            profileStatus.innerHTML = `<strong>Profile Picture:</strong> ${profileImg ? 'Element found' : 'Element not found'}`;
+            if (profileImg) {
+                profileStatus.innerHTML += `<br>Natural size: ${profileImg.naturalWidth}x${profileImg.naturalHeight}`;
+                profileStatus.innerHTML += `<br>Complete: ${profileImg.complete}`;
+            }
+            statusDiv.appendChild(profileStatus);
+        }
+        
+        // Step 3: Test html2canvas capture
+        async function testCapture() {
+            const resultDiv = document.getElementById('capture-result');
+            const canvas = document.getElementById('capture-canvas');
+            const cardElement = document.getElementById('membership-card-element');
+            
+            resultDiv.innerHTML = '<h3>Capture Status:</h3>';
+            
+            try {
+                console.log('Starting capture...');
+                
+                const capturedCanvas = await html2canvas(cardElement, {
+                    scale: 2,
+                    backgroundColor: null,
+                    logging: true,
+                    useCORS: true,
+                    allowTaint: true
+                });
+                
+                console.log('Capture successful!');
+                
+                // Display the captured canvas
+                canvas.width = capturedCanvas.width;
+                canvas.height = capturedCanvas.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(capturedCanvas, 0, 0);
+                
+                resultDiv.innerHTML += '<p style="color: green;">✅ Capture successful!</p>';
+                resultDiv.innerHTML += `<p>Canvas size: ${capturedCanvas.width}x${capturedCanvas.height}</p>`;
+                
+                // Test PDF generation
+                const pdf = new jspdf.jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [336, 212]
+                });
+                
+                pdf.addImage(capturedCanvas.toDataURL('image/png', 1.0), 'PNG', 0, 0, 336, 212);
+                pdf.save('test-membership-card.pdf');
+                
+                resultDiv.innerHTML += '<p style="color: green;">✅ PDF generated and downloaded!</p>';
+                
+            } catch (error) {
+                console.error('Capture failed:', error);
+                resultDiv.innerHTML += `<p style="color: red;">❌ Capture failed: ${error.message}</p>`;
+            }
+        }
+        
+        // Initialize
+        checkImages();
+        setTimeout(checkCardStatus, 1000); // Wait for images to load
+    </script>
+</body>
+</html>

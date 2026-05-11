@@ -1,0 +1,35 @@
+[33mcommit a206dee25bb59b6016b850a613d4673918719191[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: hanscotz <hanscotz@gmail.com>
+Date:   Sun Dec 28 13:43:56 2025 +0300
+
+    28/12/2025
+
+A	app/admin/layout.tsx
+A	app/admin/page.old.tsx
+M	app/admin/page.tsx
+A	app/admin/page.tsx.backup
+A	app/admin/page.tsx.bak
+A	app/admin/page.tsx.new
+A	app/api/admin/deleted-users/route.ts
+M	app/api/admin/users/[id]/approve/route.ts
+A	app/api/admin/users/[id]/route.ts
+A	app/api/admin/users/restore/route.ts
+M	app/api/auth/profile/route.ts
+M	app/api/auth/register/route.ts
+A	app/api/membership/next-number/route.ts
+A	app/api/reports/generate/route.ts
+A	app/api/reports/send-email/route.ts
+A	app/api/send-approval-email/route.ts
+M	app/auth/layout.tsx
+M	app/auth/login/page.tsx
+A	app/auth/pending-approval/page.tsx
+M	app/auth/register/page.tsx
+M	app/dashboard/complete-profile/page.tsx
+A	components/admin/UserRegistrationForm.tsx
+M	contexts/AuthContext.tsx
+A	lib/membership.ts
+M	middleware.ts
+A	migrations/0004_add_profile_fields.sql
+A	migrations/0005_create_report_tables.sql
+M	package.json
+M	pnpm-lock.yaml

@@ -1,0 +1,129 @@
+/* Print styles for membership card */
+@media print {
+  /* Hide everything except the card */
+  body * {
+    visibility: hidden;
+  }
+  
+  .membership-card-container,
+  .membership-card-container * {
+    visibility: visible;
+  }
+  
+  .membership-card-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: white;
+  }
+  
+  /* Ensure card maintains exact colors when printed */
+  .card-gradient {
+    background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #166534 100%) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-text-white {
+    color: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-text-green-100 {
+    color: #bbf7d0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-logo-bg {
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-profile-bg {
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-profile-fallback {
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-strip {
+    background: linear-gradient(90deg, #14532d 0%, #052e16 100%) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-shadow {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-pattern {
+    opacity: 0.2 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-border {
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  .card-signature-line {
+    border-top: 2px solid rgba(255, 255, 255, 0.4) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  /* Hide buttons and actions when printing */
+  .card-actions,
+  .card-actions * {
+    display: none !important;
+  }
+  
+  /* Ensure proper page setup */
+  @page {
+    size: auto;
+    margin: 0;
+  }
+  
+  @page :left {
+    margin: 0;
+  }
+  
+  @page :right {
+    margin: 0;
+  }
+  
+  /* High quality printing */
+  .membership-card {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+  }
+}

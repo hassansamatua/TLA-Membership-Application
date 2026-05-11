@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logo Debug</title>
+</head>
+<body>
+    <h1>Logo Debug Test</h1>
+    
+    <h2>Original Logo (Large):</h2>
+    <img src="/tutorial2/logo.png" alt="Original Logo" style="width: 200px; height: 200px; border: 2px solid red;">
+    
+    <h2>Logo in Circle (CSS):</h2>
+    <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 2px solid blue; display: inline-block;">
+        <img src="/tutorial2/logo.png" alt="Circular Logo" style="width: 100px; height: 100px; object-fit: cover;">
+    </div>
+    
+    <h2>Canvas Test:</h2>
+    <canvas id="testCanvas" width="200" height="200" style="border: 2px solid green;"></canvas>
+    
+    <script>
+        // Test canvas drawing
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Draw circle
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(100, 100, 80, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Create clipping
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(100, 100, 80, 0, Math.PI * 2);
+        ctx.clip();
+        
+        // Draw logo
+        const logoImg = new Image();
+        logoImg.onload = function() {
+            console.log('Logo loaded for canvas test');
+            console.log('Dimensions:', logoImg.naturalWidth, 'x', logoImg.naturalHeight);
+            ctx.drawImage(logoImg, 20, 20, 160, 160);
+            ctx.restore();
+        };
+        
+        logoImg.onerror = function() {
+            console.error('Logo failed to load for canvas test');
+            ctx.fillStyle = 'red';
+            ctx.font = '20px Arial';
+            ctx.fillText('FAILED', 50, 100);
+            ctx.restore();
+        };
+        
+        logoImg.src = '/tutorial2/logo.png';
+    </script>
+</body>
+</html>
