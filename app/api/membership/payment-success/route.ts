@@ -13,26 +13,42 @@ async function getAuthToken(request: Request): Promise<string | null> {
 }
 
 export async function POST(request: Request) {
+  console.log('=== PAYMENT SUCCESS API START ===');
+  console.log('Payment success API called');
+
   let connection;
   try {
     const token = await getAuthToken(request);
+    console.log('Token found:', !!token);
+    
     if (!token) {
+      console.log('No token found, returning 401');
       return NextResponse.json({ success: false, message: 'Authentication required' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
+    console.log('Token decoded:', decoded);
+    
     if (!decoded?.id) {
+      console.log('Invalid token, returning 401');
       return NextResponse.json({ success: false, message: 'Invalid or expired token' }, { status: 401 });
     }
+
+    console.log('User ID from token:', decoded.id);
 
     const body = await request.json();
     const { paymentReference } = body;
 
+    console.log('Payment reference from body:', paymentReference);
+
     if (!paymentReference) {
+      console.log('No payment reference found, returning 400');
       return NextResponse.json({ success: false, message: 'Payment reference is required' }, { status: 400 });
     }
 
+    console.log('Getting database connection...');
     connection = await pool.getConnection();
+    console.log('Database connection established');
     
     // Test database connection
     try {
