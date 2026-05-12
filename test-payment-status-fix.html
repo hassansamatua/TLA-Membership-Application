@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Status Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .logs { background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+        .status-check { background: #e3f2fd; border: 1px solid #2196f3; padding: 10px; margin: 5px 0; }
+        .status-good { background: #e8f5e8; border: 1px solid #4caf50; }
+        .status-bad { background: #ffebee; border: 1px solid #f44336; }
+    </style>
+</head>
+<body>
+    <h1>Payment Status Fix Test</h1>
+    <p>This page tests the payment status fix to ensure users can access their membership cards when payment status is 'paid' or 'completed'.</p>
+    
+    <div class="test-section">
+        <h2>Step 1: Check Membership Status API</h2>
+        <button onclick="checkMembershipStatus()">Check Membership Status</button>
+        <div id="status-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Check Card Access Logic</h2>
+        <button onclick="checkCardAccess()">Check Card Access Logic</button>
+        <div id="card-access-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: Test Membership Card Page</h2>
+        <button onclick="testMembershipCard()">Test Membership Card Page</button>
+        <div id="membership-card-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 4: Verify Payment Status Consistency</h2>
+        <button onclick="verifyStatusConsistency()">Verify Status Consistency</button>
+        <div id="consistency-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 5: Test Payment Flow</h2>
+        <button onclick="testPaymentFlow()">Test Complete Payment Flow</button>
+        <div id="payment-flow-result" class="result"></div>
+    </div>
+    
+    <div class="logs" id="logs-container">
+        <h3>Test Logs</h3>
+        <div id="test-logs">Click any test to start logging</div>
+    </div>
+
+    <script>
+        let testResults = {};
+        
+        function addLog(message) {
+            const logsContainer = document.getElementById('logs-container');
+            const testLogs = document.getElementById('test-logs');
+            if (testLogs) {
+                const logEntry = document.createElement('div');
+                logEntry.innerHTML = `<div class="log-entry">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+                testLogs.appendChild(logEntry);
+                testLogs.scrollTop = testLogs.scrollHeight;
+            }
+        }
+        
+        async function checkMembershipStatus() {
+            const resultDiv = document.getElementById('status-result');
+            resultDiv.innerHTML = 'Checking membership status...';
+            resultDiv.className = 'result';
+            
+            addLog('🔍 Checking membership status API...');
+            
+            try {
+                const response = await fetch('/api/membership/status');
+                const data = await response.json();
+                
+                addLog(`✅ API Response Status: ${response.status}`);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="status-check">
+                            <h4>✅ Membership Status Retrieved</h4>
+                            <p><strong>Success:</strong> ${data.success}</p>
+                            <p><strong>Membership Status:</strong> ${data.membership?.status || 'N/A'}</p>
+                            <p><strong>Payment Status:</strong> ${data.membership?.paymentStatus || 'N/A'}</p>
+                            <p><strong>Can Access ID Card:</strong> ${data.canAccessIdCard ? '✅ Yes' : '❌ No'}</p>
+                            <p><strong>Membership Number:</strong> ${data.membership?.membershipNumber || 'N/A'}</p>
+                            <p><strong>Membership Type:</strong> ${data.membership?.membershipType || 'N/A'}</p>
+                            <p><strong>Expiry Date:</strong> ${data.membership?.expiryDate || 'N/A'}</p>
+                        </div>
+                    `;
+                    resultDiv.className = 'result success';
+                    
+                    testResults.membershipStatus = data;
+                    addLog(`✅ Payment Status: ${data.membership?.paymentStatus}`);
+                    addLog(`✅ Can Access Card: ${data.canAccessIdCard}`);
+                    
+                    // Check if payment status is 'completed'
+                    if (data.membership?.paymentStatus === 'completed') {
+                        addLog('✅ Payment status is correctly set to "completed"');
+                    } else if (data.membership?.paymentStatus === 'paid') {
+                        addLog('⚠️ Payment status is still "paid" - API fix may not be working');
+                    } else {
+                        addLog(`❌ Unexpected payment status: ${data.membership?.paymentStatus}`);
+                    }
+                    
+                } else {
+                    resultDiv.innerHTML = `❌ Error (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                    addLog(`❌ API Error: ${response.status}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+                addLog(`❌ Network Error: ${error.message}`);
+            }
+        }
+        
+        async function checkCardAccess() {
+            const resultDiv = document.getElementById('card-access-result');
+            resultDiv.innerHTML = 'Checking card access logic...';
+            resultDiv.className = 'result';
+            
+            addLog('🔍 Checking card access logic...');
+            
+            try {
+                const response = await fetch('/api/membership/status');
+                const data = await response.json();
+                
+                if (response.ok && data.membership) {
+                    const { status, paymentStatus } = data.membership;
+                    const canAccessIdCard = data.canAccessIdCard;
+                    
+                    // Simulate the card access logic from the membership card page
+                    const simulatedAccess = (paymentStatus === 'completed' || paymentStatus === 'paid') && status === 'active';
+                    
+                    resultDiv.innerHTML = `
+                        <div class="status-check ${canAccessIdCard ? 'status-good' : 'status-bad'}">
+                            <h4>Card Access Logic Check</h4>
+                            <p><strong>Membership Status:</strong> ${status}</p>
+                            <p><strong>Payment Status:</strong> ${paymentStatus}</p>
+                            <p><strong>API Can Access Card:</strong> ${canAccessIdCard ? '✅ Yes' : '❌ No'}</p>
+                            <p><strong>Simulated Logic:</strong> ${simulatedAccess ? '✅ Yes' : '❌ No'}</p>
+                            <p><strong>Logic Match:</strong> ${canAccessIdCard === simulatedAccess ? '✅ Consistent' : '❌ Inconsistent'}</p>
+                            <hr>
+                            <p><strong>Card Access Formula:</strong></p>
+                            <p><code>(paymentStatus === 'completed' || paymentStatus === 'paid') && status === 'active'</code></p>
+                            <p><strong>Evaluation:</strong> (${paymentStatus === 'completed' || paymentStatus === 'paid'} && ${status === 'active'}) = ${simulatedAccess}</p>
+                        </div>
+                    `;
+                    
+                    if (canAccessIdCard) {
+                        resultDiv.className = 'result success';
+                        addLog('✅ Card access logic is working correctly');
+                    } else {
+                        resultDiv.className = 'result warning';
+                        addLog('⚠️ Card access is denied - check payment status');
+                    }
+                    
+                    testResults.cardAccess = { canAccessIdCard, simulatedAccess, status, paymentStatus };
+                } else {
+                    resultDiv.innerHTML = '❌ No membership data available';
+                    resultDiv.className = 'result error';
+                    addLog('❌ No membership data available');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+                addLog(`❌ Error: ${error.message}`);
+            }
+        }
+        
+        async function testMembershipCard() {
+            const resultDiv = document.getElementById('membership-card-result');
+            resultDiv.innerHTML = 'Testing membership card page...';
+            resultDiv.className = 'result';
+            
+            addLog('🔍 Testing membership card page...');
+            
+            // Check if user can access the membership card page
+            try {
+                const response = await fetch('/dashboard/membership-card');
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="status-check status-good">
+                            <h4>✅ Membership Card Page Accessible</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Page:</strong> /dashboard/membership-card</p>
+                            <p><strong>Expected:</strong> User should be able to see their membership card</p>
+                            <button onclick="window.open('/dashboard/membership-card', '_blank')" style="margin-top: 10px;">Open Membership Card</button>
+                        </div>
+                    `;
+                    resultDiv.className = 'result success';
+                    addLog('✅ Membership card page is accessible');
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status-check status-bad">
+                            <h4>❌ Membership Card Page Not Accessible</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Issue:</strong> User cannot access membership card page</p>
+                            <p><strong>Expected:</strong> User should be able to see their membership card</p>
+                        </div>
+                    `;
+                    resultDiv.className = 'result error';
+                    addLog('❌ Membership card page is not accessible');
+                }
+                
+                testResults.membershipCard = { accessible: response.ok };
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+                addLog(`❌ Error: ${error.message}`);
+            }
+        }
+        
+        async function verifyStatusConsistency() {
+            const resultDiv = document.getElementById('consistency-result');
+            resultDiv.innerHTML = 'Verifying status consistency...';
+            resultDiv.className = 'result';
+            
+            addLog('🔍 Verifying status consistency across APIs...');
+            
+            try {
+                // Check membership status API
+                const membershipResponse = await fetch('/api/membership/status');
+                const membershipData = await membershipResponse.json();
+                
+                // Check if all APIs are consistent
+                const issues = [];
+                
+                if (membershipData.membership) {
+                    const { status, paymentStatus } = membershipData.membership;
+                    
+                    // Check if payment status is 'completed' (should be after fix)
+                    if (paymentStatus !== 'completed' && paymentStatus !== 'paid') {
+                        issues.push(`Payment status is "${paymentStatus}" instead of "completed" or "paid"`);
+                    }
+                    
+                    // Check if canAccessIdCard is correct
+                    const expectedAccess = (paymentStatus === 'completed' || paymentStatus === 'paid') && status === 'active';
+                    if (membershipData.canAccessIdCard !== expectedAccess) {
+                        issues.push(`canAccessIdCard is ${membershipData.canAccessIdCard} but should be ${expectedAccess}`);
+                    }
+                    
+                    // Check if status is 'active' when payment is completed
+                    if ((paymentStatus === 'completed' || paymentStatus === 'paid') && status !== 'active') {
+                        issues.push(`Status is "${status}" but should be "active" when payment is completed`);
+                    }
+                }
+                
+                if (issues.length === 0) {
+                    resultDiv.innerHTML = `
+                        <div class="status-check status-good">
+                            <h4>✅ Status Consistency Verified</h4>
+                            <p><strong>Payment Status:</strong> ${membershipData.membership?.paymentStatus}</p>
+                            <p><strong>Membership Status:</strong> ${membershipData.membership?.status}</p>
+                            <p><strong>Can Access Card:</strong> ${membershipData.canAccessIdCard ? 'Yes' : 'No'}</p>
+                            <p><strong>All APIs are consistent!</strong></p>
+                        </div>
+                    `;
+                    resultDiv.className = 'result success';
+                    addLog('✅ Status consistency verified - all APIs are consistent');
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status-check status-bad">
+                            <h4>❌ Status Consistency Issues Found</h4>
+                            <ul>
+                                ${issues.map(issue => `<li>${issue}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    resultDiv.className = 'result error';
+                    addLog('❌ Status consistency issues found');
+                    issues.forEach(issue => addLog(`❌ ${issue}`));
+                }
+                
+                testResults.consistency = { issues: issues.length === 0, issues };
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+                addLog(`❌ Error: ${error.message}`);
+            }
+        }
+        
+        async function testPaymentFlow() {
+            const resultDiv = document.getElementById('payment-flow-result');
+            resultDiv.innerHTML = 'Testing complete payment flow...';
+            resultDiv.className = 'result';
+            
+            addLog('🔍 Testing complete payment flow...');
+            
+            try {
+                // Step 1: Check current membership status
+                const statusResponse = await fetch('/api/membership/status');
+                const statusData = await statusResponse.json();
+                
+                // Step 2: Check if user can access card
+                const canAccessCard = statusData.canAccessIdCard;
+                
+                // Step 3: Test card page access
+                const cardResponse = await fetch('/dashboard/membership-card');
+                
+                // Step 4: Check payment page status
+                const paymentResponse = await fetch('/dashboard/payment');
+                
+                const flowResults = {
+                    membershipStatus: statusData.membership?.status,
+                    paymentStatus: statusData.membership?.paymentStatus,
+                    canAccessCard: canAccessCard,
+                    cardPageAccessible: cardResponse.ok,
+                    paymentPageAccessible: paymentResponse.ok
+                };
+                
+                const allWorking = canAccessCard && cardResponse.ok && paymentResponse.ok;
+                
+                resultDiv.innerHTML = `
+                    <div class="status-check ${allWorking ? 'status-good' : 'status-bad'}">
+                        <h4>${allWorking ? '✅' : '❌'} Payment Flow Test Results</h4>
+                        <p><strong>Membership Status:</strong> ${flowResults.membershipStatus}</p>
+                        <p><strong>Payment Status:</strong> ${flowResults.paymentStatus}</p>
+                        <p><strong>Can Access Card:</strong> ${flowResults.canAccessCard ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Card Page Accessible:</strong> ${flowResults.cardPageAccessible ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Payment Page Accessible:</strong> ${flowResults.paymentPageAccessible ? '✅ Yes' : '❌ No'}</p>
+                        <hr>
+                        <p><strong>Overall Status:</strong> ${allWorking ? '✅ All systems working' : '❌ Issues found'}</p>
+                        ${allWorking ? 
+                            '<button onclick="window.open(\'/dashboard/membership-card\', \'_blank\')" style="margin-top: 10px;">View Membership Card</button>' : 
+                            '<p style="color: red;">Some systems are not working correctly. Please check the individual tests above.</p>'
+                        }
+                    </div>
+                `;
+                
+                resultDiv.className = allWorking ? 'result success' : 'result error';
+                addLog(allWorking ? '✅ Complete payment flow is working' : '❌ Payment flow has issues');
+                
+                testResults.paymentFlow = flowResults;
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+                addLog(`❌ Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -18,13 +18,13 @@ export function calculateMembershipPricing(
   isNewUser: boolean,
   currentYear: number = new Date().getFullYear()
 ): MembershipPricing {
-  // Base pricing - NEW USER: 40,000 | CONTINUING: 30,000
+  // Enhanced pricing based on user categories
   const basePrices = {
     personal: {
       new: 40000,      // New members pay 40,000 TZS for their first payment
       continuing: 30000 // Renewal/continuing members pay 30,000 TZS
     },
-    organization: 150000
+    organization: 50000 // Updated from 150,000 to 50,000 TZS
   };
 
   // Force new user pricing if it's their first payment
@@ -42,12 +42,15 @@ export function calculateMembershipPricing(
   const today = new Date();
   const isLate = today > gracePeriodEnd;
 
-  // Calculate penalty (10,000 TZS per year after March)
+  // Calculate penalty (1,000 TZS per month after April 1, for continuing users only)
   let penaltyAmount = 0;
   if (isLate && !effectiveIsNewUser) {
     // Only apply penalty to continuing members who are late
-    const yearsLate = Math.max(0, currentYear - today.getFullYear() + (today.getMonth() >= 1 ? 0 : 1));
-    penaltyAmount = Math.min(yearsLate * 10000, 50000); // Cap penalty at 50,000
+    const penaltyStartDate = new Date(currentYear, 3, 1); // April 1st
+    if (today >= penaltyStartDate) {
+      const monthsLate = Math.max(0, Math.floor((today.getTime() - penaltyStartDate.getTime()) / (1000 * 60 * 60 * 24 * 30)));
+      penaltyAmount = monthsLate * 1000; // 1,000 TZS per month
+    }
   }
 
   const totalDue = baseAmount + penaltyAmount;

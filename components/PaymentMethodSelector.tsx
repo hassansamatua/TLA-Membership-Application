@@ -9,6 +9,10 @@ interface PaymentMethod {
   name: string;
   displayName: string;
   description: string;
+  image: string;
+  color: string;
+  bgColor: string;
+  alt: string;
 }
 
 const paymentMethods: PaymentMethod[] = [
@@ -16,37 +20,61 @@ const paymentMethods: PaymentMethod[] = [
     id: 'azampesa',
     name: 'azampesa',
     displayName: 'AzamPesa',
-    description: 'Pay using AzamPesa mobile money'
+    description: 'Pay using AzamPesa mobile money',
+    image: '/azampesa.jpg',
+    color: '#0052CC',
+    bgColor: '#E8F2FF',
+    alt: 'AzamPesa Logo'
   },
   {
     id: 'mpesa',
     name: 'mpesa',
     displayName: 'M-Pesa',
-    description: 'Pay using M-Pesa mobile money'
+    description: 'Pay using M-Pesa mobile money',
+    image: '/mpesa.jpg',
+    color: '#35B039',
+    bgColor: '#E8F5E8',
+    alt: 'M-Pesa Logo'
   },
   {
     id: 'halopesa',
     name: 'halopesa',
     displayName: 'HaloPesa',
-    description: 'Pay using HaloPesa mobile money'
+    description: 'Pay using HaloPesa mobile money',
+    image: '/halopesa.png',
+    color: '#8B3A9C',
+    bgColor: '#F5EBF7',
+    alt: 'HaloPesa Logo'
   },
   {
     id: 'airtelmoney',
     name: 'airtelmoney',
     displayName: 'Airtel Money',
-    description: 'Pay using Airtel Money mobile money'
+    description: 'Pay using Airtel Money mobile money',
+    image: '/airtelmoney.jpg',
+    color: '#ED1C24',
+    bgColor: '#FFEBEE',
+    alt: 'Airtel Money Logo'
   },
   {
-    id: 'tigopesa',
-    name: 'tigopesa',
-    displayName: 'Tigo Pesa',
-    description: 'Pay using Tigo Pesa mobile money'
+    id: 'mixxbyyas',
+    name: 'mixxbyyas',
+    displayName: 'Mixx By Yas',
+    description: 'Pay using Mixx By Yas',
+    image: '/mixxbyyas.png',
+    color: '#00A6CE',
+    bgColor: '#E8F7FA',
+    alt: 'Mixx By Yas Logo'
   },
   {
     id: 'bankcard',
     name: 'bankcard',
     displayName: 'Bank Card',
-    description: 'Pay using Visa, Mastercard, or other bank cards'
+    description: 'Pay using Visa, Mastercard, or other bank cards',
+    image: '/bankcard.svg',
+    color: '#6B7280',
+    bgColor: '#F3F4F6',
+    alt: 'Bank Card Logo'
   }
 ];
 
@@ -88,18 +116,20 @@ export default function PaymentMethodSelector({ selectedMethod, onMethodSelect, 
               )}
 
               <div className="flex flex-col items-center space-y-3">
-                {/* Logo */}
-                <div className={`relative transition-transform ${selectedMethod === method.id ? 'scale-110' : ''}`}>
-                  <img
-                    src={logo.image}
-                    alt={logo.alt}
-                    className="w-16 h-10 object-contain"
-                  />
-                </div>
+                {/* Logo with safety check */}
+                {logo && (
+                  <div className={`relative transition-transform ${selectedMethod === method.id ? 'scale-110' : ''}`}>
+                    <img
+                      src={logo.image}
+                      alt={logo.alt}
+                      className="w-16 h-10 object-contain"
+                    />
+                  </div>
+                )}
 
                 {/* Provider name */}
                 <div className="text-center">
-                  <h4 className="font-semibold" style={{ color: logo.color }}>
+                  <h4 className="font-semibold" style={{ color: logo?.color }}>
                     {method.displayName}
                   </h4>
                   <p className="text-xs text-gray-600 mt-1">
@@ -108,7 +138,7 @@ export default function PaymentMethodSelector({ selectedMethod, onMethodSelect, 
                 </div>
 
                 {/* Hover effect background */}
-                {hoveredMethod === method.id && selectedMethod !== method.id && (
+                {logo && hoveredMethod === method.id && selectedMethod !== method.id && (
                   <div 
                     className="absolute inset-0 opacity-10 rounded-lg pointer-events-none" 
                     style={{ backgroundColor: logo.bgColor }}

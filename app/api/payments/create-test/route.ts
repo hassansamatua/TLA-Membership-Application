@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       const [result] = await connection.query(
         `INSERT INTO payments 
          (reference, amount, currency, status, payment_method, user_id, membership_type, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           testPayment.reference,
           testPayment.amount,
@@ -105,11 +105,20 @@ export async function POST(request: Request) {
       );
       
       console.log('Test payment created successfully:', result);
+      console.log('Inserted payment ID:', (result as any).insertId);
+      console.log('Inserted payment ID:', (result as any).insertId);
+
+      // Commit the transaction
+      await connection.commit();
+      console.log('Transaction committed successfully');
 
       return NextResponse.json({
         success: true,
         message: 'Test payment created successfully',
-        data: { reference }
+        data: { 
+          reference,
+          paymentId: (result as any).insertId
+        }
       });
     } finally {
       connection.release();

@@ -13,7 +13,7 @@ const paymentMethods = [
   { id: 'mpesa', displayName: 'M-Pesa' },
   { id: 'halopesa', displayName: 'HaloPesa' },
   { id: 'airtelmoney', displayName: 'Airtel Money' },
-  { id: 'tigopesa', displayName: 'Tigo Pesa' },
+  { id: 'mixxbyyas', displayName: 'Mixx By Yas' },
   { id: 'bankcard', displayName: 'Bank Card' }
 ];
 

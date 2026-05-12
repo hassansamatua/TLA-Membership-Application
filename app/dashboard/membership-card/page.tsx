@@ -157,7 +157,7 @@ export default function MembershipCardPage() {
       // Draw TLA logo image
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
-      logoImg.src = '/logo (3).png';
+      logoImg.src = '/logo.png';
       
       // Draw profile picture
       const profileImg = new Image();
@@ -173,76 +173,66 @@ export default function MembershipCardPage() {
       
       // Define completeCardDrawing function first
       const completeCardDrawing = () => {
-        // Draw organization name
+        // Draw organization name matching displayed SVG exactly
         ctx.fillStyle = 'white';
         ctx.font = `bold ${Math.round(12 * (canvasWidth / 336))}px Arial, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText('TANZANIA LIBRARY AND', canvasWidth / 2, canvasHeight * 0.15);
-        ctx.fillText('INFORMATION ASSOCIATION', canvasWidth / 2, canvasHeight * 0.23);
+        ctx.fillText('TANZANIA LIBRARY AND', 190 * (canvasWidth / 336), 30 * (canvasHeight / 212));
+        ctx.fillText('INFORMATION ASSOCIATION', 190 * (canvasWidth / 336), 50 * (canvasHeight / 212));
         
         ctx.fillStyle = '#10b981';
         ctx.font = `bold ${Math.round(10 * (canvasWidth / 336))}px Arial, sans-serif`;
-        ctx.fillText('(TLA)', canvasWidth / 2, canvasHeight * 0.29);
+        ctx.fillText('(TLA)', 175 * (canvasWidth / 336), 70 * (canvasHeight / 212));
         
-        // Draw member name section
+        // Draw member name section matching displayed SVG exactly
         ctx.fillStyle = '#10b981';
         ctx.font = `bold ${Math.round(8 * (canvasWidth / 336))}px Arial, sans-serif`;
         ctx.textAlign = 'left';
-        ctx.fillText('MEMBER NAME', canvasWidth * 0.05, canvasHeight * 0.35);
+        ctx.fillText('MEMBER NAME', 20 * (canvasWidth / 336), 95 * (canvasHeight / 212));
         
         ctx.fillStyle = 'white';
         ctx.font = `bold ${Math.round(13 * (canvasWidth / 336))}px Arial, sans-serif`;
-        ctx.fillText((user?.name || 'Member Name').toUpperCase(), canvasWidth * 0.05, canvasHeight * 0.43);
+        ctx.fillText((user?.name || 'Member Name').substring(0, 20), 20 * (canvasWidth / 336), 115 * (canvasHeight / 212));
         
-        // Draw membership number
+        // Draw membership number matching displayed SVG exactly
         ctx.fillStyle = '#10b981';
         ctx.font = `bold ${Math.round(8 * (canvasWidth / 336))}px Arial, sans-serif`;
-        ctx.fillText('MEMBERSHIP No', canvasWidth * 0.05, canvasHeight * 0.52); // Moved up more
+        ctx.fillText('MEMBERSHIP No', 20 * (canvasWidth / 336), 130 * (canvasHeight / 212));
         
         ctx.fillStyle = 'white';
         ctx.font = `bold ${Math.round(14 * (canvasWidth / 336))}px monospace`;
         const membershipNumber = membershipStatus?.membership?.membershipNumber || 'N/A';
-        const spacedNumber = membershipNumber.substring(0, 16).split('').join(' ');
-        ctx.fillText(spacedNumber, canvasWidth * 0.05, canvasHeight * 0.60); // Moved up more
+        ctx.fillText(membershipNumber.substring(0, 16), 20 * (canvasWidth / 336), 150 * (canvasHeight / 212));
         
-        // Draw membership type
-        const typeY = canvasHeight * 0.72; // Moved up
+        // Draw membership type and phone matching displayed SVG exactly
         ctx.fillStyle = '#10b981';
         ctx.font = `bold ${Math.round(7 * (canvasWidth / 336))}px Arial, sans-serif`;
-        ctx.fillText('TYPE', canvasWidth * 0.05, typeY - canvasHeight * 0.06); // Increased gap
+        ctx.fillText('TYPE', 20 * (canvasWidth / 336), 170 * (canvasHeight / 212));
         
         ctx.fillStyle = 'white';
         ctx.font = `bold ${Math.round(11 * (canvasWidth / 336))}px Arial, sans-serif`;
-        ctx.fillText(membershipStatus?.membership?.membershipType?.toUpperCase() || 'PERSONAL', canvasWidth * 0.05, typeY);
+        ctx.fillText((membershipStatus?.membership?.membershipType || 'Personal').toUpperCase(), 20 * (canvasWidth / 336), 185 * (canvasHeight / 212));
         
         // Draw phone number if available
-        const phoneY = typeY + canvasHeight * 0.13; // Moved up (reduced gap)
-        ctx.fillStyle = '#10b981';
-        ctx.font = `bold ${Math.round(7 * (canvasWidth / 336))}px Arial, sans-serif`;
-        ctx.fillText('PHONE', canvasWidth * 0.05, phoneY - canvasHeight * 0.06); // Increased gap
+        if (user?.profile?.contactInfo?.phone) {
+          ctx.fillStyle = '#10b981';
+          ctx.font = `bold ${Math.round(7 * (canvasWidth / 336))}px Arial, sans-serif`;
+          ctx.textAlign = 'end';
+          ctx.fillText('PHONE', 201 * (canvasWidth / 336), 170 * (canvasHeight / 212));
+          
+          ctx.fillStyle = 'white';
+          ctx.font = `bold ${Math.round(9 * (canvasWidth / 336))}px Arial, sans-serif`;
+          ctx.fillText(user.profile.contactInfo.phone.substring(0, 25), 201 * (canvasWidth / 336), 185 * (canvasHeight / 212));
+        }
         
-        ctx.fillStyle = 'white';
-        ctx.font = `bold ${Math.round(11 * (canvasWidth / 336))}px Arial, sans-serif`;
+        // Draw bottom strip matching displayed SVG exactly
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+        ctx.fillRect(0, 192 * (canvasHeight / 212), canvasWidth, 20 * (canvasHeight / 212));
         
-        // Use the same path as the displayed card
-        const phone = user?.profile?.contactInfo?.phone || 'N/A';
-        console.log('Found phone:', phone);
-        ctx.fillText(phone, canvasWidth * 0.05, phoneY);
-        
-        // Draw card details strip
-        const stripGradient = ctx.createLinearGradient(0, canvasHeight * 0.9, 0, canvasHeight);
-        stripGradient.addColorStop(0, 'rgba(20, 83, 45, 0.4)'); // More transparent
-        stripGradient.addColorStop(1, 'rgba(5, 46, 22, 0.4)'); // More transparent
-        ctx.fillStyle = stripGradient;
-        ctx.globalAlpha = 0.4; // Reduced from 0.8 to 0.4
-        ctx.fillRect(0, canvasHeight * 0.9, canvasWidth, canvasHeight * 0.1);
-        ctx.globalAlpha = 1;
-        
-        // Draw strip text
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.font = `${Math.round(8 * (canvasWidth / 336))}px Arial, sans-serif`;
         ctx.textAlign = 'left';
-        ctx.fillText('Authorized Membership Card • Tanzania Library Association', canvasWidth * 0.05, canvasHeight * 0.97);
+        ctx.fillText('Authorized Membership Card • TLA', 16 * (canvasWidth / 336), 205 * (canvasHeight / 212));
         
         // Convert canvas to PDF and download
         console.log('💾 Converting canvas to PDF...');
@@ -320,27 +310,39 @@ export default function MembershipCardPage() {
         if (logoImg.complete) {
           ctx.save();
           ctx.globalAlpha = 0.9;
-          ctx.drawImage(logoImg, -5 * (canvasWidth / 336), -5 * (canvasHeight / 212), 100 * (canvasWidth / 336), 70 * (canvasHeight / 212));
+          // Match the displayed SVG exactly: x=9, y=5, width=60, height=60
+          ctx.drawImage(logoImg, 9 * (canvasWidth / 336), 5 * (canvasHeight / 212), 60 * (canvasWidth / 336), 60 * (canvasHeight / 212));
           ctx.restore();
         }
         
-        // Draw profile picture as large rectangle covering right side
+        // Draw profile picture matching the displayed SVG exactly
         if (profileImg.complete && user?.profile?.personalInfo?.profilePicture) {
           ctx.save();
-          // Create smaller rectangle covering right side of card
+          // Match the displayed SVG: x=233, y=67, width=90, height=90 with 8px radius
           ctx.beginPath();
-          ctx.roundRect(canvasWidth * 0.71, canvasHeight * 0.35, canvasWidth * 0.24, canvasHeight * 0.47, 8);
+          ctx.roundRect(233 * (canvasWidth / 336), 67 * (canvasHeight / 212), 90 * (canvasWidth / 336), 90 * (canvasHeight / 212), 8);
           ctx.clip();
-          ctx.drawImage(profileImg, canvasWidth * 0.71, canvasHeight * 0.35, canvasWidth * 0.24, canvasHeight * 0.47);
+          ctx.drawImage(profileImg, 233 * (canvasWidth / 336), 67 * (canvasHeight / 212), 90 * (canvasWidth / 336), 90 * (canvasHeight / 212));
           ctx.restore();
-          // No border - blends with card background
         } else {
-          // Draw profile initial directly on card background (no rectangle)
+          // Draw profile fallback matching displayed SVG
+          const fallbackX = 233 * (canvasWidth / 336);
+          const fallbackY = 67 * (canvasHeight / 212);
+          const fallbackWidth = 90 * (canvasWidth / 336);
+          const fallbackHeight = 90 * (canvasHeight / 212);
+          
+          // Draw green background
+          ctx.fillStyle = '#10b981';
+          ctx.beginPath();
+          ctx.roundRect(fallbackX, fallbackY, fallbackWidth, fallbackHeight, 8);
+          ctx.fill();
+          
+          // Draw initial
           ctx.fillStyle = 'white';
-          ctx.font = `bold ${Math.round(24 * (canvasWidth / 336))}px Arial, sans-serif`;
+          ctx.font = `bold ${Math.round(40 * (canvasWidth / 336))}px Arial, sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(user?.name?.charAt(0)?.toUpperCase() || 'M', canvasWidth * 0.83, canvasHeight * 0.59);
+          ctx.fillText(user?.name?.charAt(0)?.toUpperCase() || 'M', fallbackX + fallbackWidth/2, fallbackY + fallbackHeight/2);
         }
         
         // Continue with the rest of the card drawing...
@@ -391,7 +393,7 @@ export default function MembershipCardPage() {
     }
     setPrintInProgress(true);
     
-    // Create a print-specific version with SVG for better color preservation
+    // Create a print-specific version using the exact same SVG as displayed
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       alert('Please allow popups for printing');
@@ -399,17 +401,7 @@ export default function MembershipCardPage() {
       return;
     }
 
-    const phone = (() => {
-      const phone1 = (user?.profile as any)?.phone;
-      const contactInfo = (user?.profile as any)?.contact_info;
-      let phone2 = null;
-      try {
-        phone2 = JSON.parse(contactInfo || '{}')?.phone;
-      } catch (e) {
-        return '+255 XXX XXX XXX';
-      }
-      return phone1 || phone2 || '+255 XXX XXX XXX';
-    })();
+    const phone = user?.profile?.contactInfo?.phone || 'N/A';
 
     const printContent = `
       <!DOCTYPE html>
@@ -446,28 +438,24 @@ export default function MembershipCardPage() {
       </head>
       <body>
         <div class="card-container">
-          <svg width="336" height="212" xmlns="http://www.w3.org/2000/svg" style="border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3), 0 10px 15px -5px rgba(0, 0, 0, 0.2);">
-            <!-- Gradients and patterns -->
+          <svg width="336" height="212" xmlns="http://www.w3.org/2000/svg" style="border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3), 0 10px 15px -5px rgba(0, 0, 0, 0.2);">
+            <!-- Background with gradient - EXACT MATCH -->
             <defs>
-              <!-- Main gradient: Gray to dark gray -->
               <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" style="stop-color:#2d3e50;stop-opacity:1" />
                 <stop offset="50%" style="stop-color:#34495e;stop-opacity:1" />
                 <stop offset="100%" style="stop-color:#1a252f;stop-opacity:1" />
               </linearGradient>
               
-              <!-- Green accent gradient -->
               <linearGradient id="greenAccent" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
                 <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
               </linearGradient>
               
-              <!-- Diagonal stripe pattern -->
               <pattern id="diagonalPattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <line x1="0" y1="0" x2="0" y2="60" stroke="rgba(16, 185, 129, 0.08)" stroke-width="20"/>
               </pattern>
               
-              <!-- Semi-transparent overlay for depth -->
               <linearGradient id="overlay" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" style="stop-color:rgba(16, 185, 129, 0.1);stop-opacity:1" />
                 <stop offset="100%" style="stop-color:rgba(16, 185, 129, 0.05);stop-opacity:1" />
@@ -489,51 +477,71 @@ export default function MembershipCardPage() {
             <!-- Top header bar with green -->
             <rect width="336" height="50" fill="rgba(16, 185, 129, 0.2)" rx="16" ry="16"/>
             
-            <!-- TLA Logo and name header -->
-            <!-- Logo background - circular with white -->
-            <circle cx="36" cy="28" r="20" fill="white" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2"/>
-            <text x="36" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#059669" text-anchor="middle" dominant-baseline="middle">TLA</text>
+            <!-- Logo Image - EXACT MATCH -->
+            <image
+              href="/logo.png"
+              x="9"
+              y="5"
+              width="60"
+              height="60"
+              preserveAspectRatio="xMidYMid meet"
+            />
             
-            <!-- Organization name -->
-            <text x="168" y="32" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">TANZANIA LIBRARY AND</text>
-            <text x="168" y="48" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">INFORMATION ASSOCIATION</text>
-            <text x="168" y="62" font-family="Arial" font-size="10" fill="#10b981" text-anchor="middle" font-weight="600">(TLA)</text>
+            <!-- Organization name - EXACT MATCH -->
+            <text x="190" y="30" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">TANZANIA LIBRARY AND</text>
+            <text x="190" y="50" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">INFORMATION ASSOCIATION</text>
+            <text x="175" y="70" font-family="Arial" font-size="10" fill="#10b981" text-anchor="middle" font-weight="600">(TLA)</text>
             
-            <!-- Profile picture with proper fallback -->
+            <!-- Profile picture - EXACT MATCH -->
             <g>
-              <!-- Profile background circle -->
-              <circle cx="296" cy="32" r="20" fill="rgba(16, 185, 129, 0.1)" stroke="rgba(16, 185, 129, 0.4)" stroke-width="2"/>
-              <circle cx="296" cy="32" r="19" fill="url(#greenAccent)" stroke="white" stroke-width="1.5"/>
-              <!-- Profile initial or image placeholder -->
-              <text x="296" y="32" font-family="Arial" font-size="20" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${user?.name?.charAt(0)?.toUpperCase() || 'M'}</text>
+              <rect x="233" y="67" width="90" height="90" fill="none" rx="8" ry="8"/>
+              ${user?.profile?.personalInfo?.profilePicture ? `
+                <defs>
+                  <clipPath id="profileClip">
+                    <rect x="233" y="67" width="90" height="90" rx="8" ry="8"/>
+                  </clipPath>
+                </defs>
+                <image
+                  href="${user.profile.personalInfo.profilePicture.startsWith('/uploads/') ? user.profile.personalInfo.profilePicture : `/uploads/profile-pictures/${user.profile.personalInfo.profilePicture?.split('/').pop()}`}"
+                  x="233"
+                  y="67"
+                  width="90"
+                  height="90"
+                  clipPath="url(#profileClip)"
+                  preserveAspectRatio="xMidYMid slice"
+                />
+              ` : `
+                <rect x="233" y="67" width="90" height="90" fill="url(#greenAccent)" rx="8" ry="8"/>
+                <text x="278" y="112" font-family="Arial" font-size="40" font-weight="bold" fill="white" text-anchor="middle" dominantBaseline="middle">${user?.name?.charAt(0)?.toUpperCase() || 'M'}</text>
+              `}
             </g>
-            <!-- Member name section - aligned with TLA logo left edge (x=16) -->
-            <text x="16" y="75" font-family="Arial, sans-serif" font-size="8" fill="#10b981" font-weight="700" letter-spacing="1">MEMBER NAME</text>
-            <text x="16" y="92" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white">${user?.name?.substring(0, 20) || 'Member Name'}</text>
             
-            <!-- Membership number - aligned with TLA logo left edge (x=16) -->
-            <g>
-              <text x="16" y="120" font-family="Arial, sans-serif" font-size="8" fill="#10b981" font-weight="700" letter-spacing="0.5">MEMBERSHIP No</text>
-              <!-- Display membership number as spaced groups -->
-              <text x="16" y="138" font-family="monospace" font-size="14" font-weight="bold" fill="white" letter-spacing="2">${(user?.membershipNumber || membershipStatus?.membership?.membershipNumber || 'N/A').substring(0, 16).split('').join(' ')}</text>
-            </g>
+            <!-- Member name section - EXACT MATCH -->
+            <text x="20" y="95" font-family="Arial, sans-serif" font-size="8" fill="#10b981" font-weight="700" letter-spacing="1">MEMBER NAME</text>
+            <text x="20" y="115" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white">${user?.name?.substring(0, 20) || 'Member Name'}</text>
             
-            <!-- Bottom section with details -->
+            <!-- Membership number - EXACT MATCH -->
+            <text x="20" y="130" font-family="Arial, sans-serif" font-size="8" fill="#10b981" font-weight="700" letter-spacing="0.5">MEMBERSHIP No</text>
+            <text x="20" y="150" font-family="monospace" font-size="14" font-weight="bold" fill="white" letter-spacing="2">${(user?.membershipNumber || membershipStatus?.membership?.membershipNumber || 'N/A').substring(0, 16)}</text>
+            
+            <!-- Membership type and phone number - EXACT MATCH -->
             <g>
+              <text x="20" y="170" font-family="Arial, sans-serif" font-size="7" fill="#10b981" font-weight="700">TYPE</text>
+              <text x="20" y="185" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">
+                ${(membershipStatus?.membership?.membershipType || 'Personal').toUpperCase()}
+              </text>
               
-              <!-- Membership type -->
-              <text x="150" y="162" font-family="Arial, sans-serif" font-size="7" fill="#10b981" font-weight="700">TYPE</text>
-              <text x="150" y="174" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">${membershipStatus?.membership?.membershipType?.toUpperCase() || 'PERSONAL'}</text>
-              
+              ${phone !== 'N/A' ? `
+                <text x="165" y="170" font-family="Arial, sans-serif" font-size="7" fill="#10b981" font-weight="700">PHONE</text>
+                <text x="165" y="185" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="white">
+                  ${phone?.substring(0, 25) || 'N/A'}
+                </text>
+              ` : ''}
             </g>
             
-            <!-- Bottom accent bar with green -->
+            <!-- Bottom accent bar with green - EXACT MATCH -->
             <rect y="192" width="336" height="20" fill="rgba(16, 185, 129, 0.15)"/>
-            <text x="16" y="205" font-family="Arial, sans-serif" font-size="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • Tanzania Library Association</text>
-          </svg>
-          </svg>
-            <!-- Card strip -->
-            <rect x="0" y="192" width="336" height="20" fill="url(#stripGradient)"/>
+            <text x="16" y="205" font-family="Arial, sans-serif" font-size="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • TLA</text>
           </svg>
         </div>
         
@@ -845,11 +853,11 @@ export default function MembershipCardPage() {
                   
                   {/* Logo Image without background */}
                   <image
-                    href="/logo (3).png"
-                    x="-20"
-                    y="-20"
-                    width="130"
-                    height="130"
+                    href="/logo.png"
+                    x="9"
+                    y="5"
+                    width="60"
+                    height="60"
                     preserveAspectRatio="xMidYMid meet"
                   />
                   
@@ -976,10 +984,9 @@ export default function MembershipCardPage() {
                     <dt className="text-gray-600">Valid Until:</dt>
                     <dd className="font-medium">
                       {membershipStatus?.membership?.expiryDate ? 
-                        new Date(membershipStatus.membership.expiryDate).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
+                        new Date(membershipStatus.membership.expiryDate).toLocaleDateString('en-GB', { 
+                          day: 'numeric', 
+                          month: 'short' 
                         }) : 
                         'N/A'
                       }

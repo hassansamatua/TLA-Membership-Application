@@ -35,17 +35,17 @@ export default function PaymentSuccessPage() {
         checkPaymentStatus(referenceParam);
       }
     } else {
-      setStatus('failed');
+      setStatus('error');
       setMessage('No payment reference found');
     }
   }, [searchParams]);
 
-  const activateTestMembership = async (ref: string) => {
-    console.log('Starting test membership activation for reference:', ref);
+  const activateTestMembership = async (ref: string, retryCount: number = 0): Promise<void> => {
+    console.log(`Starting test membership activation for reference: ${ref} (attempt ${retryCount + 1})`);
     
     try {
-      // First, ensure the test payment exists
-      console.log('Creating test payment...');
+      // First, create a test payment record
+      console.log('Creating test payment record...');
       const createResponse = await fetch('/api/payments/create-test', {
         method: 'POST',
         headers: {
@@ -68,127 +68,60 @@ export default function PaymentSuccessPage() {
         return;
       }
 
-      // Test simple endpoint to isolate the issue
-      console.log('Testing simple endpoint...');
-      try {
-        const simpleResponse = await fetch('/api/test-simple', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ test: true }),
-          credentials: 'include',
-        });
-        
-        console.log('Simple response status:', simpleResponse.status);
-        console.log('Simple response ok:', simpleResponse.ok);
-        
-        const simpleData = await simpleResponse.json().catch(async (e) => {
-          console.error('Simple JSON parse failed:', e);
-          const text = await simpleResponse.text().catch(() => 'Failed to read simple response text');
-          console.error('Simple raw text:', text);
-          return { error: 'Simple JSON failed', rawText: text };
-        });
-        
-        console.log('Simple response data:', simpleData);
-      } catch (simpleError) {
-        console.error('Simple test failed:', simpleError);
-        console.error('Simple error type:', typeof simpleError);
-        console.error('Simple error message:', simpleError instanceof Error ? simpleError.message : 'Unknown error');
-      }
+      // Wait for database to commit and then try activation
+      console.log('Waiting for payment to be committed...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Test echo endpoint first to isolate the issue
-      console.log('Testing echo endpoint...');
-      try {
-        const echoResponse = await fetch('/api/test-echo', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ reference: ref, test: true }),
-          credentials: 'include',
-        });
-        
-        const echoData = await echoResponse.json();
-        console.log('Echo response:', {
-          status: echoResponse.status,
-          ok: echoResponse.ok,
-          data: echoData
-        });
-      } catch (echoError) {
-        console.error('Echo test failed:', echoError);
-      }
-
-      // Then activate the membership
-      console.log('Activating test membership...');
-      let response;
-      let data;
+      // Now activate the membership
+      console.log('Activating membership via payment-success API...');
       
-      try {
-        response = await fetch('/api/payments/activate-test', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache',
-          },
-          body: JSON.stringify({ reference: ref }),
-          credentials: 'include',
-        });
-        console.log('Fetch completed, response status:', response.status);
-      } catch (fetchError) {
-        console.error('Fetch failed completely:', fetchError);
-        console.error('Fetch error type:', typeof fetchError);
-        console.error('Fetch error message:', fetchError instanceof Error ? fetchError.message : 'Unknown error');
-        return;
-      }
+      const response = await fetch('/api/membership/payment-success', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+        },
+        body: JSON.stringify({ paymentReference: ref }),
+        credentials: 'include',
+      });
       
-      try {
-        data = await response.json().catch(async (e) => {
-          console.error('Failed to parse JSON response:', e);
-          // Try to get the raw response text to see what's actually being returned
-          const text = await response.text().catch(() => 'Could not read response text');
-          console.error('Raw response text:', text);
-          console.error('Response headers:', Object.fromEntries(response.headers.entries()));
-          return { error: 'Invalid JSON response', rawText: text };
-        });
-      } catch (jsonError) {
-        console.error('JSON parsing failed completely:', jsonError);
-        data = { error: 'JSON parsing failed', details: jsonError instanceof Error ? jsonError.message : 'Unknown error' };
-      }
+      console.log('Payment success response status:', response.status);
       
-      console.log('Activate test membership response:', {
+      const data = await response.json().catch(async (e) => {
+        console.error('Failed to parse JSON response:', e);
+        const text = await response.text().catch(() => 'Could not read response text');
+        console.error('Raw response text:', text);
+        return { error: 'Invalid JSON response', rawText: text };
+      });
+      
+      console.log('Payment success response:', {
         status: response.status,
         ok: response.ok,
         data: data
       });
       
-      // Log the specific error details
-      if (data && data.error) {
-        console.error('API Error Details:');
-        console.error('- Error:', data.error);
-        console.error('- Details:', data.details);
-        console.error('- Success:', data.success);
-      }
-      
       if (response.ok && data.success) {
         console.log('Test membership activated for reference:', ref);
-        console.log('Membership number:', data.data?.membershipNumber);
+        setStatus('success');
+        setMessage('Payment successful! Your membership has been activated.');
       } else {
         console.error('Failed to activate test membership:', data.error || 'Unknown error');
         console.error('Response status:', response.status);
         console.error('Response data:', data);
-        console.error('Response data type:', typeof data);
-        console.error('Response data keys:', data ? Object.keys(data) : 'null');
         
-        // Try to get more details from the response text if JSON parsing failed
-        if (response.status >= 400) {
-          const text = await response.text().catch(() => 'Failed to read response text');
-          console.error('Raw response text:', text);
+        // Retry logic
+        if (retryCount < 3) {
+          console.log(`Activation failed, retrying... (${retryCount + 1}/3)`);
+          await activateTestMembership(ref, retryCount + 1);
+        } else {
+          setStatus('error');
+          setMessage('Payment activation failed after multiple attempts. Please try again.');
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error activating test membership:', error);
-      // Don't show error to user, just log it
+      setStatus('error');
+      setMessage('Payment activation failed. Please try again.');
     }
   };
 

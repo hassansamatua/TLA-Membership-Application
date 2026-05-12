@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Payment Flow Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .logs { background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+        .step { background: #e3f2fd; border: 1px solid #10b981; padding: 10px; margin: 5px 0; }
+        .step-number { background: #10b981; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Complete Payment Flow Test</h1>
+    <p>This page tests the entire payment flow from creation to membership activation.</p>
+    
+    <div class="test-section">
+        <h2>Step 1: Create Test Payment</h2>
+        <button onclick="createTestPayment()">Create Test Payment</button>
+        <div id="create-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Check Payment Created</h2>
+        <button onclick="checkPayment()">Check Payment in Database</button>
+        <div id="check-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: Activate Membership</h2>
+        <button onclick="activateMembership()">Activate Membership</button>
+        <div id="activate-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 4: Check Membership Status</h2>
+        <button onclick="checkMembershipStatus()">Check Membership Status</button>
+        <div id="status-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 5: Clear Logs</h2>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 6: Test Payment Success API</h2>
+        <button onclick="testPaymentSuccessAPI()">Test Payment Success API</button>
+        <div id="api-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 7: Test Membership Status API</h2>
+        <button onclick="testMembershipStatusAPI()">Test Membership Status API</button>
+        <div id="membership-status-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 8: Database Connection Test</h2>
+        <button onclick="testDatabaseConnection()">Test Database Connection</button>
+        <div id="db-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 9: Check Server Logs</h2>
+        <button onclick="checkServerLogs()">Check Server Logs</button>
+        <div id="logs-result" class="result"></div>
+    </div>
+    
+    <div class="logs" id="logs-container">
+        <h3>Test Logs</h3>
+        <div id="test-logs">Click "Clear Logs" to start testing</div>
+    </div>
+
+    <script>
+        let currentReference = '';
+        let testCounter = 0;
+        
+        function addLog(message) {
+            const logsContainer = document.getElementById('logs-container');
+            const testLogs = document.getElementById('test-logs');
+            if (testLogs) {
+                const logEntry = document.createElement('div');
+                logEntry.innerHTML = `<div class="log-entry">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+                testLogs.appendChild(logEntry);
+                testLogs.scrollTop = testLogs.scrollHeight;
+            }
+        }
+        
+        async function createTestPayment() {
+            testCounter++;
+            currentReference = 'TEST-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            
+            const resultDiv = document.getElementById('create-result');
+            resultDiv.innerHTML = 'Creating test payment...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/payments/create-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: currentReference })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Success: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function checkPayment() {
+            const resultDiv = document.getElementById('check-result');
+            resultDiv.innerHTML = 'Checking payment...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/payments/check-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: currentReference })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Payment Found: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Payment Not Found (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function activateMembership() {
+            const resultDiv = document.getElementById('activate-result');
+            resultDiv.innerHTML = 'Activating membership...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/membership/payment-success', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentReference: currentReference })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Membership Activated: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Activation Failed (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function checkMembershipStatus() {
+            const resultDiv = document.getElementById('status-result');
+            resultDiv.innerHTML = 'Checking membership status...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/membership/status');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Membership Status: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Status Check Failed (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testPaymentSuccessAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = 'Testing payment success API...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/membership/payment-success', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentReference: 'TEST-EXISTING-PAYMENT' })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `✅ Payment Success API Response: ${JSON.stringify(data, null, 2)}`;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.innerHTML = `❌ API Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testMembershipStatusAPI() {
+            const resultDiv = document.getElementById('membership-status-result');
+            resultDiv.innerHTML = 'Testing membership status API...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/membership/status');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `✅ Membership Status API Response: ${JSON.stringify(data, null, 2)}`;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.innerHTML = `❌ API Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testDatabaseConnection() {
+            const resultDiv = document.getElementById('db-result');
+            resultDiv.innerHTML = 'Testing database connection...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/membership/payment-success', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentReference: 'TEST-DB-CONNECTION' })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `✅ DB Connection Test Response: ${JSON.stringify(data, null, 2)}`;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.innerHTML = `❌ DB Connection Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function checkServerLogs() {
+            const resultDiv = document.getElementById('logs-result');
+            resultDiv.innerHTML = 'Checking server logs...';
+            resultDiv.className = 'result';
+            
+            // In a real scenario, you would check the server logs
+            // For now, just show a message
+            resultDiv.innerHTML = 'Check the browser console and server terminal for detailed logs';
+            resultDiv.className = 'result';
+        }
+        
+        function clearLogs() {
+            const testLogs = document.getElementById('test-logs');
+            if (testLogs) {
+                testLogs.innerHTML = 'Logs cleared. Click "Clear Logs" to start testing';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .logs { background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>Payment Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Create Test Payment</h2>
+        <input type="text" id="reference" placeholder="Enter reference (e.g., TEST-123)" style="width: 300px; padding: 5px;">
+        <button onclick="testCreatePayment()">Create Payment</button>
+        <div id="create-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Activate Membership</h2>
+        <button onclick="testActivateMembership()">Activate Membership</button>
+        <div id="activate-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: Check Payment Created</h2>
+        <input type="text" id="checkReference" placeholder="Enter reference to check" style="width: 300px; padding: 5px;">
+        <button onclick="checkPayment()">Check Payment</button>
+        <div id="check-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Server Logs</h2>
+        <button onclick="refreshLogs()">Refresh Logs</button>
+        <div id="logs" class="logs">Click "Refresh Logs" to see server logs</div>
+    </div>
+
+    <script>
+        let currentReference = '';
+        
+        async function testCreatePayment() {
+            const reference = document.getElementById('reference').value || 'TEST-' + Date.now();
+            currentReference = reference;
+            const resultDiv = document.getElementById('create-result');
+            resultDiv.innerHTML = 'Creating payment...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/payments/create-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: reference })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Success: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testActivateMembership() {
+            const resultDiv = document.getElementById('activate-result');
+            resultDiv.innerHTML = 'Activating membership...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/membership/payment-success', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentReference: currentReference })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Success: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function checkPayment() {
+            const reference = document.getElementById('checkReference').value;
+            const resultDiv = document.getElementById('check-result');
+            resultDiv.innerHTML = 'Checking payment...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/payments/check-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: reference })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Payment Found: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Payment Not Found (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function refreshLogs() {
+            const logsDiv = document.getElementById('logs');
+            logsDiv.innerHTML = 'Refreshing logs...';
+            
+            // Poll for new logs (simulate real-time log viewing)
+            setTimeout(() => {
+                logsDiv.innerHTML = 'Logs refreshed. Check the server console for detailed debugging information.';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

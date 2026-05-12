@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Payment API</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>Payment API Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Create Test Payment</h2>
+        <button onclick="createTestPayment()">Create Test Payment</button>
+        <div id="create-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Activate Membership</h2>
+        <button onclick="activateMembership()">Activate Membership</button>
+        <div id="activate-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Full Test (Create + Activate)</h2>
+        <button onclick="fullTest()">Full Test</button>
+        <div id="full-result" class="result"></div>
+    </div>
+
+    <script>
+        async function createTestPayment() {
+            const resultDiv = document.getElementById('create-result');
+            resultDiv.innerHTML = 'Creating test payment...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/payments/create-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: 'TEST-' + Date.now() })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Success: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function activateMembership() {
+            const resultDiv = document.getElementById('activate-result');
+            resultDiv.innerHTML = 'Activating membership...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/membership/payment-success', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentReference: 'TEST-' + Date.now() })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Success: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error (${response.status}): ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function fullTest() {
+            const resultDiv = document.getElementById('full-result');
+            resultDiv.innerHTML = 'Running full test...';
+            resultDiv.className = 'result';
+            
+            try {
+                // Step 1: Create payment
+                const testRef = 'TEST-' + Date.now();
+                const createResponse = await fetch('/api/payments/create-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: testRef })
+                });
+                
+                const createData = await createResponse.json();
+                
+                if (!createResponse.ok) {
+                    throw new Error(`Create payment failed: ${createData.error}`);
+                }
+                
+                // Step 2: Activate membership
+                const activateResponse = await fetch('/api/membership/payment-success', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentReference: testRef })
+                });
+                
+                const activateData = await activateResponse.json();
+                
+                if (activateResponse.ok) {
+                    resultDiv.innerHTML = `✅ Full Test Success: ${JSON.stringify(activateData, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Activate Error (${activateResponse.status}): ${JSON.stringify(activateData, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Full Test Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@ import { pool } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
-async function getAuthToken(request: Request) {
+async function getAuthToken(request: Request): Promise<string | null> {
   const authHeader = request.headers.get('authorization');
   const authToken = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
   if (authToken) return authToken;
@@ -33,22 +33,52 @@ export async function POST(request: Request) {
     }
 
     connection = await pool.getConnection();
+    
+    // Test database connection
+    try {
+      const [testResult] = await connection.query('SELECT 1 as test_value');
+      console.log('Database connection test result:', testResult);
+    } catch (dbError) {
+      console.error('Database connection test failed:', dbError);
+    }
 
     // Find the payment record - using LIKE to handle potential URL-encoded characters
+    console.log('Searching for payment with reference:', paymentReference);
+    console.log('User ID from token:', decoded.id);
+    
     const [paymentRows] = await connection.query(
       'SELECT * FROM payments WHERE (reference = ? OR reference LIKE ?) AND user_id = ?',
       [paymentReference, `%${paymentReference}%`, decoded.id]
     ) as any[];
 
+    console.log('Payment query result:', {
+      rowCount: paymentRows.length,
+      rows: paymentRows
+    });
+
     if (!paymentRows.length) {
+      console.error('Payment not found with reference:', paymentReference);
+      console.error('Available payments for this user:');
+      // Debug: Show all payments for this user
+      const [allPayments] = await connection.query(
+        'SELECT reference, status, created_at FROM payments WHERE user_id = ? ORDER BY created_at DESC LIMIT 10',
+        [decoded.id]
+      ) as any[];
+      console.log('All user payments:', allPayments);
+      
       return NextResponse.json(
-        { success: false, message: 'Payment not found' },
+        { 
+          success: false, 
+          message: 'Payment not found',
+          details: `No payment found with reference: ${paymentReference} for user: ${decoded.id}. Available payments: ${JSON.stringify(allPayments, null, 2)}`
+        },
         { status: 400 }
       );
     }
 
     // Start transaction to ensure data consistency
     await connection.beginTransaction();
+    console.log('Transaction started for payment processing');
 
     try {
       const paymentId = paymentRows[0]?.id;
@@ -66,7 +96,7 @@ export async function POST(request: Request) {
         [paymentId, decoded.id]
       ) as any;
 
-      // 2. Update or create membership record
+      // 2. Update or create membership record with proper expiry_date handling
       await connection.query(
         `INSERT INTO memberships 
          (user_id, status, payment_status, payment_date, expiry_date, created_at, updated_at)
@@ -75,65 +105,62 @@ export async function POST(request: Request) {
            status = 'active',
            payment_status = 'paid',
            payment_date = NOW(),
-           expiry_date = DATE_ADD(NOW(), INTERVAL 1 YEAR),
+           expiry_date = CASE 
+             WHEN expiry_date IS NULL OR expiry_date < NOW() 
+             THEN DATE_ADD(NOW(), INTERVAL 1 YEAR)
+             ELSE expiry_date
+           END,
            updated_at = NOW()`,
         [decoded.id]
       );
 
-      // Commit the transaction
+      // Commit transaction
       await connection.commit();
 
-      // Update user_profiles
-      await connection.query(
-        'UPDATE user_profiles SET updated_at = NOW() WHERE user_id = ?',
-        [decoded.id]
-      );
+      // Update user_profiles outside of transaction to avoid deadlock
+      try {
+        await connection.query(
+          'UPDATE user_profiles SET updated_at = NOW() WHERE user_id = ?',
+          [decoded.id]
+        );
+      } catch (profileError) {
+        console.warn('Failed to update user_profiles:', profileError);
+        // Don't fail the whole operation if profile update fails
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Payment processed successfully' 
+      });
 
     } catch (error) {
       // Rollback in case of error
       await connection.rollback();
-      console.error('Error in payment success:', error);
+      console.error('Error in payment success transaction:', error);
       return NextResponse.json(
-        { success: false, message: 'Failed to process payment' },
+        { 
+          success: false, 
+          message: 'Failed to process payment',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Payment successful! Your membership has been activated.',
-      data: {
-        payment: {
-          reference: paymentReference,
-          amount: 40000,
-          method: 'test',
-          date: new Date().toISOString(),
-          status: 'completed'
-        },
-        membership: {
-          membershipNumber: 'TLA' + new Date().getFullYear().toString().slice(-2) + Math.floor(Math.random() * 100000).toString().padStart(5, '0'),
-          membershipType: 'personal',
-          status: 'active',
-          paymentStatus: 'paid',
-          joinedDate: new Date().toISOString().split('T')[0],
-          expiryDate: new Date(new Date().getFullYear(), 11, 30).toISOString().split('T')[0],
-          amountPaid: 40000
-        },
-        contact: {
-          email: 'membership@tla.or.tz',
-          phone: '+255 22 211 3456'
-        },
-        actions: {
-          viewMembershipCard: '/dashboard/membership-card',
-          goToDashboard: '/dashboard'
-        },
-        canAccessIdCard: true
-      }
-    });
   } catch (error) {
-    console.error('Error processing payment success:', error);
-    return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
+    console.error('Payment success API error:', error);
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: 'Failed to process payment',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   } finally {
-    if (connection) connection.release();
+    // Always release connection
+    if (connection) {
+      connection.release();
+    }
   }
 }
