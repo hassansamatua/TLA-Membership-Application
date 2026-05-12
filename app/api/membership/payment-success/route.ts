@@ -43,8 +43,27 @@ export async function POST(request: Request) {
     }
 
     // Find the payment record - using LIKE to handle potential URL-encoded characters
+    console.log('=== PAYMENT SEARCH DEBUG ===');
     console.log('Searching for payment with reference:', paymentReference);
     console.log('User ID from token:', decoded.id);
+    console.log('Payment reference type:', typeof paymentReference);
+    console.log('Payment reference length:', paymentReference.length);
+    
+    // First, let's check if payments table exists and has data
+    try {
+      const [tableCheck] = await connection.query('SHOW TABLES LIKE "payments"');
+      console.log('Payments table exists:', tableCheck.length > 0);
+      
+      if (tableCheck.length > 0) {
+        const [countResult] = await connection.query('SELECT COUNT(*) as total FROM payments');
+        console.log('Total payments in database:', countResult[0].total);
+        
+        const [userPayments] = await connection.query('SELECT COUNT(*) as user_total FROM payments WHERE user_id = ?', [decoded.id]);
+        console.log('Payments for this user:', userPayments[0].user_total);
+      }
+    } catch (tableError) {
+      console.error('Error checking payments table:', tableError);
+    }
     
     const [paymentRows] = await connection.query(
       'SELECT * FROM payments WHERE (reference = ? OR reference LIKE ?) AND user_id = ?',
@@ -55,6 +74,16 @@ export async function POST(request: Request) {
       rowCount: paymentRows.length,
       rows: paymentRows
     });
+    
+    // If no exact match, try a broader search
+    if (paymentRows.length === 0) {
+      console.log('No exact match found, trying broader search...');
+      const [broadRows] = await connection.query(
+        'SELECT * FROM payments WHERE user_id = ? ORDER BY created_at DESC LIMIT 5',
+        [decoded.id]
+      ) as any[];
+      console.log('Recent payments for this user:', broadRows);
+    }
 
     if (!paymentRows.length) {
       console.error('Payment not found with reference:', paymentReference);
