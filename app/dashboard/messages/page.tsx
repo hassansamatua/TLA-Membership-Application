@@ -122,7 +122,7 @@ export default function MessagesPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
@@ -130,51 +130,51 @@ export default function MessagesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-100 mb-4"
           >
             <FiArrowLeft className="mr-2" />
             Back to Dashboard
           </button>
           
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Messages</h1>
+          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500">
             Communication with TLA administration and members
           </p>
         </div>
 
         {/* Messages List */}
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="border-b border-gray-200 p-4">
-            <h2 className="text-lg font-semibold text-gray-900">Inbox</h2>
-            <p className="text-sm text-gray-600">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md">
+          <div className="border-b border-gray-200 dark:border-white/10 p-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Inbox</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
               {messages.filter(m => !m.read_at).length} unread messages
             </p>
           </div>
 
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-200 dark:divide-white/10">
             {messages.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <FiInbox className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <FiInbox className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
                 <p>No messages yet</p>
               </div>
             ) : (
               messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
+                  className={`p-4 hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03] transition-colors cursor-pointer ${
                     isUnread(message) ? 'bg-blue-50' : ''
                   }`}
                   onClick={() => setSelectedMessage(message)}
@@ -182,7 +182,7 @@ export default function MessagesPage() {
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        isUnread(message) ? 'bg-blue-500' : 'bg-gray-300'
+                        isUnread(message) ? 'bg-blue-500' : 'bg-gray-300 dark:bg-white/10'
                       }`}>
                         <FiMessageSquare className="h-5 w-5 text-white" />
                       </div>
@@ -190,22 +190,22 @@ export default function MessagesPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <div>
-                          <p className="font-medium text-gray-900">{message.sender_name}</p>
-                          <p className="text-sm text-gray-600">{message.sender_email}</p>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{message.sender_name}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">{message.sender_email}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-gray-500">{formatTime(message.created_at)}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">{formatTime(message.created_at)}</p>
                         </div>
                       </div>
-                      <div className="text-sm text-gray-900 mb-2">
+                      <div className="text-sm text-gray-900 dark:text-gray-100 mb-2">
                         <p className="font-medium">{message.subject}</p>
                       </div>
-                      <div className="text-sm text-gray-600 line-clamp-2">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500 line-clamp-2">
                         {message.content}
                       </div>
                       
                       {selectedMessage?.id === message.id && (
-                        <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
                           <div className="flex items-center space-x-2 mb-3">
                             <button
                               onClick={() => handleMarkAsRead(message.id)}
@@ -233,13 +233,13 @@ export default function MessagesPage() {
                                 value={replyContent}
                                 onChange={(e) => setReplyContent(e.target.value)}
                                 placeholder="Type your reply..."
-                                className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full p-3 border border-gray-300 dark:border-white/15 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                 rows={3}
                               />
                               <div className="flex justify-end space-x-2 mt-2">
                                 <button
                                   onClick={() => setShowReplyBox(false)}
-                                  className="text-xs bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300"
+                                  className="text-xs bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200 px-3 py-1 rounded hover:bg-gray-300 dark:hover:bg-white/20 dark:bg-white/10"
                                 >
                                   Cancel
                                 </button>

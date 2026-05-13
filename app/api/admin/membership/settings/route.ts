@@ -46,8 +46,8 @@ export async function GET(request: Request) {
       renewalReminder: '30 days',
       autoRenewal: false,
       fees: {
-        personal: 50000,
-        organization: 100000
+        personal: 30000,
+        organization: 150000
       }
     };
 
@@ -119,8 +119,8 @@ export async function PUT(request: Request) {
       renewalReminder: renewalReminder || '30 days',
       autoRenewal: autoRenewal || false,
       fees: fees || {
-        personal: 50000,
-        organization: 100000
+        personal: 30000,
+        organization: 150000
       }
     };
 

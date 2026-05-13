@@ -116,10 +116,10 @@ export default function PhoneNumberInput({
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
           Enter {config.name} Details
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
           {paymentMethod === 'bankcard' 
             ? 'Enter your card details to proceed with payment'
             : 'Enter your mobile money number to proceed with payment'
@@ -130,12 +130,12 @@ export default function PhoneNumberInput({
       {/* Phone Number Input */}
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
             {paymentMethod === 'bankcard' ? 'Card Number' : 'Phone Number'}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiPhone className="h-5 w-5 text-gray-400" />
+              <FiPhone className="h-5 w-5 text-gray-400 dark:text-gray-500" />
             </div>
             <input
               type={paymentMethod === 'bankcard' ? 'text' : 'tel'}
@@ -143,7 +143,7 @@ export default function PhoneNumberInput({
               onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
               placeholder={paymentMethod === 'bankcard' ? '1234 5678 9012 3456' : '0652542346'}
               className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-                errors.phone ? 'border-red-500' : 'border-gray-300'
+                errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-white/15'
               }`}
               maxLength={paymentMethod === 'bankcard' ? 19 : 10}
             />
@@ -179,11 +179,11 @@ export default function PhoneNumberInput({
 
         {/* Mobile Money Notice */}
         {paymentMethod !== 'bankcard' && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+          <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 rounded-lg p-4">
             <div className="flex items-start space-x-3">
               <FiCheck className="h-5 w-5 text-emerald-600 mt-0.5" />
               <div>
-                <p className="font-medium text-emerald-800">Mobile Money Payment</p>
+                <p className="font-medium text-emerald-800 dark:text-emerald-300">Mobile Money Payment</p>
                 <p className="text-sm text-emerald-600 mt-1">
                   After entering your number, you'll be redirected to AzamPay.
                   Your {config.name} app will show a payment prompt to confirm the transaction.
@@ -201,7 +201,7 @@ export default function PhoneNumberInput({
       <div className="flex space-x-3">
         <button
           onClick={onCancel}
-          className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 px-4 py-3 border border-gray-300 dark:border-white/15 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03] transition-colors"
         >
           Cancel
         </button>

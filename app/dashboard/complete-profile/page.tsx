@@ -501,17 +501,17 @@ export default function CompleteProfilePage() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Personal Information</h3>
-              <p className="mt-1 text-sm text-gray-600">Update your personal information here.</p>
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Personal Information</h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Update your personal information here.</p>
             </div>
 
             {/* Profile Picture Upload */}
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               <div className="sm:col-span-6">
-                <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Profile Picture</label>
                 <div className="mt-2 flex items-start">
                   <div className="relative">
-                    <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100">
+                    <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-950">
                       {formData.personalInfo.profilePicture ? (
                         <img
                           src={formData.personalInfo.profilePicture}
@@ -519,8 +519,8 @@ export default function CompleteProfilePage() {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="h-full w-full flex items-center justify-center bg-gray-100">
-                          <FiUser className="h-12 w-12 text-gray-400" />
+                        <div className="h-full w-full flex items-center justify-center bg-gray-100 dark:bg-gray-950">
+                          <FiUser className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                         </div>
                       )}
                     </div>
@@ -539,7 +539,7 @@ export default function CompleteProfilePage() {
                   </div>
                   
                   <div className="ml-5">
-                    <label className="relative cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <label className="relative cursor-pointer bg-white dark:bg-gray-900 py-2 px-3 border border-gray-300 dark:border-white/15 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                       <span>{formData.personalInfo.profilePicture ? 'Change Photo' : 'Upload Photo'}</span>
                       <input
                         type="file"
@@ -558,7 +558,7 @@ export default function CompleteProfilePage() {
                         }}
                       />
                     </label>
-                    <p className="mt-2 text-xs text-gray-500">
+                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                       JPG or PNG (Min. 400×400px, Max. 2MB)
                     </p>
                     {formData.personalInfo.profilePicture && (
@@ -572,7 +572,7 @@ export default function CompleteProfilePage() {
 
               {/* Full Name */}
               <div className="sm:col-span-6">
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Full Name
                 </label>
                 <div className="mt-1">
@@ -580,23 +580,23 @@ export default function CompleteProfilePage() {
                     type="text"
                     id="fullName"
                     name="fullName"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.personalInfo.fullName}
                     onChange={(e) => handleInputChange('personalInfo', 'fullName', e.target.value)}
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">Member's legal name (First, Middle, Last)</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Member's legal name (First, Middle, Last)</p>
               </div>
 
               {/* Gender */}
               <div className="sm:col-span-3">
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Gender
                 </label>
                 <select
                   id="gender"
                   name="gender"
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-white/15 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                   value={formData.personalInfo.gender}
                   onChange={(e) => handleInputChange('personalInfo', 'gender', e.target.value)}
                 >
@@ -605,12 +605,12 @@ export default function CompleteProfilePage() {
                   <option value="female">Female</option>
                   <option value="other">Other</option>
                 </select>
-                <p className="mt-1 text-xs text-gray-500">Gender identity</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Gender identity</p>
               </div>
 
               {/* Date of Birth */}
               <div className="sm:col-span-3">
-                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Date of Birth
                 </label>
                 <div className="mt-1">
@@ -618,17 +618,17 @@ export default function CompleteProfilePage() {
                     type="date"
                     id="dateOfBirth"
                     name="dateOfBirth"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.personalInfo.dateOfBirth}
                     onChange={(e) => handleInputChange('personalInfo', 'dateOfBirth', e.target.value)}
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">Used for demographics or age-based services</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Used for demographics or age-based services</p>
               </div>
 
               {/* Place of Birth */}
               <div className="sm:col-span-6">
-                <label htmlFor="placeOfBirth" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="placeOfBirth" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Place of Birth
                 </label>
                 <div className="mt-1">
@@ -636,7 +636,7 @@ export default function CompleteProfilePage() {
                     type="text"
                     id="placeOfBirth"
                     name="placeOfBirth"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.personalInfo.placeOfBirth}
                     onChange={(e) => handleInputChange('personalInfo', 'placeOfBirth', e.target.value)}
                     list="tanzaniaRegions"
@@ -675,7 +675,7 @@ export default function CompleteProfilePage() {
                     <option value="Zanzibar West" />
                   </datalist>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">Regions of Tanzania</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Regions of Tanzania</p>
               </div>
             </div>
           </div>
@@ -685,13 +685,13 @@ export default function CompleteProfilePage() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Contact Information</h3>
-              <p className="mt-1 text-sm text-gray-600">Update your contact details.</p>
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Contact Information</h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Update your contact details.</p>
             </div>
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               {/* Email */}
               <div className="sm:col-span-6">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Email Address
                 </label>
                 <div className="mt-1">
@@ -699,7 +699,7 @@ export default function CompleteProfilePage() {
                     type="email"
                     id="email"
                     name="email"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.contactInfo?.email || ''}
                     onChange={(e) => handleInputChange('contactInfo', 'email', e.target.value)}
                     disabled={!formData.contactInfo}
@@ -708,7 +708,7 @@ export default function CompleteProfilePage() {
               </div>
               {/* Phone */}
               <div className="sm:col-span-3">
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Phone Number
                 </label>
                 <div className="mt-1">
@@ -716,7 +716,7 @@ export default function CompleteProfilePage() {
                     type="tel"
                     id="phone"
                     name="phone"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.contactInfo.phone}
                     onChange={(e) => handleInputChange('contactInfo', 'phone', e.target.value)}
                   />
@@ -724,7 +724,7 @@ export default function CompleteProfilePage() {
               </div>
               {/* Address */}
               <div className="sm:col-span-6">
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Street Address
                 </label>
                 <div className="mt-1">
@@ -732,7 +732,7 @@ export default function CompleteProfilePage() {
                     type="text"
                     id="address"
                     name="address"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.contactInfo.address}
                     onChange={(e) => handleInputChange('contactInfo', 'address', e.target.value)}
                   />
@@ -740,7 +740,7 @@ export default function CompleteProfilePage() {
               </div>
               {/* City */}
               <div className="sm:col-span-2">
-                <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   City
                 </label>
                 <div className="mt-1">
@@ -748,7 +748,7 @@ export default function CompleteProfilePage() {
                     type="text"
                     id="city"
                     name="city"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.contactInfo.city}
                     onChange={(e) => handleInputChange('contactInfo', 'city', e.target.value)}
                   />
@@ -756,14 +756,14 @@ export default function CompleteProfilePage() {
               </div>
               {/* Country */}
               <div className="sm:col-span-2">
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Country
                 </label>
                 <div className="mt-1">
                   <select
                     id="country"
                     name="country"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.contactInfo.country}
                     onChange={(e) => handleInputChange('contactInfo', 'country', e.target.value)}
                   >
@@ -776,7 +776,7 @@ export default function CompleteProfilePage() {
               </div>
               {/* Postal Code */}
               <div className="sm:col-span-2">
-                <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Postal Code
                 </label>
                 <div className="mt-1">
@@ -784,7 +784,7 @@ export default function CompleteProfilePage() {
                     type="text"
                     id="postalCode"
                     name="postalCode"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.contactInfo.postalCode}
                     onChange={(e) => handleInputChange('contactInfo', 'postalCode', e.target.value)}
                   />
@@ -797,13 +797,13 @@ export default function CompleteProfilePage() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Professional Information</h3>
-              <p className="mt-1 text-sm text-gray-600">Tell us about your professional background.</p>
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Professional Information</h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Tell us about your professional background.</p>
             </div>
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               {/* Current Position */}
               <div className="sm:col-span-3">
-                <label htmlFor="currentPosition" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="currentPosition" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Current Position
                 </label>
                 <div className="mt-1">
@@ -811,7 +811,7 @@ export default function CompleteProfilePage() {
                     type="text"
                     id="currentPosition"
                     name="currentPosition"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.professionalInfo.occupation}
 onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.value)}
                   />
@@ -819,7 +819,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               </div>
               {/* Company */}
               <div className="sm:col-span-3">
-                <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Company
                 </label>
                 <div className="mt-1">
@@ -827,7 +827,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                     type="text"
                     id="company"
                     name="company"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.professionalInfo.company}
                     onChange={(e) => handleInputChange('professionalInfo', 'company', e.target.value)}
                   />
@@ -835,7 +835,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               </div>
               {/* Industry */}
               <div className="sm:col-span-3">
-                <label htmlFor="industry" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="industry" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Industry
                 </label>
                 <div className="mt-1">
@@ -843,7 +843,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                     type="text"
                     id="industry"
                     name="industry"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.professionalInfo.industry}
                     onChange={(e) => handleInputChange('professionalInfo', 'industry', e.target.value)}
                   />
@@ -851,14 +851,14 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               </div>
               {/* Years of Experience */}
               <div className="sm:col-span-3">
-                <label htmlFor="yearsOfExperience" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="yearsOfExperience" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Years of Experience
                 </label>
                 <div className="mt-1">
                   <select
                     id="yearsOfExperience"
                     name="yearsOfExperience"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.professionalInfo.yearsOfExperience}
                     onChange={(e) => handleInputChange('professionalInfo', 'yearsOfExperience', e.target.value)}
                   >
@@ -872,7 +872,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               </div>
               {/* Skills */}
               <div className="sm:col-span-6">
-                <label htmlFor="skills" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="skills" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Skills
                 </label>
                 <div className="mt-1">
@@ -880,7 +880,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                     type="text"
                     id="skills"
                     name="skills"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.professionalInfo.skills ? formData.professionalInfo.skills.join(', ') : ''}
                     onChange={(e) => handleInputChange(
                       'professionalInfo',
@@ -889,11 +889,11 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                     )}
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">Separate skills with commas</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Separate skills with commas</p>
               </div>
               {/* Previous Positions */}
               <div className="sm:col-span-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Previous Positions</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Previous Positions</h4>
                 {/* Add dynamic form for previous positions */}
               </div>
             </div>
@@ -903,21 +903,21 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Education Background</h3>
-              <p className="mt-1 text-sm text-gray-600">Add your educational qualifications.</p>
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Education Background</h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Add your educational qualifications.</p>
             </div>
             {formData.education.map((edu, index) => (
-              <div key={index} className="space-y-4 border border-gray-200 p-4 rounded-lg">
+              <div key={index} className="space-y-4 border border-gray-200 dark:border-white/10 p-4 rounded-lg">
                 {/* Highest Degree */}
                 <div className="sm:col-span-3">
-                  <label htmlFor={`highestDegree-${index}`} className="block text-sm font-medium text-gray-700">
+                  <label htmlFor={`highestDegree-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Highest Degree Achieved
                   </label>
                   <div className="mt-1">
                     <select
                       id={`highestDegree-${index}`}
                       name={`highestDegree-${index}`}
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                       value={edu.highestDegree}
                       onChange={(e) => {
                         const newEducation = [...formData.education];
@@ -936,7 +936,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                 </div>
                 {/* Institution */}
                 <div className="sm:col-span-3">
-                  <label htmlFor={`institution-${index}`} className="block text-sm font-medium text-gray-700">
+                  <label htmlFor={`institution-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Institution
                   </label>
                   <div className="mt-1">
@@ -944,7 +944,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                       type="text"
                       id={`institution-${index}`}
                       name={`institution-${index}`}
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                       value={edu.institution}
                       onChange={(e) => {
                         const newEducation = [...formData.education];
@@ -956,7 +956,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                 </div>
                 {/* Year of Graduation */}
                 <div className="sm:col-span-3">
-                  <label htmlFor={`yearOfGraduation-${index}`} className="block text-sm font-medium text-gray-700">
+                  <label htmlFor={`yearOfGraduation-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Year of Graduation
                   </label>
                   <div className="mt-1">
@@ -966,7 +966,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                       name={`yearOfGraduation-${index}`}
                       min="1900"
                       max={new Date().getFullYear()}
-                      className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                       value={edu.yearOfGraduation}
                       onChange={(e) => {
                         const newEducation = [...formData.education];
@@ -978,7 +978,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                 </div>
                 {/* Additional Certifications */}
                 <div className="sm:col-span-6">
-                  <label htmlFor={`additionalCertifications-${index}`} className="block text-sm font-medium text-gray-700">
+                  <label htmlFor={`additionalCertifications-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Additional Certifications
                   </label>
                   <div className="mt-1">
@@ -986,7 +986,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                       id={`additionalCertifications-${index}`}
                       name={`additionalCertifications-${index}`}
                       rows={3}
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                       value={edu.additionalCertifications}
                       onChange={(e) => {
                         const newEducation = [...formData.education];
@@ -995,14 +995,14 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                       }}
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">List any additional certifications or training</p>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">List any additional certifications or training</p>
                 </div>
               </div>
             ))}
             <div className="flex justify-end">
               <button
                 type="button"
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-emerald-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-emerald-700 dark:text-emerald-300 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={() => {
                   const newEducation = [
                     ...formData.education,
@@ -1025,21 +1025,21 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Membership Details</h3>
-              <p className="mt-1 text-sm text-gray-600">Your membership information and status.</p>
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Membership Details</h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Your membership information and status.</p>
             </div>
 
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div className="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
               <div className="px-4 py-5 sm:p-6">
                 <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                   {/* Membership Type */}
                   <div className="sm:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700">Membership Type</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Membership Type</label>
                     <div className="mt-1">
                       <div className="relative rounded-md shadow-sm">
                         <input
                           type="text"
-                          className="bg-gray-50 border border-gray-300 text-gray-700 block w-full sm:text-sm rounded-md p-2"
+                          className="bg-gray-50 dark:bg-white/[0.03] border border-gray-300 dark:border-white/15 text-gray-700 dark:text-gray-200 block w-full sm:text-sm rounded-md p-2"
                           value={formData.membership.membershipType || 'Standard'}
                           readOnly
                         />
@@ -1049,12 +1049,12 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
 
                   {/* Membership Number */}
                   <div className="sm:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700">Membership Number</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Membership Number</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="flex">
                         <input
                           type="text"
-                          className="bg-gray-50 border border-gray-300 text-gray-700 block w-full sm:text-sm rounded-l-md p-2"
+                          className="bg-gray-50 dark:bg-white/[0.03] border border-gray-300 dark:border-white/15 text-gray-700 dark:text-gray-200 block w-full sm:text-sm rounded-l-md p-2"
                           value={formattedMembershipNumber}
                           readOnly
                         />
@@ -1065,7 +1065,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                               navigator.clipboard.writeText(formattedMembershipNumber);
                               toast.success('Membership number copied to clipboard');
                             }}
-                            className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 hover:bg-gray-100"
+                            className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 dark:border-white/15 bg-gray-50 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:bg-gray-950"
                           >
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
@@ -1078,12 +1078,12 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
 
                   {/* Membership Status */}
                   <div className="sm:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700">Membership Status</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Membership Status</label>
                     <div className="mt-1">
                       <div className="relative rounded-md shadow-sm">
                         <input
                           type="text"
-                          className="bg-gray-50 border border-gray-300 text-gray-700 block w-full sm:text-sm rounded-md p-2"
+                          className="bg-gray-50 dark:bg-white/[0.03] border border-gray-300 dark:border-white/15 text-gray-700 dark:text-gray-200 block w-full sm:text-sm rounded-md p-2"
                           value={formData.membership.membershipStatus || 'Pending Approval'}
                           readOnly
                         />
@@ -1093,12 +1093,12 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
 
                   {/* Join Date */}
                   <div className="sm:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700">Join Date</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Join Date</label>
                     <div className="mt-1">
                       <div className="relative rounded-md shadow-sm">
                         <input
                           type="text"
-                          className="bg-gray-50 border border-gray-300 text-gray-700 block w-full sm:text-sm rounded-md p-2"
+                          className="bg-gray-50 dark:bg-white/[0.03] border border-gray-300 dark:border-white/15 text-gray-700 dark:text-gray-200 block w-full sm:text-sm rounded-md p-2"
                           value={formData.membership.joinDate ? new Date(formData.membership.joinDate).toLocaleDateString() : 'N/A'}
                           readOnly
                         />
@@ -1108,10 +1108,10 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
 
                   {/* Areas of Interest */}
                   <div className="sm:col-span-6">
-                    <label className="block text-sm font-medium text-gray-700">Areas of Interest</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Areas of Interest</label>
                     <div className="mt-1">
                       <div className="relative rounded-md shadow-sm">
-                        <div className="bg-gray-50 border border-gray-300 rounded-md p-3 min-h-12">
+                        <div className="bg-gray-50 dark:bg-white/[0.03] border border-gray-300 dark:border-white/15 rounded-md p-3 min-h-12">
                           {formData.participation.areasOfInterest && formData.participation.areasOfInterest.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
                               {Array.isArray(formData.participation.areasOfInterest) ? (
@@ -1127,7 +1127,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                               )}
                             </div>
                           ) : (
-                            <p className="text-sm text-gray-500">No areas of interest selected</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">No areas of interest selected</p>
                           )}
                         </div>
                       </div>
@@ -1142,20 +1142,20 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Payment Information</h3>
-              <p className="mt-1 text-sm text-gray-600">Your payment details for membership fees.</p>
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Payment Information</h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Your payment details for membership fees.</p>
             </div>
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               {/* Payment Method */}
               <div className="sm:col-span-6">
-                <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Payment Method
                 </label>
                 <div className="mt-1">
                   <select
                     id="paymentMethod"
                     name="paymentMethod"
-                    className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                     value={formData.payment.paymentMethod}
                     onChange={(e) => handleInputChange('payment', 'paymentMethod', e.target.value)}
                   >
@@ -1170,7 +1170,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               {formData.payment.paymentMethod === 'credit_card' && (
                 <>
                   <div className="sm:col-span-6">
-                    <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       Card Number
                     </label>
                     <div className="mt-1">
@@ -1178,7 +1178,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="cardNumber"
                         name="cardNumber"
-                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                         value={formData.payment.cardNumber || ''}
                         onChange={(e) => handleInputChange('payment', 'cardNumber', e.target.value)}
                         placeholder="1234 5678 9012 3456"
@@ -1186,7 +1186,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                     </div>
                   </div>
                   <div className="sm:col-span-3">
-                    <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       Expiry Date
                     </label>
                     <div className="mt-1">
@@ -1194,7 +1194,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="expiryDate"
                         name="expiryDate"
-                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                         value={formData.payment.expiryDate || ''}
                         onChange={(e) => handleInputChange('payment', 'expiryDate', e.target.value)}
                         placeholder="MM/YY"
@@ -1202,7 +1202,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                     </div>
                   </div>
                   <div className="sm:col-span-3">
-                    <label htmlFor="cvv" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       CVV
                     </label>
                     <div className="mt-1">
@@ -1210,7 +1210,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="cvv"
                         name="cvv"
-                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                         value={formData.payment.cvv || ''}
                         onChange={(e) => handleInputChange('payment', 'cvv', e.target.value)}
                         placeholder="123"
@@ -1222,7 +1222,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               {formData.payment.paymentMethod === 'bank_transfer' && (
                 <>
                   <div className="sm:col-span-6">
-                    <label htmlFor="bankName" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="bankName" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       Bank Name
                     </label>
                     <div className="mt-1">
@@ -1230,14 +1230,14 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="bankName"
                         name="bankName"
-                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                         value={formData.payment.bankName || ''}
                         onChange={(e) => handleInputChange('payment', 'bankName', e.target.value)}
                       />
                     </div>
                   </div>
                   <div className="sm:col-span-6">
-                    <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       Account Number
                     </label>
                     <div className="mt-1">
@@ -1245,7 +1245,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="accountNumber"
                         name="accountNumber"
-                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                         value={formData.payment.accountNumber || ''}
                         onChange={(e) => handleInputChange('payment', 'accountNumber', e.target.value)}
                       />
@@ -1256,14 +1256,14 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               {formData.payment.paymentMethod === 'mobile_money' && (
                 <>
                   <div className="sm:col-span-3">
-                    <label htmlFor="mobileProvider" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="mobileProvider" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       Mobile Provider
                     </label>
                     <div className="mt-1">
                       <select
                         id="mobileProvider"
                         name="mobileProvider"
-                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                         value={formData.payment.mobileProvider || ''}
                         onChange={(e) => handleInputChange('payment', 'mobileProvider', e.target.value)}
                       >
@@ -1276,7 +1276,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                     </div>
                   </div>
                   <div className="sm:col-span-3">
-                    <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       Mobile Number
                     </label>
                     <div className="mt-1">
@@ -1284,7 +1284,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="tel"
                         id="mobileNumber"
                         name="mobileNumber"
-                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                         value={formData.payment.mobileNumber || ''}
                         onChange={(e) => handleInputChange('payment', 'mobileNumber', e.target.value)}
                         placeholder="e.g., 0712345678"
@@ -1295,7 +1295,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               )}
               {formData.payment.paymentMethod === 'other' && (
                 <div className="sm:col-span-6">
-                  <label htmlFor="paymentReference" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="paymentReference" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Payment Reference
                   </label>
                   <div className="mt-1">
@@ -1303,7 +1303,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                       type="text"
                       id="paymentReference"
                       name="paymentReference"
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-white/15 rounded-md"
                       value={formData.payment.paymentReference || ''}
                       onChange={(e) => handleInputChange('payment', 'paymentReference', e.target.value)}
                       placeholder="Enter payment reference or instructions"
@@ -1318,13 +1318,13 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Document Upload</h3>
-              <p className="mt-1 text-sm text-gray-600">Upload required documents for verification.</p>
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Document Upload</h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Upload required documents for verification.</p>
             </div>
             <div className="space-y-6">
               {/* ID Proof */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   ID Proof (Passport/National ID)
                 </label>
                 <div className="flex items-center">
@@ -1342,22 +1342,22 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                   />
                   <label
                     htmlFor="idProof"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
+                    className="relative cursor-pointer bg-white dark:bg-gray-900 rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
                   >
                     <span>Upload file</span>
                     <input id="idProof" name="idProof" type="file" className="sr-only" />
                   </label>
-                  <p className="pl-1 text-sm text-gray-500">
+                  <p className="pl-1 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                     {formData.documents.idProof ? formData.documents.idProof.name : 'No file chosen'}
                   </p>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                   Upload a clear copy of your passport or national ID (PDF, JPG, or PNG, max 5MB)
                 </p>
               </div>
               {/* Degree Certificates */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Degree Certificates
                 </label>
                 <div className="flex items-center">
@@ -1382,15 +1382,15 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                   />
                   <label
                     htmlFor="degreeCertificates"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
+                    className="relative cursor-pointer bg-white dark:bg-gray-900 rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
                   >
                     <span>Upload files</span>
                   </label>
-                  <p className="pl-1 text-sm text-gray-500">
+                  <p className="pl-1 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                     {formData.documents.degreeCertificates?.length || 0} files chosen
                   </p>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                   Upload copies of your degree certificates (PDF, JPG, or PNG, max 5MB each)
                 </p>
 
@@ -1398,7 +1398,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                 {formData.documents.degreeCertificates?.length > 0 && (
                   <ul className="mt-2 space-y-1">
                     {formData.documents.degreeCertificates.map((file, index) => (
-                      <li key={index} className="text-sm text-gray-600">
+                      <li key={index} className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
                         {file.name}
                       </li>
                     ))}
@@ -1407,7 +1407,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
               </div>
               {/* CV/Resume */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   CV/Resume
                 </label>
                 <div className="flex items-center">
@@ -1426,16 +1426,16 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                   />
                   <label
                     htmlFor="cv"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-emerald-500 focus-within:outline-none"
+                    className="relative cursor-pointer bg-white dark:bg-gray-900 rounded-md font-medium text-indigo-600 hover:text-emerald-500 focus-within:outline-none"
                   >
                     <span>Upload file</span>
                     <input id="cv" name="cv" type="file" className="sr-only" />
                   </label>
-                  <p className="pl-1 text-sm text-gray-500">
+                  <p className="pl-1 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                     {formData.documents.cv ? formData.documents.cv.name : 'No file chosen'}
                   </p>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                   Upload your CV/Resume (PDF or Word document, max 5MB)
                 </p>
               </div>
@@ -1448,24 +1448,24 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/[0.03] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900">Complete Your Profile</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Complete Your Profile</h1>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
             Please provide the following information to complete your profile
           </p>
         </div>
 
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Profile Completion</h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
+        <div className="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
+          <div className="px-4 py-5 sm:px-6 bg-gray-50 dark:bg-white/[0.03] border-b border-gray-200 dark:border-white/10">
+            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Profile Completion</h3>
+            <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
               Complete all sections to finish setting up your profile.
             </p>
           </div>
 
-          <div className="border-b border-gray-200">
+          <div className="border-b border-gray-200 dark:border-white/10">
             <nav className="-mb-px flex overflow-x-auto" aria-label="Tabs">
               {[
                 { id: 'personal', name: 'Personal', icon: <FiUser className="mr-2" /> },
@@ -1481,7 +1481,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                   onClick={() => setActiveSection(tab.id)}
                   className={`whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm flex items-center ${activeSection === tab.id
                     ? 'border-emerald-500 text-emerald-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-200 hover:border-gray-300 dark:border-white/15'
                     }`}
                 >
                   {tab.icon}
@@ -1497,7 +1497,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
             <div className="mt-8 flex justify-between">
               <button
                 type="button"
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-white/15 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={() => router.back()}
               >
                 Back

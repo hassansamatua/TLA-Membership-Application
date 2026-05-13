@@ -62,31 +62,31 @@ function PaymentHistory() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <FiLoader className="animate-spin h-6 w-6 text-gray-400" />
+        <FiLoader className="animate-spin h-6 w-6 text-gray-400 dark:text-gray-500" />
       </div>
     );
   }
   if (error || payments.length === 0) {
     return (
-      <p className="text-sm text-gray-500 py-2">
+      <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 py-2">
         {error || 'No payments yet.'}
       </p>
     );
   }
   return (
-    <ul className="divide-y divide-gray-200">
+    <ul className="divide-y divide-gray-200 dark:divide-white/10">
       {payments.slice(0, 5).map((p, i) => (
         <li key={i} className="flex items-center justify-between py-3 text-sm">
           <div>
-            <p className="font-medium text-gray-900">
+            <p className="font-medium text-gray-900 dark:text-gray-100">
               {p.source === 'membership_payment' ? 'Membership payment' : 'Payment'}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
               {new Date(p.payment_date || p.paid_at || p.created_at).toLocaleDateString()}
               {p.cycle_year ? ` · cycle ${p.cycle_year}` : ''}
             </p>
           </div>
-          <p className="font-semibold text-emerald-700">
+          <p className="font-semibold text-emerald-700 dark:text-emerald-300">
             TZS {Number(p.amount || 0).toLocaleString()}
           </p>
         </li>
@@ -267,7 +267,7 @@ export default function PaymentPage() {
 
   if (!user || loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-gray-950 flex items-center justify-center">
         <FiLoader className="animate-spin h-10 w-10 text-emerald-600" />
       </div>
     );
@@ -289,18 +289,18 @@ export default function PaymentPage() {
     paymentMethods.find((m) => m.id === selectedMethod)?.displayName || null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-32 lg:pb-12">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-32 lg:pb-12 dark:from-gray-950 dark:to-gray-950">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <button
             onClick={() => router.push('/dashboard')}
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-100"
           >
             <FiArrowLeft className="mr-2 h-4 w-4" />
             Back to dashboard
           </button>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
             Tanzania Library Association · Membership checkout
           </span>
         </div>
@@ -321,7 +321,7 @@ export default function PaymentPage() {
         )}
 
         {/* Stepper */}
-        <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mb-8 rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-5 shadow-sm">
           <CheckoutStepper
             steps={STEPS}
             currentIndex={stepIndex}
@@ -341,7 +341,7 @@ export default function PaymentPage() {
           {/* Left: stepper content */}
           <div className="space-y-6">
             {stepIndex === 0 && (
-              <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-6 shadow-sm">
                 <CycleSelector
                   cycles={cycles}
                   selectedYears={selectedCycleYears}
@@ -360,7 +360,7 @@ export default function PaymentPage() {
             )}
 
             {stepIndex === 1 && (
-              <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-6 shadow-sm">
                 <PaymentMethodSelector
                   selectedMethod={selectedMethod}
                   onMethodSelect={setSelectedMethod}
@@ -369,7 +369,7 @@ export default function PaymentPage() {
                 <div className="mt-6 flex justify-between">
                   <button
                     onClick={goBack}
-                    className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03]"
                   >
                     Back
                   </button>
@@ -384,11 +384,11 @@ export default function PaymentPage() {
             )}
 
             {stepIndex === 2 && selectedMethod && (
-              <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="text-base font-semibold text-gray-900">
+              <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-6 shadow-sm">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                   Phone number for the payment prompt
                 </h2>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
                   Use the number registered with{' '}
                   <span className="font-medium">{providerLabel}</span>. You'll
                   approve the debit on that handset.
@@ -407,28 +407,28 @@ export default function PaymentPage() {
             )}
 
             {stepIndex === 3 && (
-              <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="text-base font-semibold text-gray-900">
+              <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-6 shadow-sm">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                   Review &amp; pay
                 </h2>
                 <dl className="mt-4 grid grid-cols-2 gap-y-3 text-sm">
-                  <dt className="text-gray-500">Membership type</dt>
-                  <dd className="text-right font-medium text-gray-900">
+                  <dt className="text-gray-500 dark:text-gray-400 dark:text-gray-500">Membership type</dt>
+                  <dd className="text-right font-medium text-gray-900 dark:text-gray-100">
                     {membershipType === 'organization'
                       ? 'Organization'
                       : 'Personal'}
                   </dd>
-                  <dt className="text-gray-500">Cycles</dt>
-                  <dd className="text-right font-medium text-gray-900">
+                  <dt className="text-gray-500 dark:text-gray-400 dark:text-gray-500">Cycles</dt>
+                  <dd className="text-right font-medium text-gray-900 dark:text-gray-100">
                     {selectedCycleYears.join(', ')} ({cycleCount} cycle
                     {cycleCount === 1 ? '' : 's'})
                   </dd>
-                  <dt className="text-gray-500">Payment method</dt>
-                  <dd className="text-right font-medium text-gray-900">
+                  <dt className="text-gray-500 dark:text-gray-400 dark:text-gray-500">Payment method</dt>
+                  <dd className="text-right font-medium text-gray-900 dark:text-gray-100">
                     {providerLabel}
                   </dd>
-                  <dt className="text-gray-500">Phone number</dt>
-                  <dd className="text-right font-medium text-gray-900">
+                  <dt className="text-gray-500 dark:text-gray-400 dark:text-gray-500">Phone number</dt>
+                  <dd className="text-right font-medium text-gray-900 dark:text-gray-100">
                     {phoneNumber}
                   </dd>
                 </dl>
@@ -438,9 +438,9 @@ export default function PaymentPage() {
                     type="checkbox"
                     checked={authorized}
                     onChange={(e) => setAuthorized(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-white/15 text-emerald-600 focus:ring-emerald-500"
                   />
-                  <span className="text-gray-700">
+                  <span className="text-gray-700 dark:text-gray-200">
                     I authorise Tanzania Library Association to debit TZS{' '}
                     <span className="font-semibold">
                       {totalAmount.toLocaleString()}
@@ -462,7 +462,7 @@ export default function PaymentPage() {
                   <button
                     onClick={goBack}
                     disabled={paymentLoading}
-                    className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03] disabled:opacity-50"
                   >
                     Back
                   </button>
@@ -471,7 +471,7 @@ export default function PaymentPage() {
                     disabled={paymentLoading || !authorized}
                     className={`inline-flex items-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all ${
                       paymentLoading || !authorized
-                        ? 'bg-gray-300 cursor-not-allowed'
+                        ? 'bg-gray-300 dark:bg-white/10 cursor-not-allowed'
                         : 'bg-emerald-600 hover:bg-emerald-700'
                     }`}
                   >
@@ -492,16 +492,16 @@ export default function PaymentPage() {
             )}
 
             {/* Recent payments */}
-            <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="text-base font-semibold text-gray-900 mb-2">
+            <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-6 shadow-sm">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Recent payments
               </h3>
               <PaymentHistory />
             </section>
 
             {/* Membership info */}
-            <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm text-sm text-gray-600">
-              <h3 className="text-base font-semibold text-gray-900 mb-3">
+            <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-6 shadow-sm text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">
                 Membership rules
               </h3>
               <ul className="space-y-1">

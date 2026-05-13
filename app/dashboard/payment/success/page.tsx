@@ -165,22 +165,22 @@ export default function PaymentSuccessPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-8">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center py-8">
+      <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
         {/* Status Icon */}
         <div className="flex justify-center mb-6">
           {status === 'loading' && (
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
           )}
           {status === 'success' && (
-            <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center">
+            <div className="h-16 w-16 bg-emerald-100 dark:bg-emerald-500/15 rounded-full flex items-center justify-center">
               <FiCheckCircle className="h-8 w-8 text-emerald-600" />
             </div>
           )}
@@ -202,10 +202,10 @@ export default function PaymentSuccessPage() {
             {status === 'failed' && 'Payment Failed'}
           </h1>
           
-          <p className="text-gray-600 mb-4">{message}</p>
+          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-4">{message}</p>
           
           {reference && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
               Reference: {reference}
             </p>
           )}
@@ -225,7 +225,7 @@ export default function PaymentSuccessPage() {
               
               <button
                 onClick={() => router.push('/dashboard')}
-                className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-white/20 dark:bg-white/10 transition-colors"
               >
                 <FiHome className="mr-2 h-4 w-4" />
                 Dashboard
@@ -245,7 +245,7 @@ export default function PaymentSuccessPage() {
               
               <button
                 onClick={() => router.push('/dashboard')}
-                className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-white/20 dark:bg-white/10 transition-colors"
               >
                 <FiHome className="mr-2 h-4 w-4" />
                 Dashboard
@@ -254,7 +254,7 @@ export default function PaymentSuccessPage() {
           )}
           
           {status === 'loading' && (
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
               <p>Please wait while we verify your payment...</p>
               <p>This may take a few seconds.</p>
             </div>
@@ -262,8 +262,8 @@ export default function PaymentSuccessPage() {
         </div>
 
         {/* Help Information */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <div className="text-center text-sm text-gray-600">
+        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
             <p className="mb-2">Need help? Contact us:</p>
             <p>Email: membership@tla.or.tz</p>
             <p>Phone: +255 22 211 3456</p>

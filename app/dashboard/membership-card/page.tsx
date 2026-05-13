@@ -596,7 +596,7 @@ export default function MembershipCardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
@@ -604,11 +604,11 @@ export default function MembershipCardPage() {
 
   if (error || !membershipStatus?.success) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
           <FiAlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Membership Card</h2>
-          <p className="text-gray-600 mb-4">{error || 'Unable to load membership information'}</p>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Error Loading Membership Card</h2>
+          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-4">{error || 'Unable to load membership information'}</p>
           <button
             onClick={() => router.push('/dashboard')}
             className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
@@ -622,11 +622,11 @@ export default function MembershipCardPage() {
 
   if (!membershipStatus?.canAccessIdCard) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 text-center">
           <FiX className="mx-auto h-12 w-12 text-red-500 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Membership Card Not Available</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Membership Card Not Available</h2>
+          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-4">
             Your membership card is not available because your membership payment is not active.
           </p>
           <div className="space-y-3">
@@ -638,7 +638,7 @@ export default function MembershipCardPage() {
             </button>
             <button
               onClick={() => router.push('/dashboard')}
-              className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+              className="w-full px-4 py-2 bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-white/20 dark:bg-white/10 transition-colors"
             >
               Back to Dashboard
             </button>
@@ -787,11 +787,11 @@ export default function MembershipCardPage() {
         }
       `}</style>
       
-      <div className="min-h-screen bg-gray-100 py-8">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold text-gray-900">Membership Card</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Membership Card</h1>
               <button
                 onClick={forceRefresh}
                 className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
@@ -799,11 +799,11 @@ export default function MembershipCardPage() {
                 Refresh Status
               </button>
             </div>
-            <p className="mt-2 text-gray-600">Your official Tanzania Library Association membership card</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400 dark:text-gray-500">Your official Tanzania Library Association membership card</p>
           </div>
 
           {/* Membership Card */}
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-6 membership-card-container">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 mb-6 membership-card-container">
             <div className="relative">
               {/* Standard Credit Card Size (85.6mm × 53.98mm) */}
               <div className="relative mx-auto membership-card" style={{ width: '336px', height: '212px' }}>
@@ -960,28 +960,28 @@ export default function MembershipCardPage() {
           </div>
 
           {/* Card Information */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Card Information</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Card Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-medium text-gray-700 mb-2">Membership Details</h3>
+                <h3 className="font-medium text-gray-700 dark:text-gray-200 mb-2">Membership Details</h3>
                 <dl className="space-y-2">
                   <div className="flex justify-between">
-                    <dt className="text-gray-600">Status:</dt>
+                    <dt className="text-gray-600 dark:text-gray-400 dark:text-gray-500">Status:</dt>
                     <dd className="font-medium text-emerald-600">Active</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-gray-600">Member Since:</dt>
+                    <dt className="text-gray-600 dark:text-gray-400 dark:text-gray-500">Member Since:</dt>
                     <dd className="font-medium">
                       {new Date(membershipStatus?.membership?.joinedDate || '').toLocaleDateString()}
                     </dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-gray-600">Cycle:</dt>
+                    <dt className="text-gray-600 dark:text-gray-400 dark:text-gray-500">Cycle:</dt>
                     <dd className="font-medium">{membershipStatus?.cycle?.year}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-gray-600">Valid Until:</dt>
+                    <dt className="text-gray-600 dark:text-gray-400 dark:text-gray-500">Valid Until:</dt>
                     <dd className="font-medium">
                       {membershipStatus?.membership?.expiryDate ? 
                         new Date(membershipStatus.membership.expiryDate).toLocaleDateString('en-GB', { 
@@ -996,8 +996,8 @@ export default function MembershipCardPage() {
               </div>
               
               <div>
-                <h3 className="font-medium text-gray-700 mb-2">Usage Instructions</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
+                <h3 className="font-medium text-gray-700 dark:text-gray-200 mb-2">Usage Instructions</h3>
+                <ul className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500 space-y-1">
                   <li>• Present this card for member benefits at libraries</li>
                   <li>• Use membership number for event registrations</li>
                   <li>• Card is valid until the expiry date shown</li>

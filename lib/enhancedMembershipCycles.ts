@@ -5,7 +5,7 @@ import type { RowDataPacket } from 'mysql2';
  * ENHANCED MEMBERSHIP CYCLE SYSTEM
  * Based on user requirements:
  * - Librarian: 40,000 TZS/year (first time), then 30,000 TZS/year
- * - Organization: 50,000 TZS/year
+ * - Organization: 150,000 TZS/year
  * - Regular: 40,000 TZS/year (first time), then 30,000 TZS/year
  * - Cycle: Feb 1 - Jan 31
  * - Due date: Jan 31 (last day for current payment)
@@ -16,7 +16,7 @@ import type { RowDataPacket } from 'mysql2';
 export const ENHANCED_MEMBERSHIP_CONFIG = {
   LIBRARIAN_FIRST_YEAR: 40000,
   LIBRARIAN_RENEWAL: 30000,
-  ORGANIZATION_FEE: 50000,
+  ORGANIZATION_FEE: 150000,
   REGULAR_FIRST_YEAR: 40000,
   REGULAR_RENEWAL: 30000,
   PENALTY_PER_MONTH: 1000, // TZS 1,000 per month (12,000 TZS per year)

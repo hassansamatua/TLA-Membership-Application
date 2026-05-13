@@ -37,27 +37,27 @@ export default function OrderSummary({
   const Body = (
     <div className="space-y-4">
       <div>
-        <h3 className="text-base font-semibold text-gray-900">Order summary</h3>
-        <p className="text-xs text-gray-500">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Order summary</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
           {selected.length} cycle{selected.length === 1 ? '' : 's'} selected
         </p>
       </div>
 
       <dl className="space-y-3 text-sm">
         {selected.length === 0 && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
             Select at least one cycle to continue.
           </p>
         )}
         {selected.map((c) => (
-          <div key={c.cycleYear} className="space-y-1 border-b border-dashed border-gray-200 pb-3 last:border-0 last:pb-0">
+          <div key={c.cycleYear} className="space-y-1 border-b border-dashed border-gray-200 dark:border-white/10 pb-3 last:border-0 last:pb-0">
             <div className="flex justify-between">
-              <dt className="font-medium text-gray-900">Cycle {c.cycleYear}</dt>
-              <dd className="font-medium text-gray-900">
+              <dt className="font-medium text-gray-900 dark:text-gray-100">Cycle {c.cycleYear}</dt>
+              <dd className="font-medium text-gray-900 dark:text-gray-100">
                 TZS {c.totalDue.toLocaleString()}
               </dd>
             </div>
-            <div className="flex justify-between text-xs text-gray-500">
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
               <dt>Base fee</dt>
               <dd>TZS {c.baseAmount.toLocaleString()}</dd>
             </div>
@@ -72,8 +72,8 @@ export default function OrderSummary({
       </dl>
 
       {selected.length > 0 && (
-        <div className="border-t border-gray-200 pt-3">
-          <div className="flex justify-between text-sm text-gray-600">
+        <div className="border-t border-gray-200 dark:border-white/10 pt-3">
+          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
             <span>Subtotal</span>
             <span>TZS {subtotal.toLocaleString()}</span>
           </div>
@@ -84,8 +84,8 @@ export default function OrderSummary({
             </div>
           )}
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-sm font-medium text-gray-900">Total</span>
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Total</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               TZS {total.toLocaleString()}
             </span>
           </div>
@@ -96,10 +96,10 @@ export default function OrderSummary({
         type="button"
         disabled={ctaDisabled || selected.length === 0 || ctaLoading}
         onClick={onCta}
-        className={`w-full rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all ${
+        className={`w-full rounded-xl px-4 py-3 text-sm font-semibold shadow-sm transition-all ${
           ctaDisabled || selected.length === 0 || ctaLoading
-            ? 'bg-gray-300 cursor-not-allowed'
-            : 'bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99]'
+            ? 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-white/5 dark:text-gray-500'
+            : 'bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.99]'
         }`}
       >
         {ctaLoading ? 'Processing…' : ctaLabel}
@@ -108,7 +108,7 @@ export default function OrderSummary({
         )}
       </button>
 
-      <p className="flex items-center justify-center gap-1.5 text-[11px] text-gray-500">
+      <p className="flex items-center justify-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400 dark:text-gray-500">
         <FiShield className="h-3 w-3" />
         Secured by AzamPay · Tanzania Library Association
       </p>
@@ -119,7 +119,7 @@ export default function OrderSummary({
     <>
       {/* Desktop: sticky right rail */}
       <aside className="hidden lg:block lg:sticky lg:top-6 h-fit">
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-5 shadow-sm">
           {Body}
         </div>
       </aside>
@@ -130,11 +130,11 @@ export default function OrderSummary({
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="fixed bottom-0 inset-x-0 z-30 flex items-center justify-between gap-4 border-t border-gray-200 bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]"
+          className="fixed bottom-0 inset-x-0 z-30 flex items-center justify-between gap-4 border-t border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]"
         >
           <span className="flex flex-col text-left">
-            <span className="text-[11px] uppercase tracking-wide text-gray-500">Total</span>
-            <span className="text-lg font-bold text-gray-900">
+            <span className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400 dark:text-gray-500">Total</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
               TZS {total.toLocaleString()}
             </span>
           </span>
@@ -153,17 +153,17 @@ export default function OrderSummary({
           />
         )}
         <div
-          className={`fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-white p-5 shadow-2xl transition-transform duration-200 ${
+          className={`fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-white dark:bg-gray-900 p-5 shadow-2xl transition-transform duration-200 ${
             mobileOpen ? 'translate-y-0' : 'translate-y-full'
           }`}
           aria-hidden={!mobileOpen}
         >
-          <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-gray-300" />
+          <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-gray-300 dark:bg-white/10" />
           {Body}
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
-            className="mt-3 w-full rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-600"
+            className="mt-3 w-full rounded-xl border border-gray-200 dark:border-white/10 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500"
           >
             Close
           </button>

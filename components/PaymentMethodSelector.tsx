@@ -89,7 +89,7 @@ export default function PaymentMethodSelector({ selectedMethod, onMethodSelect, 
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Payment Method</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Select Payment Method</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {paymentMethods.map((method) => {
@@ -103,7 +103,7 @@ export default function PaymentMethodSelector({ selectedMethod, onMethodSelect, 
               className={`relative p-4 rounded-lg border-2 transition-all duration-200 ${
                 selectedMethod === method.id
                   ? 'border-emerald-500 shadow-lg transform scale-105'
-                  : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:border-white/15 hover:shadow-md'
               }`}
             >
               {/* Selection indicator */}
@@ -132,7 +132,7 @@ export default function PaymentMethodSelector({ selectedMethod, onMethodSelect, 
                   <h4 className="font-semibold" style={{ color: logo?.color }}>
                     {method.displayName}
                   </h4>
-                  <p className="text-xs text-gray-600 mt-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-500 mt-1">
                     {method.description}
                   </p>
                 </div>
@@ -152,11 +152,11 @@ export default function PaymentMethodSelector({ selectedMethod, onMethodSelect, 
 
       {/* Selected method details */}
       {selectedMethod && (
-        <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+        <div className="mt-6 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 rounded-lg">
           <div className="flex items-center space-x-3">
             <FiSmartphone className="w-5 h-5 text-emerald-600" />
             <div>
-              <p className="font-medium text-emerald-800">
+              <p className="font-medium text-emerald-800 dark:text-emerald-300">
                 Selected: {paymentMethods.find(m => m.id === selectedMethod)?.displayName}
               </p>
               <p className="text-sm text-emerald-600">

@@ -112,34 +112,34 @@ export default function CreateEventPage() {
 
   if (!isAuthenticated || (user && !user.isAdmin)) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+            className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-100 mb-6"
           >
             <FiArrowLeft className="mr-2" />
             Back to Events
           </button>
           
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Create New Event</h1>
-          <p className="text-gray-600">Fill in the details below to create a new event</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Create New Event</h1>
+          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500">Fill in the details below to create a new event</p>
         </div>
 
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div className="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
           <form onSubmit={handleSubmit} className="p-6">
             <div className="space-y-6">
               {/* Event Title */}
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Event Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -148,7 +148,7 @@ export default function CreateEventPage() {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                  className="mt-1 block w-full border border-gray-300 dark:border-white/15 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Enter event title"
                   required
                 />
@@ -156,7 +156,7 @@ export default function CreateEventPage() {
 
               {/* Description */}
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Description
                 </label>
                 <textarea
@@ -165,7 +165,7 @@ export default function CreateEventPage() {
                   rows={3}
                   value={formData.description}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                  className="mt-1 block w-full border border-gray-300 dark:border-white/15 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Describe your event"
                 />
               </div>
@@ -173,7 +173,7 @@ export default function CreateEventPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Event Date */}
                 <div className="md:col-span-2">
-                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Event Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -183,7 +183,7 @@ export default function CreateEventPage() {
                     value={formData.startDate}
                     onChange={handleChange}
                     min={new Date().toISOString().split('T')[0]}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                    className="mt-1 block w-full border border-gray-300 dark:border-white/15 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     required
                   />
                 </div>
@@ -191,7 +191,7 @@ export default function CreateEventPage() {
                 <div className="grid grid-cols-2 gap-6 md:col-span-2">
                   {/* Start Time */}
                   <div>
-                    <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       From <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -200,14 +200,14 @@ export default function CreateEventPage() {
                       name="startTime"
                       value={formData.startTime}
                       onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                      className="mt-1 block w-full border border-gray-300 dark:border-white/15 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                       required
                     />
                   </div>
 
                   {/* End Time */}
                   <div>
-                    <label htmlFor="endTime" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="endTime" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                       To <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -217,7 +217,7 @@ export default function CreateEventPage() {
                       value={formData.endTime}
                       onChange={handleChange}
                       min={formData.startTime}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                      className="mt-1 block w-full border border-gray-300 dark:border-white/15 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                       required
                     />
                   </div>
@@ -225,7 +225,7 @@ export default function CreateEventPage() {
 
                 {/* Location */}
                 <div className="md:col-span-2">
-                  <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Location
                   </label>
                   <input
@@ -234,14 +234,14 @@ export default function CreateEventPage() {
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                    className="mt-1 block w-full border border-gray-300 dark:border-white/15 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Event location"
                   />
                 </div>
 
                 {/* Capacity */}
                 <div>
-                  <label htmlFor="capacity" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="capacity" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Maximum Attendees
                   </label>
                   <input
@@ -251,18 +251,18 @@ export default function CreateEventPage() {
                     min="1"
                     value={formData.capacity}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                    className="mt-1 block w-full border border-gray-300 dark:border-white/15 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 </div>
 
                 {/* Fee Input */}
                 <div className="md:col-span-2">
-                  <label htmlFor="fee" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="fee" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Event Fee (TZS)
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 sm:text-sm">TZS</span>
+                      <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500 sm:text-sm">TZS</span>
                     </div>
                     <input
                       type="number"
@@ -272,11 +272,11 @@ export default function CreateEventPage() {
                       step="1000"
                       value={formData.fee}
                       onChange={handleChange}
-                      className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-16 pr-12 sm:text-sm border-gray-300 rounded-md py-2 border"
+                      className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-16 pr-12 sm:text-sm border-gray-300 dark:border-white/15 rounded-md py-2 border"
                       placeholder="Enter fee amount"
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                     Enter 0 for free events
                   </p>
                 </div>
@@ -287,7 +287,7 @@ export default function CreateEventPage() {
               <button
                 type="button"
                 onClick={() => router.push('/dashboard/events')}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-white/15 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
               >
                 <FiX className="-ml-1 mr-2 h-5 w-5" />
                 Cancel

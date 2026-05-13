@@ -50,8 +50,8 @@ export default function CheckoutStepper({
                   isComplete
                     ? 'border-emerald-600 bg-emerald-600 text-white'
                     : isCurrent
-                    ? 'border-emerald-600 bg-white text-emerald-600'
-                    : 'border-gray-300 bg-white text-gray-400'
+                    ? 'border-emerald-600 bg-white dark:bg-gray-900 text-emerald-600'
+                    : 'border-gray-300 dark:border-white/15 bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500'
                 }`}
                 aria-hidden="true"
               >
@@ -61,16 +61,16 @@ export default function CheckoutStepper({
                 <span
                   className={`text-sm font-medium ${
                     isCurrent
-                      ? 'text-gray-900'
+                      ? 'text-gray-900 dark:text-gray-100'
                       : isComplete
-                      ? 'text-gray-700'
-                      : 'text-gray-400'
+                      ? 'text-gray-700 dark:text-gray-200'
+                      : 'text-gray-400 dark:text-gray-500'
                   }`}
                 >
                   {step.label}
                 </span>
                 {step.description && (
-                  <span className="text-xs text-gray-500">{step.description}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">{step.description}</span>
                 )}
               </span>
             </button>
@@ -78,7 +78,7 @@ export default function CheckoutStepper({
               <div
                 aria-hidden="true"
                 className={`h-px w-full mt-3 ${
-                  isComplete ? 'bg-emerald-600' : 'bg-gray-200'
+                  isComplete ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-white/10'
                 }`}
               />
             )}

@@ -459,7 +459,7 @@ export default function NewsPage() {
     switch (priority) {
       case 'urgent': return 'border-red-500 bg-red-50';
       case 'high': return 'border-orange-500 bg-orange-50';
-      case 'low': return 'border-gray-300 bg-gray-50';
+      case 'low': return 'border-gray-300 dark:border-white/15 bg-gray-50 dark:bg-white/[0.03]';
       default: return 'border-yellow-500 bg-yellow-50';
     }
   };
@@ -473,18 +473,18 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
       {/* Header */}
-      <div className="bg-white shadow">
+      <div className="bg-white dark:bg-gray-900 shadow">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center">
             <button
               onClick={() => router.push('/dashboard')}
-              className="mr-4 text-gray-600 hover:text-gray-900"
+              className="mr-4 text-gray-600 hover:text-gray-900 dark:text-gray-100"
             >
               ← Back
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">News & Notifications</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">News & Notifications</h1>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
@@ -494,8 +494,8 @@ export default function NewsPage() {
                   disabled={isBulkUpdating}
                   className={`text-sm font-medium transition-all duration-200 ${
                     isBulkUpdating 
-                      ? 'text-gray-400 cursor-not-allowed' 
-                      : 'text-emerald-600 hover:text-emerald-700 hover:underline'
+                      ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' 
+                      : 'text-emerald-600 hover:text-emerald-700 dark:text-emerald-300 hover:underline'
                   }`}
                 >
                   {isBulkUpdating ? 'Processing...' : 'Mark all as read'}
@@ -509,7 +509,7 @@ export default function NewsPage() {
                     disabled={isBulkUpdating}
                     className={`text-sm font-medium transition-all duration-200 ${
                       isBulkUpdating 
-                        ? 'text-gray-400 cursor-not-allowed' 
+                        ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' 
                         : 'text-blue-600 hover:text-blue-700 hover:underline'
                     }`}
                   >
@@ -521,20 +521,20 @@ export default function NewsPage() {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => fetchNews(pagination.page)}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-200 transition-colors"
                 title="Refresh news"
               >
                 <FiRefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
               </button>
               <div className="relative">
-                <FiBell className="h-6 w-6 text-gray-600" />
+                <FiBell className="h-6 w-6 text-gray-600 dark:text-gray-400 dark:text-gray-500" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
                     {unreadCount}
                   </span>
                 )}
               </div>
-              <div className="flex items-center text-xs text-gray-500">
+              <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                 {isAutoRefreshing ? (
                   <>
                     <FiWifi className="h-3 w-3 text-emerald-500" />
@@ -542,14 +542,14 @@ export default function NewsPage() {
                   </>
                 ) : (
                   <>
-                    <FiWifiOff className="h-3 w-3 text-gray-400" />
+                    <FiWifiOff className="h-3 w-3 text-gray-400 dark:text-gray-500" />
                     <span className="ml-1">Offline</span>
                   </>
                 )}
               </div>
             </div>
             {lastUpdated && (
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </div>
             )}
@@ -577,16 +577,16 @@ export default function NewsPage() {
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500 mx-auto"></div>
             </div>
           ) : news.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-8 text-center">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-8 text-center">
               <FiBell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No news yet</h3>
-              <p className="text-gray-500">Check back later for updates and announcements</p>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No news yet</h3>
+              <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">Check back later for updates and announcements</p>
             </div>
           ) : (
             news.map((newsItem, index) => (
               <div
                 key={`${newsItem.id}-${newsItem.sentAt}-${index}`}
-                className={`bg-white rounded-lg shadow border-l-4 ${getPriorityColor(newsItem.priority)} ${
+                className={`bg-white dark:bg-gray-900 rounded-lg shadow border-l-4 ${getPriorityColor(newsItem.priority)} ${
                   !newsItem.is_read ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
                 }`}
               >
@@ -598,7 +598,7 @@ export default function NewsPage() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          <h3 className={`text-lg font-medium ${!newsItem.is_read ? 'text-gray-900' : 'text-gray-600'}`}>
+                          <h3 className={`text-lg font-medium ${!newsItem.is_read ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 dark:text-gray-500'}`}>
                             {newsItem.title}
                           </h3>
                           {!newsItem.is_read && (
@@ -610,10 +610,10 @@ export default function NewsPage() {
                             {newsItem.type}
                           </span>
                         </div>
-                        <p className={`${!newsItem.is_read ? 'text-gray-800' : 'text-gray-600'} mb-3`}>
+                        <p className={`${!newsItem.is_read ? 'text-gray-800 dark:text-gray-200' : 'text-gray-600 dark:text-gray-400 dark:text-gray-500'} mb-3`}>
                           {newsItem.message}
                         </p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                           <div className="flex items-center">
                             <FiUser className="h-4 w-4 mr-1" />
                             {newsItem.sender_name}
@@ -650,7 +650,7 @@ export default function NewsPage() {
                         className={`p-2 rounded-md transition-all duration-200 transform hover:scale-105 ${
                           newsItem.is_read 
                             ? 'text-blue-600 hover:bg-blue-50 hover:text-blue-700' 
-                            : 'text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700'
+                            : 'text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:text-emerald-300'
                         }`}
                         title={newsItem.is_read ? "Mark as unread" : "Mark as read"}
                       >
@@ -670,22 +670,22 @@ export default function NewsPage() {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="mt-6 flex justify-between items-center bg-white rounded-lg shadow p-4">
-            <span className="text-sm text-gray-600">
+          <div className="mt-6 flex justify-between items-center bg-white dark:bg-gray-900 rounded-lg shadow p-4">
+            <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
               Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} news
             </span>
             <div className="flex space-x-2">
               <button
                 onClick={() => fetchNews(pagination.page - 1)}
                 disabled={pagination.page === 1}
-                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="px-3 py-1 border border-gray-300 dark:border-white/15 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03]"
               >
                 Previous
               </button>
               <button
                 onClick={() => fetchNews(pagination.page + 1)}
                 disabled={pagination.page === pagination.totalPages}
-                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="px-3 py-1 border border-gray-300 dark:border-white/15 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-white/[0.03]"
               >
                 Next
               </button>

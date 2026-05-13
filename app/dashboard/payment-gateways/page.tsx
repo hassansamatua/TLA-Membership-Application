@@ -10,11 +10,11 @@ export default function PaymentGatewaysPage() {
   const [membershipType, setMembershipType] = useState<'personal' | 'organization'>('personal');
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow-lg rounded-lg">
+        <div className="bg-white dark:bg-gray-900 shadow-lg rounded-lg">
           <div className="px-6 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 text-center">
               Payment Gateway Testing
             </h1>
             
@@ -25,7 +25,7 @@ export default function PaymentGatewaysPage() {
                   className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                     gateway === 'testing' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-200 text-gray-700'
+                      : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-200'
                   }`}
                 >
                   Testing Gateway
@@ -35,7 +35,7 @@ export default function PaymentGatewaysPage() {
                   className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                     gateway === 'azampay' 
                       ? 'bg-emerald-600 text-white' 
-                      : 'bg-gray-200 text-gray-700'
+                      : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-200'
                   }`}
                 >
                   AzamPay Integration
@@ -48,7 +48,7 @@ export default function PaymentGatewaysPage() {
                   className={`px-6 py-2 rounded-lg font-medium transition-colors ${
                     membershipType === 'personal' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-200 text-gray-700'
+                      : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-200'
                   }`}
                 >
                   Personal (40,000 TZS)
@@ -58,22 +58,22 @@ export default function PaymentGatewaysPage() {
                   className={`px-6 py-2 rounded-lg font-medium transition-colors ${
                     membershipType === 'organization' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-200 text-gray-700'
+                      : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-200'
                   }`}
                 >
-                  Organization (50,000 TZS)
+                  Organization (150,000 TZS)
                 </button>
               </div>
 
               <div className="flex justify-center mb-8">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   Amount (TZS)
                 </label>
                 <input
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/15 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="40000"
                 />
               </div>
@@ -81,7 +81,7 @@ export default function PaymentGatewaysPage() {
 
             {gateway === 'testing' && (
               <div className="border-t pt-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">Testing Payment Gateway</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Testing Payment Gateway</h2>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                   <div className="flex items-center mb-4">
                     <div className="h-6 w-6 text-blue-600 mr-2">
@@ -111,7 +111,7 @@ export default function PaymentGatewaysPage() {
 
             {gateway === 'azampay' && (
               <div className="border-t pt-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">AzamPay Integration</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">AzamPay Integration</h2>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
                   <div className="flex items-center mb-4">
                     <div className="h-6 w-6 text-emerald-600 mr-2">
@@ -119,11 +119,11 @@ export default function PaymentGatewaysPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 2 0 0 0 0 0-2 2v2a2 2 0 0 0 0-2 2v2a2 2 0 0 0 0-2 2V7a2 2 0 0 0 0-2 2v2a2 2 0 0 0 0-2 2V7a2 2 0 0 0 0-2 2z" />
                       </svg>
                     </div>
-                    <span className="text-sm text-emerald-800">
+                    <span className="text-sm text-emerald-800 dark:text-emerald-300">
                       <strong>Production Mode</strong> - Real AzamPay API
                     </span>
                   </div>
-                  <p className="text-xs text-emerald-700">
+                  <p className="text-xs text-emerald-700 dark:text-emerald-300">
                     This gateway connects to the actual AzamPay API for real payment processing.
                     Use this for production payments with real transactions.
                   </p>
