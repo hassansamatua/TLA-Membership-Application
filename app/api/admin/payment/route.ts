@@ -88,15 +88,15 @@ export async function GET(request: Request) {
     const user = users[0];
     const joinDate = new Date(user.created_at || user.join_date || user.createdAt);
 
-    // Get existing payments
+    // Get existing payments (column is `cycle_year`, not `payment_year`)
     const [payments] = await connection.query<RowDataPacket[]>(
       `SELECT * FROM membership_payments 
        WHERE user_id = ? 
-       ORDER BY payment_year DESC`,
+       ORDER BY cycle_year DESC`,
       [userId]
     );
 
-    const paidYears = (payments as any[]).map(p => p.payment_year);
+    const paidYears = (payments as any[]).map(p => p.cycle_year);
 
     // Calculate payment plan
     const paymentPlan = calculatePaymentPlan(
@@ -198,13 +198,13 @@ export async function POST(request: Request) {
     const user = users[0];
     const joinDate = new Date(user.created_at);
 
-    // Get existing payments
+    // Get existing payments (column is `cycle_year`)
     const [existingPayments] = await connection.query<RowDataPacket[]>(
-      `SELECT payment_year FROM membership_payments WHERE user_id = ?`,
+      `SELECT cycle_year FROM membership_payments WHERE user_id = ?`,
       [userId]
     );
 
-    const paidYears = (existingPayments as any[]).map(p => p.payment_year);
+    const paidYears = (existingPayments as any[]).map(p => p.cycle_year);
 
     // Check for duplicate payments
     const duplicateYears = selectedYears.filter((year: number) => paidYears.includes(year));
@@ -252,20 +252,20 @@ export async function POST(request: Request) {
           penalty = PENALTY_FEE;
         }
 
-        // Insert payment record
+        // Insert payment record (column is `cycle_year`; `reference` is required NOT NULL)
+        const reference = `ADMIN-${Date.now()}-${userId}-${year}`;
         await connection.query(
-          `INSERT INTO membership_payments 
-           (user_id, payment_year, amount, penalty_amount, payment_method, transaction_id, payment_date, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO membership_payments
+            (user_id, cycle_year, amount, payment_method, reference,
+             payment_date, status, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, 'completed', NOW(), NOW())`,
           [
             userId,
             year,
-            MEMBERSHIP_FEE,
-            penalty,
+            MEMBERSHIP_FEE + penalty,
             paymentMethod,
-            transactionId || null,
+            transactionId || reference,
             now,
-            'completed'
           ]
         );
       }

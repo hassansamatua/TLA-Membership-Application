@@ -451,7 +451,7 @@ export default function NewsPage() {
       case 'urgent': return 'text-red-600 bg-red-100';
       case 'announcement': return 'text-purple-600 bg-purple-100';
       case 'notification': return 'text-blue-600 bg-blue-100';
-      default: return 'text-green-600 bg-green-100';
+      default: return 'text-emerald-600 bg-emerald-100';
     }
   };
 
@@ -467,7 +467,7 @@ export default function NewsPage() {
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -495,7 +495,7 @@ export default function NewsPage() {
                   className={`text-sm font-medium transition-all duration-200 ${
                     isBulkUpdating 
                       ? 'text-gray-400 cursor-not-allowed' 
-                      : 'text-green-600 hover:text-green-700 hover:underline'
+                      : 'text-emerald-600 hover:text-emerald-700 hover:underline'
                   }`}
                 >
                   {isBulkUpdating ? 'Processing...' : 'Mark all as read'}
@@ -537,7 +537,7 @@ export default function NewsPage() {
               <div className="flex items-center text-xs text-gray-500">
                 {isAutoRefreshing ? (
                   <>
-                    <FiWifi className="h-3 w-3 text-green-500" />
+                    <FiWifi className="h-3 w-3 text-emerald-500" />
                     <span className="ml-1">Live</span>
                   </>
                 ) : (
@@ -574,7 +574,7 @@ export default function NewsPage() {
         <div className="space-y-4">
           {isLoading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500 mx-auto"></div>
             </div>
           ) : news.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
@@ -629,8 +629,8 @@ export default function NewsPage() {
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium">
                               {newsItem.is_read ? (
                                 <>
-                                  <FiCheck className="h-3 w-3 mr-1 text-green-500" />
-                                  <span className="text-green-600">Read</span>
+                                  <FiCheck className="h-3 w-3 mr-1 text-emerald-500" />
+                                  <span className="text-emerald-600">Read</span>
                                 </>
                               ) : (
                                 <>
@@ -650,7 +650,7 @@ export default function NewsPage() {
                         className={`p-2 rounded-md transition-all duration-200 transform hover:scale-105 ${
                           newsItem.is_read 
                             ? 'text-blue-600 hover:bg-blue-50 hover:text-blue-700' 
-                            : 'text-green-600 hover:bg-green-50 hover:text-green-700'
+                            : 'text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700'
                         }`}
                         title={newsItem.is_read ? "Mark as unread" : "Mark as read"}
                       >

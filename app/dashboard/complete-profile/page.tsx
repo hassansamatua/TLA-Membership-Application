@@ -562,7 +562,7 @@ export default function CompleteProfilePage() {
                       JPG or PNG (Min. 400×400px, Max. 2MB)
                     </p>
                     {formData.personalInfo.profilePicture && (
-                      <p className="mt-1 text-xs text-green-600">
+                      <p className="mt-1 text-xs text-emerald-600">
                         ✓ Photo meets requirements
                       </p>
                     )}
@@ -966,7 +966,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                       name={`yearOfGraduation-${index}`}
                       min="1900"
                       max={new Date().getFullYear()}
-                      className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       value={edu.yearOfGraduation}
                       onChange={(e) => {
                         const newEducation = [...formData.education];
@@ -1002,7 +1002,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
             <div className="flex justify-end">
               <button
                 type="button"
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-emerald-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={() => {
                   const newEducation = [
                     ...formData.education,
@@ -1155,7 +1155,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                   <select
                     id="paymentMethod"
                     name="paymentMethod"
-                    className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     value={formData.payment.paymentMethod}
                     onChange={(e) => handleInputChange('payment', 'paymentMethod', e.target.value)}
                   >
@@ -1178,7 +1178,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="cardNumber"
                         name="cardNumber"
-                        className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         value={formData.payment.cardNumber || ''}
                         onChange={(e) => handleInputChange('payment', 'cardNumber', e.target.value)}
                         placeholder="1234 5678 9012 3456"
@@ -1194,7 +1194,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="expiryDate"
                         name="expiryDate"
-                        className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         value={formData.payment.expiryDate || ''}
                         onChange={(e) => handleInputChange('payment', 'expiryDate', e.target.value)}
                         placeholder="MM/YY"
@@ -1210,7 +1210,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="cvv"
                         name="cvv"
-                        className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         value={formData.payment.cvv || ''}
                         onChange={(e) => handleInputChange('payment', 'cvv', e.target.value)}
                         placeholder="123"
@@ -1230,7 +1230,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                         type="text"
                         id="bankName"
                         name="bankName"
-                        className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         value={formData.payment.bankName || ''}
                         onChange={(e) => handleInputChange('payment', 'bankName', e.target.value)}
                       />
@@ -1426,7 +1426,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                   />
                   <label
                     htmlFor="cv"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-green-500 focus-within:outline-none"
+                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-emerald-500 focus-within:outline-none"
                   >
                     <span>Upload file</span>
                     <input id="cv" name="cv" type="file" className="sr-only" />
@@ -1480,7 +1480,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                   key={tab.id}
                   onClick={() => setActiveSection(tab.id)}
                   className={`whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm flex items-center ${activeSection === tab.id
-                    ? 'border-green-500 text-green-600'
+                    ? 'border-emerald-500 text-emerald-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                 >
@@ -1516,7 +1516,7 @@ onChange={(e) => handleInputChange('professionalInfo', 'occupation', e.target.va
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50"
                 >
                   {isSubmitting ? 'Saving...' : 'Save and Continue'}
                 </button>

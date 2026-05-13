@@ -82,7 +82,7 @@ export default function PaymentStatusSidebar() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'paid':
-        return <FiCheckCircle className="h-4 w-4 text-green-500" />;
+        return <FiCheckCircle className="h-4 w-4 text-emerald-500" />;
       case 'pending':
         return <FiClock className="h-4 w-4 text-yellow-500" />;
       case 'overdue':
@@ -97,7 +97,7 @@ export default function PaymentStatusSidebar() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'paid':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-emerald-600 bg-emerald-50 border-emerald-200';
       case 'pending':
         return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'overdue':
@@ -235,7 +235,7 @@ export default function PaymentStatusSidebar() {
       <div className="mt-4 pt-3 border-t border-gray-200">
         <a
           href="/dashboard/payment"
-          className="w-full flex items-center justify-center px-3 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+          className="w-full flex items-center justify-center px-3 py-2 bg-emerald-600 text-white text-sm rounded-md hover:bg-emerald-700 transition-colors"
         >
           <FiCreditCard className="h-4 w-4 mr-2" />
           Make Payment

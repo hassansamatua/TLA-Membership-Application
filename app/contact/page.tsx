@@ -113,7 +113,7 @@ export default function ContactPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -121,11 +121,11 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-green-600 to-green-700 text-white py-20">
+      <section className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">{mainHeading}</h1>
-            <p className="text-xl mb-8 text-green-100 max-w-3xl mx-auto">{description}</p>
+            <p className="text-xl mb-8 text-emerald-100 max-w-3xl mx-auto">{description}</p>
           </div>
         </div>
       </section>
@@ -135,24 +135,24 @@ export default function ContactPage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center">
-              <div className="bg-green-100 p-4 rounded-full inline-block mb-4">
-                <FiMail className="h-6 w-6 text-green-600" />
+              <div className="bg-emerald-100 p-4 rounded-full inline-block mb-4">
+                <FiMail className="h-6 w-6 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Email</h3>
               <p className="text-gray-600">{email}</p>
             </div>
             
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center">
-              <div className="bg-green-100 p-4 rounded-full inline-block mb-4">
-                <FiPhone className="h-6 w-6 text-green-600" />
+              <div className="bg-emerald-100 p-4 rounded-full inline-block mb-4">
+                <FiPhone className="h-6 w-6 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Phone</h3>
               <p className="text-gray-600">{phone}</p>
             </div>
             
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center">
-              <div className="bg-green-100 p-4 rounded-full inline-block mb-4">
-                <FiMapPin className="h-6 w-6 text-green-600" />
+              <div className="bg-emerald-100 p-4 rounded-full inline-block mb-4">
+                <FiMapPin className="h-6 w-6 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Address</h3>
               <p className="text-gray-600">{address}</p>
@@ -181,7 +181,7 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Your Name"
                   />
                 </div>
@@ -195,7 +195,7 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -211,7 +211,7 @@ export default function ContactPage() {
                   value={formData.subject}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="How can we help?"
                 />
               </div>
@@ -226,7 +226,7 @@ export default function ContactPage() {
                   onChange={handleInputChange}
                   required
                   rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Tell us more about your inquiry..."
                 />
               </div>
@@ -235,7 +235,7 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-emerald-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-emerald-700 transition-colors inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <>
@@ -260,7 +260,7 @@ export default function ContactPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Find Us</h2>
-            <div className="w-24 h-1 bg-green-600 mx-auto"></div>
+            <div className="w-24 h-1 bg-emerald-600 mx-auto"></div>
           </div>
           
           <div className="max-w-5xl mx-auto">
@@ -294,7 +294,7 @@ export default function ContactPage() {
               <div className="mt-6 flex flex-wrap gap-4 justify-center">
                 <button
                   onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=Tanzania+Library+Association+Dar+es+Salaam`, '_blank')}
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors inline-flex items-center"
+                  className="bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors inline-flex items-center"
                 >
                   <FiMapPin className="mr-2 h-5 w-5" />
                   Open in Google Maps
@@ -322,7 +322,7 @@ export default function ContactPage() {
               {/* Address Information */}
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-start space-x-3">
-                  <FiMapPin className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <FiMapPin className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-1">Visit Us</h4>
                     <p className="text-gray-600">{address}</p>

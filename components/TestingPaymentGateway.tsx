@@ -121,7 +121,7 @@ export default function TestingPaymentGateway({ amount, membershipType, onPaymen
         <button
           onClick={processTestPayment}
           disabled={status === 'processing'}
-          className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="w-full flex items-center justify-center px-4 py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
           {status === 'processing' && (
             <>

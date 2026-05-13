@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center h-16 w-16 bg-green-600 rounded-full mb-8">
+          <div className="inline-flex items-center justify-center h-16 w-16 bg-emerald-600 rounded-full mb-8">
             <FiMail className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Forgot Password</h1>
@@ -96,13 +96,13 @@ export default function ForgotPasswordPage() {
 
         {message && (
           <div className={`p-4 rounded-md mb-4 ${
-            message.includes('sent') ? 'bg-green-50 border-green-200' : 
+            message.includes('sent') ? 'bg-emerald-50 border-emerald-200' : 
             message.includes('success') ? 'bg-blue-50 border-blue-200' : 
             message.includes('Failed') ? 'bg-red-50 border-red-200' : 
             'bg-yellow-50 border-yellow-200'
           }`}>
             <div className="flex items-center">
-              {message.includes('success') && <FiCheck className="h-5 w-5 text-green-600 mr-2" />}
+              {message.includes('success') && <FiCheck className="h-5 w-5 text-emerald-600 mr-2" />}
               {message.includes('Failed') && <FiAlertCircle className="h-5 w-5 text-red-600 mr-2" />}
               <p className="text-sm">{message}</p>
             </div>
@@ -118,7 +118,7 @@ export default function ForgotPasswordPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
               placeholder="Enter your email"
               required
             />
@@ -128,11 +128,11 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading || !email}
-              className="px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md border border-transparent"
+              className="px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md border border-transparent"
             >
               {isLoading ? (
                 <div className="inline-flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-500 border-white border-opacity-25"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-emerald-500 border-white border-opacity-25"></div>
                   <span className="ml-2">Sending...</span>
                 </div>
               ) : 'Send Reset Code'}
@@ -153,7 +153,7 @@ export default function ForgotPasswordPage() {
         <div className="text-center mt-6 space-y-4">
           <button
             onClick={() => router.push('/auth/login')}
-            className="text-sm text-green-600 hover:text-green-700 font-medium"
+            className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
           >
             Back to Login
           </button>
@@ -178,7 +178,7 @@ export default function ForgotPasswordPage() {
                   type="text"
                   value={resetCode}
                   onChange={(e) => setResetCode(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Enter 6-digit code"
                   maxLength={6}
                 />
@@ -192,7 +192,7 @@ export default function ForgotPasswordPage() {
                     setMessage('Please enter a valid 6-digit code');
                   }
                 }}
-                className="w-full px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-md border border-transparent"
+                className="w-full px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-md border border-transparent"
               >
                 Submit Code & Reset Password
               </button>

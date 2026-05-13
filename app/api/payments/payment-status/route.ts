@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
               membershipNumber: membership.membership_number,
               membershipType: membership.membership_type,
               status: membership.status,
-              joinedDate: membership.join_date,
+              joinedDate: membership.joined_date,
               expiryDate: membership.expiry_date,
               lastPaymentDate: membership.payment_date,
             }

@@ -94,7 +94,7 @@ export async function createMembershipCardTemplate(): Promise<string> {
     try {
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
-      logoImg.src = '/logo (3).png'; // Use the same path as the SVG
+      logoImg.src = '/logo.png'; // Use the same path as the SVG
       
       await new Promise((resolve, reject) => {
         logoImg.onload = resolve;

@@ -163,7 +163,7 @@ export default function MemberManagementPage() {
   if (isPageLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -172,7 +172,7 @@ export default function MemberManagementPage() {
     <div>
       {/* Header Section */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-green-700 to-green-500 rounded-2xl p-8 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-emerald-700 to-emerald-500 rounded-2xl p-8 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">Member Management</h1>
@@ -181,7 +181,7 @@ export default function MemberManagementPage() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1">
                   <span className="text-sm font-medium">Total: {users.length}</span>
                 </div>
-                <div className="bg-green-900/30 backdrop-blur-sm rounded-lg px-3 py-1">
+                <div className="bg-emerald-900/30 backdrop-blur-sm rounded-lg px-3 py-1">
                   <span className="text-sm font-medium">Active: {tabCounts.approved}</span>
                 </div>
                 <div className="bg-yellow-400/30 backdrop-blur-sm rounded-lg px-3 py-1">
@@ -360,7 +360,7 @@ export default function MemberManagementPage() {
                         : user.status === 'expired'
                         ? 'bg-gray-100 text-gray-800'
                         : user.isApproved
-                        ? 'bg-green-100 text-green-800'
+                        ? 'bg-emerald-100 text-emerald-800'
                         : 'bg-yellow-100 text-yellow-800'
                     }`}>
                       {user.status === 'rejected' ? (
@@ -408,7 +408,7 @@ export default function MemberManagementPage() {
                       {!user.isApproved && user.status !== 'rejected' && user.status !== 'expired' && (
                         <button
                           onClick={() => handleApprove(user.id)}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                           title="Approve User"
                         >
                           <FiCheck className="h-4 w-4" />
@@ -417,7 +417,7 @@ export default function MemberManagementPage() {
                       {user.status === 'rejected' && (
                         <button
                           onClick={() => handleApprove(user.id)}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                           title="Re-approve User"
                         >
                           <FiCheck className="h-4 w-4" />
@@ -472,7 +472,7 @@ export default function MemberManagementPage() {
                   // TODO: Implement bulk actions (approve, delete, export)
                   alert('Bulk actions coming soon!');
                 }}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-green-700 bg-green-100 hover:bg-green-200 transition-colors"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-emerald-700 bg-emerald-100 hover:bg-emerald-200 transition-colors"
               >
                 <FiCheck className="mr-2 h-4 w-4" />
                 Approve Selected

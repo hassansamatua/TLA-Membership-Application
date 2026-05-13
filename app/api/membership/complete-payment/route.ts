@@ -35,12 +35,12 @@ export async function POST(request: Request) {
     connection = await pool.getConnection();
 
     // Get current membership info
-    const membershipRows = await connection.query(
+    const [membershipRows] = await connection.query(
       'SELECT * FROM memberships WHERE user_id = ? ORDER BY expiry_date DESC LIMIT 1',
       [decoded.id]
-    );
+    ) as any[];
 
-    const membership = (membershipRows as any[])[0] || null;
+    const membership = membershipRows[0] || null;
 
     if (!membership) {
       return NextResponse.json({ success: false, message: 'No active membership found' }, { status: 404 });
@@ -69,15 +69,12 @@ export async function POST(request: Request) {
         [amount, paymentReference, paymentMethod, expiryDateStr, decoded.id]
       );
 
-      // 2. Create payment record in membership_payments
+      // 2. Create payment record in membership_payments (column is `reference`, not `payment_reference`)
       await connection.query(
-        `INSERT INTO membership_payments 
-         (user_id, amount, payment_method, payment_reference, 
+        `INSERT INTO membership_payments
+         (user_id, amount, payment_method, reference,
           payment_date, status, cycle_year, created_at, updated_at)
-         VALUES (?, ?, ?, ?, NOW(), 'completed', ?, NOW(), NOW())
-         ON DUPLICATE KEY UPDATE
-           status = 'completed',
-           updated_at = NOW()`,
+         VALUES (?, ?, ?, ?, NOW(), 'completed', ?, NOW(), NOW())`,
         [
           decoded.id,
           amount,

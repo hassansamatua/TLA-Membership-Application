@@ -164,7 +164,7 @@ export default function AdminHomePage() {
       case 'heading': return 'bg-purple-100 text-purple-800';
       case 'subheading': return 'bg-blue-100 text-blue-800';
       case 'text': return 'bg-gray-100 text-gray-800';
-      case 'list_item': return 'bg-green-100 text-green-800';
+      case 'list_item': return 'bg-emerald-100 text-emerald-800';
       case 'image': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -173,7 +173,7 @@ export default function AdminHomePage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -196,13 +196,13 @@ export default function AdminHomePage() {
                 placeholder="Search home content..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
           </div>
           <button
             onClick={() => openModal()}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
           >
             <FiPlus className="mr-2 h-4 w-4" />
             Add Content
@@ -241,7 +241,7 @@ export default function AdminHomePage() {
                 <tr>
                   <td colSpan={6} className="px-6 py-4 text-center">
                     <div className="flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div>
                     </div>
                   </td>
                 </tr>
@@ -277,7 +277,7 @@ export default function AdminHomePage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          item.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          item.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {item.is_active ? (
                             <>
@@ -349,7 +349,7 @@ export default function AdminHomePage() {
                       type="text"
                       value={formData.section_key || ''}
                       onChange={(e) => setFormData({ ...formData, section_key: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                       required
                     />
                   </div>
@@ -360,7 +360,7 @@ export default function AdminHomePage() {
                     <select
                       value={formData.section_type || ''}
                       onChange={(e) => setFormData({ ...formData, section_type: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                       required
                     >
                       <option value="">Select type</option>
@@ -381,7 +381,7 @@ export default function AdminHomePage() {
                     value={formData.content || ''}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     required
                   />
                 </div>
@@ -395,7 +395,7 @@ export default function AdminHomePage() {
                       type="number"
                       value={formData.order_index || 0}
                       onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     />
                   </div>
                   <div>
@@ -404,7 +404,7 @@ export default function AdminHomePage() {
                         type="checkbox"
                         checked={formData.is_active !== false}
                         onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                        className="rounded border-gray-300 text-green-600 focus:ring-green-500 mr-2"
+                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2"
                       />
                       <span className="text-sm font-medium text-gray-700">Active</span>
                     </label>
@@ -424,7 +424,7 @@ export default function AdminHomePage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md text-white bg-green-600 hover:bg-green-700"
+                    className="px-4 py-2 border border-transparent rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
                   >
                     {isEditing ? 'Update' : 'Create'}
                   </button>

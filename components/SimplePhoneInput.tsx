@@ -79,7 +79,7 @@ export default function SimplePhoneInput({
       
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <FiPhone className={`h-5 w-5 ${showError ? 'text-red-500' : isValid ? 'text-green-500' : 'text-gray-400'}`} />
+          <FiPhone className={`h-5 w-5 ${showError ? 'text-red-500' : isValid ? 'text-emerald-500' : 'text-gray-400'}`} />
         </div>
         
         <input
@@ -88,18 +88,18 @@ export default function SimplePhoneInput({
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
+          className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors ${
             showError 
               ? 'border-red-500 bg-red-50' 
               : isValid 
-                ? 'border-green-500 bg-green-50' 
+                ? 'border-emerald-500 bg-emerald-50' 
                 : 'border-gray-300'
           }`}
         />
         
         {isValid && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
           </div>
         )}
       </div>

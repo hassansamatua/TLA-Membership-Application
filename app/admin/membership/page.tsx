@@ -271,7 +271,7 @@ export default function AdminMembershipPage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -298,7 +298,7 @@ export default function AdminMembershipPage() {
                 onClick={() => setActiveTab(tab.key as any)}
                 className={`group inline-flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.key
-                    ? 'border-green-500 text-green-600'
+                    ? 'border-emerald-500 text-emerald-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -321,14 +321,14 @@ export default function AdminMembershipPage() {
                 placeholder={`Search ${activeTab}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
           </div>
           {activeTab !== 'settings' && (
             <button
               onClick={() => openModal()}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
             >
               <FiPlus className="mr-2 h-4 w-4" />
               Add {activeTab.slice(0, -1)}
@@ -407,7 +407,7 @@ export default function AdminMembershipPage() {
                 <tr>
                   <td colSpan={6} className="px-6 py-4 text-center">
                     <div className="flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div>
                     </div>
                   </td>
                 </tr>
@@ -445,7 +445,7 @@ export default function AdminMembershipPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            item.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            item.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
                           }`}>
                             {item.isActive ? <FiCheck className="h-3 w-3 mr-1" /> : <FiX className="h-3 w-3 mr-1" />}
                             {item.isActive ? 'Active' : 'Inactive'}
@@ -472,7 +472,7 @@ export default function AdminMembershipPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            item.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            item.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
                           }`}>
                             {item.isActive ? <FiCheck className="h-3 w-3 mr-1" /> : <FiX className="h-3 w-3 mr-1" />}
                             {item.isActive ? 'Active' : 'Inactive'}
@@ -505,7 +505,7 @@ export default function AdminMembershipPage() {
                             <button
                               onClick={() => handleToggleStatus(item.id, item.isActive)}
                               className={`${
-                                item.isActive ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'
+                                item.isActive ? 'text-yellow-600 hover:text-yellow-900' : 'text-emerald-600 hover:text-emerald-900'
                               }`}
                               title={item.isActive ? 'Deactivate' : 'Activate'}
                             >
@@ -578,7 +578,7 @@ export default function AdminMembershipPage() {
                         required
                         value={formData.name || ''}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                       />
                     </div>
                     <div>
@@ -589,7 +589,7 @@ export default function AdminMembershipPage() {
                         rows={3}
                         value={formData.description || ''}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -603,7 +603,7 @@ export default function AdminMembershipPage() {
                           min="0"
                           value={formData.fee || ''}
                           onChange={(e) => setFormData({ ...formData, fee: parseFloat(e.target.value) })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                       <div>
@@ -613,7 +613,7 @@ export default function AdminMembershipPage() {
                         <select
                           value={formData.currency || 'TZS'}
                           onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         >
                           <option value="TZS">TZS</option>
                           <option value="USD">USD</option>
@@ -631,7 +631,7 @@ export default function AdminMembershipPage() {
                           min="1"
                           value={formData.duration || ''}
                           onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                       <div>
@@ -644,7 +644,7 @@ export default function AdminMembershipPage() {
                           min="1"
                           value={formData.maxBorrowBooks || ''}
                           onChange={(e) => setFormData({ ...formData, maxBorrowBooks: parseInt(e.target.value) })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                       <div>
@@ -657,7 +657,7 @@ export default function AdminMembershipPage() {
                           min="1"
                           value={formData.maxBorrowDays || ''}
                           onChange={(e) => setFormData({ ...formData, maxBorrowDays: parseInt(e.target.value) })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                     </div>
@@ -686,7 +686,7 @@ export default function AdminMembershipPage() {
                         required
                         value={formData.name || ''}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -699,7 +699,7 @@ export default function AdminMembershipPage() {
                           required
                           value={formData.startDate || ''}
                           onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                       <div>
@@ -711,7 +711,7 @@ export default function AdminMembershipPage() {
                           required
                           value={formData.endDate || ''}
                           onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                     </div>
@@ -725,7 +725,7 @@ export default function AdminMembershipPage() {
                           required
                           value={formData.dueDate || ''}
                           onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                       <div>
@@ -740,7 +740,7 @@ export default function AdminMembershipPage() {
                           step="0.1"
                           value={formData.penaltyRate || ''}
                           onChange={(e) => setFormData({ ...formData, penaltyRate: parseFloat(e.target.value) })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                     </div>
@@ -780,7 +780,7 @@ export default function AdminMembershipPage() {
                         required
                         value={formData.value || ''}
                         onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                       />
                     </div>
                     <div>
@@ -791,7 +791,7 @@ export default function AdminMembershipPage() {
                         rows={3}
                         value={formData.description || ''}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                       />
                     </div>
                   </>
@@ -810,7 +810,7 @@ export default function AdminMembershipPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                    className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
                   >
                     {isEditing ? 'Update' : 'Create'}
                   </button>

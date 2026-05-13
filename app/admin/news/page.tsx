@@ -224,7 +224,7 @@ export default function NewsManagementPage() {
       case 'urgent': return 'bg-red-100 text-red-800';
       case 'announcement': return 'bg-purple-100 text-purple-800';
       case 'notification': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-green-100 text-green-800';
+      default: return 'bg-emerald-100 text-emerald-800';
     }
   };
 
@@ -240,7 +240,7 @@ export default function NewsManagementPage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -254,7 +254,7 @@ export default function NewsManagementPage() {
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
         >
           <FiPlus className="mr-2 h-5 w-5" />
           Send News
@@ -278,7 +278,7 @@ export default function NewsManagementPage() {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   required
                 />
               </div>
@@ -291,7 +291,7 @@ export default function NewsManagementPage() {
                   value={formData.message}
                   onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   required
                 />
               </div>
@@ -304,7 +304,7 @@ export default function NewsManagementPage() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as 'news' | 'notification' | 'announcement' | 'urgent' }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     <option value="news">News</option>
                     <option value="notification">Notification</option>
@@ -320,7 +320,7 @@ export default function NewsManagementPage() {
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value as 'low' | 'medium' | 'high' | 'urgent' }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -337,7 +337,7 @@ export default function NewsManagementPage() {
                 <select
                   value={formData.targetAudience}
                   onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value as 'all' | 'members' | 'admin' | 'specific' }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="all">All Users</option>
                   <option value="members">Approved Members Only</option>
@@ -358,7 +358,7 @@ export default function NewsManagementPage() {
                           type="checkbox"
                           checked={formData.targetUsers.includes(user.id)}
                           onChange={() => handleUserToggle(user.id)}
-                          className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
                         />
                         <span className="text-sm">{user.name} ({user.email})</span>
                       </label>
@@ -375,7 +375,7 @@ export default function NewsManagementPage() {
                   type="date"
                   value={formData.expiresAt}
                   onChange={(e) => setFormData(prev => ({ ...prev, expiresAt: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
@@ -401,7 +401,7 @@ export default function NewsManagementPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
                 >
                   {editingNews ? 'Update' : 'Send'} News
                 </button>
@@ -419,7 +419,7 @@ export default function NewsManagementPage() {
         
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500 mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500 mx-auto"></div>
           </div>
         ) : news.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
@@ -460,7 +460,7 @@ export default function NewsManagementPage() {
                   <div className="flex items-center space-x-2 ml-4">
                     <button
                       onClick={() => handleToggleActive(newsItem.id, newsItem.isActive)}
-                      className={`p-2 rounded-md ${newsItem.isActive ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}
+                      className={`p-2 rounded-md ${newsItem.isActive ? 'text-emerald-600 hover:bg-emerald-50' : 'text-gray-400 hover:bg-gray-50'}`}
                       title={newsItem.isActive ? 'Deactivate' : 'Activate'}
                     >
                       {newsItem.isActive ? <FiEye /> : <FiEyeOff />}

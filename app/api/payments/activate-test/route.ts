@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 import { getCycleYearForDate } from '@/lib/membershipCycles';
+import { generateMembershipNumber } from '@/lib/membership';
 import { cookies } from 'next/headers';
 import type { RowDataPacket } from 'mysql2';
 
@@ -87,10 +88,24 @@ export async function POST(request: Request) {
       
       const payment = paymentRows[0];
       
-      // 2. Generate membership number and get current year
-      const cycleYear = getCycleYearForDate(new Date()); // Use membership cycle year (2025 until Feb 1, 2026)
-      const year = cycleYear.toString().slice(-2);
-      const membershipNumber = `TLA${year}${Math.floor(10000 + Math.random() * 90000)}`;
+      // 2. Resolve / generate membership number (reuse existing where possible)
+      const cycleYear = getCycleYearForDate(new Date());
+      const [existingMembershipRows] = await connection.query<RowDataPacket[]>(
+        'SELECT membership_number FROM memberships WHERE user_id = ?',
+        [userId]
+      );
+      let membershipNumber: string =
+        (existingMembershipRows as any[])[0]?.membership_number || '';
+      if (!membershipNumber) {
+        const [profileRows] = await connection.query<RowDataPacket[]>(
+          'SELECT membership_number FROM user_profiles WHERE user_id = ?',
+          [userId]
+        );
+        membershipNumber = (profileRows as any[])[0]?.membership_number || '';
+      }
+      if (!membershipNumber) {
+        membershipNumber = await generateMembershipNumber();
+      }
       
       // Calculate expiry year based on membership cycle (Feb 1 - Jan 31)
       const now = new Date();

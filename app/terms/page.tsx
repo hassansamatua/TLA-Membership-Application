@@ -77,7 +77,7 @@ export default function TermsPage() {
       </div>
 
       <div className="mt-12 pt-6 border-t border-gray-200">
-        <Link href="/privacy" className="text-green-600 hover:text-green-800">
+        <Link href="/privacy" className="text-emerald-600 hover:text-emerald-800">
           View our Privacy Policy →
         </Link>
       </div>

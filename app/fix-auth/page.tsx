@@ -68,9 +68,9 @@ export default function FixAuthPage() {
             </div>
 
             {result && (
-              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md">
-                <h3 className="text-sm font-medium text-green-800">Fix Complete!</h3>
-                <div className="mt-2 text-sm text-green-700">
+              <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-md">
+                <h3 className="text-sm font-medium text-emerald-800">Fix Complete!</h3>
+                <div className="mt-2 text-sm text-emerald-700">
                   <p>✅ {result.message}</p>
                   {result.credentials && (
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
@@ -82,7 +82,7 @@ export default function FixAuthPage() {
                     </div>
                   )}
                 </div>
-                <p className="mt-4 text-sm text-green-600">
+                <p className="mt-4 text-sm text-emerald-600">
                   Redirecting to login page in 2 seconds...
                 </p>
               </div>

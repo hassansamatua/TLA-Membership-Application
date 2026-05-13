@@ -113,15 +113,15 @@ export default function AzamPayCheckout({
 
   if (paymentStatus === 'success') {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
         <div className="flex items-center space-x-3">
-          <FiCheckCircle className="w-8 h-8 text-green-600" />
+          <FiCheckCircle className="w-8 h-8 text-emerald-600" />
           <div>
-            <h3 className="text-lg font-semibold text-green-800">Payment Successful!</h3>
-            <p className="text-green-600 mt-1">
+            <h3 className="text-lg font-semibold text-emerald-800">Payment Successful!</h3>
+            <p className="text-emerald-600 mt-1">
               Your payment of TZS {amount.toLocaleString()} has been processed successfully.
             </p>
-            <p className="text-sm text-green-500 mt-2">
+            <p className="text-sm text-emerald-500 mt-2">
               Reference: {reference}
             </p>
           </div>
@@ -177,7 +177,7 @@ export default function AzamPayCheckout({
           <button
             onClick={handlePaymentRedirect}
             disabled={isLoading}
-            className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+            className="flex-1 bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
           >
             {isLoading ? (
               <>

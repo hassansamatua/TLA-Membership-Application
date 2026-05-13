@@ -10,21 +10,33 @@ export async function POST(request: Request) {
     connection = await pool.getConnection();
 
     if (action === 'cleanup-test-payments') {
-      // Delete all test payments and their associated records
-      await connection.query('DELETE FROM payments WHERE reference LIKE "TEST-%"');
-      
-      // Also clean up any memberships that were created from test payments
-      await connection.query(`
-        DELETE FROM memberships 
-        WHERE user_id IN (
-          SELECT DISTINCT user_id FROM payments WHERE reference LIKE "TEST-%"
-        )
-      `);
+      // Capture which users had ONLY test payments so we don't wipe real memberships
+      const [usersOnlyTestRows] = await connection.query(`
+        SELECT user_id FROM payments
+        GROUP BY user_id
+        HAVING SUM(CASE WHEN reference LIKE 'TEST-%' THEN 0 ELSE 1 END) = 0
+      `) as any[];
+      const userIds: number[] = (usersOnlyTestRows as any[]).map(r => r.user_id);
+
+      const [delPayments] = await connection.query(
+        'DELETE FROM payments WHERE reference LIKE "TEST-%"'
+      ) as any;
+
+      let deletedMemberships = 0;
+      if (userIds.length > 0) {
+        const placeholders = userIds.map(() => '?').join(',');
+        const [delMembers] = await connection.query(
+          `DELETE FROM memberships WHERE user_id IN (${placeholders})`,
+          userIds
+        ) as any;
+        deletedMemberships = (delMembers as any).affectedRows || 0;
+      }
 
       return NextResponse.json({
         success: true,
         message: 'Test payments cleaned up successfully',
-        deletedCount: 0 // We could return the actual count if needed
+        deletedPayments: (delPayments as any).affectedRows || 0,
+        deletedMemberships,
       });
     }
 

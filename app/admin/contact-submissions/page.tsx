@@ -169,7 +169,7 @@ export default function ContactSubmissionsPage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -192,7 +192,7 @@ export default function ContactSubmissionsPage() {
           <button
             onClick={handleExportCSV}
             disabled={submissions.length === 0}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+            className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors disabled:opacity-50"
           >
             <FiDownload className="mr-2 h-4 w-4" />
             Export CSV
@@ -230,12 +230,12 @@ export default function ContactSubmissionsPage() {
         
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="bg-green-100 p-3 rounded-full">
-              <FiMail className="h-6 w-6 text-green-600" />
+            <div className="bg-emerald-100 p-3 rounded-full">
+              <FiMail className="h-6 w-6 text-emerald-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Read</p>
-              <p className="text-2xl font-semibold text-green-600">
+              <p className="text-2xl font-semibold text-emerald-600">
                 {submissions.filter(s => s.read_status === 1).length}
               </p>
             </div>
@@ -261,7 +261,7 @@ export default function ContactSubmissionsPage() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
           </div>
         ) : submissions.length === 0 ? (
           <div className="p-12 text-center">
@@ -301,7 +301,7 @@ export default function ContactSubmissionsPage() {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         submission.read_status === 0 
                           ? 'bg-red-100 text-red-800' 
-                          : 'bg-green-100 text-green-800'
+                          : 'bg-emerald-100 text-emerald-800'
                       }`}>
                         {submission.read_status === 0 ? 'Unread' : 'Read'}
                       </span>
@@ -382,7 +382,7 @@ export default function ContactSubmissionsPage() {
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                         selectedSubmission.read_status === 0 
                           ? 'bg-red-100 text-red-800' 
-                          : 'bg-green-100 text-green-800'
+                          : 'bg-emerald-100 text-emerald-800'
                       }`}>
                         {selectedSubmission.read_status === 0 ? '📖 Unread' : '📕 Read'}
                       </span>

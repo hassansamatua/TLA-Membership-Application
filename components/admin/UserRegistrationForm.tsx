@@ -127,7 +127,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
             value={formData.name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
           />
         </div>
 
@@ -142,7 +142,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
             value={formData.email}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
           />
         </div>
 
@@ -159,7 +159,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
             required
             readOnly={isAdmin}
             minLength={6}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 bg-gray-100"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 bg-gray-100"
           />
           {isAdmin && (
             <p className="mt-1 text-sm text-gray-500">
@@ -181,7 +181,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
             required
             readOnly={isAdmin}
             minLength={6}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 bg-gray-100"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 bg-gray-100"
           />
         </div>
 
@@ -197,7 +197,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
             onChange={handleChange}
             required
             placeholder="Enter 16-digit NIDA number"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
           />
         </div>
 
@@ -211,7 +211,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
                 value="personal"
                 checked={formData.membershipType === 'personal'}
                 onChange={handleChange}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300"
               />
               <span className="ml-2">Personal</span>
             </label>
@@ -222,7 +222,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
                 value="organization"
                 checked={formData.membershipType === 'organization'}
                 onChange={handleChange}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300"
               />
               <span className="ml-2">Organization</span>
             </label>
@@ -241,7 +241,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
               value={formData.organizationName}
               onChange={handleChange}
               required={formData.membershipType === 'organization'}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
             />
           </div>
         )}
@@ -257,7 +257,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
             value={formData.phoneNumber}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
           />
         </div>
 
@@ -271,7 +271,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
             name="otherPhoneNumber"
             value={formData.otherPhoneNumber}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
           />
         </div>
 
@@ -283,7 +283,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
               name="isAdmin"
               checked={formData.isAdmin}
               onChange={handleChange}
-              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+              className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
             />
             <label htmlFor="isAdmin" className="ml-2 block text-sm text-gray-700">
               Make this user an administrator
@@ -297,7 +297,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
               type="button"
               onClick={onCancel}
               disabled={isLoading}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
             >
               Cancel
             </button>
@@ -305,7 +305,7 @@ export default function UserRegistrationForm({ onSuccess, onCancel, isAdmin = fa
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
           >
             {isLoading ? 'Processing...' : isAdmin ? 'Create User' : 'Register'}
           </button>

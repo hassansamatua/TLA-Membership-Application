@@ -195,7 +195,7 @@ const response = await fetch(`/api/admin/users/${resolvedParams.id}/reject`, {
   if (isAuthLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -208,7 +208,7 @@ const response = await fetch(`/api/admin/users/${resolvedParams.id}/reject`, {
           <p className="text-gray-600 mb-6">The user you're looking for doesn't exist.</p>
           <button
             onClick={() => router.push('/admin/users')}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
           >
             <FiArrowLeft className="mr-2 h-4 w-4" />
             Back to Users
@@ -266,7 +266,7 @@ const response = await fetch(`/api/admin/users/${resolvedParams.id}/reject`, {
               </button>
               <button
                 onClick={handleSave}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
               >
                 <FiSave className="mr-2 h-4 w-4" />
                 Save
@@ -290,7 +290,7 @@ const response = await fetch(`/api/admin/users/${resolvedParams.id}/reject`, {
                     type="text"
                     value={editForm.name || ''}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 ) : (
                   <p className="text-gray-900">{userDetail.name}</p>
@@ -303,7 +303,7 @@ const response = await fetch(`/api/admin/users/${resolvedParams.id}/reject`, {
                     type="email"
                     value={editForm.email || ''}
                     onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 ) : (
                   <p className="text-gray-900">{userDetail.email}</p>
@@ -486,7 +486,7 @@ const response = await fetch(`/api/admin/users/${resolvedParams.id}/reject`, {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">Approved</span>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  userDetail.is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  userDetail.is_approved ? 'bg-emerald-100 text-emerald-800' : 'bg-yellow-100 text-yellow-800'
                 }`}>
                   {userDetail.is_approved ? 'Yes' : 'Pending'}
                 </span>
@@ -497,7 +497,7 @@ const response = await fetch(`/api/admin/users/${resolvedParams.id}/reject`, {
               <div className="mt-4 space-y-2">
                 <button
                   onClick={handleApprove}
-                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
                 >
                   <FiCheck className="mr-2 h-4 w-4" />
                   Approve User

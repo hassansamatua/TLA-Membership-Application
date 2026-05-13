@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
+import { generateMembershipNumber } from '@/lib/membership';
 import { cookies } from 'next/headers';
 
 async function getAuthToken(request: Request) {
@@ -83,66 +84,67 @@ export async function POST(request: Request) {
     const isRenewal = currentMembership?.membership_type === 'renewal';
     const baseAmount = isRenewal ? 30000 : 40000;
 
-    // Get or create membership record for next cycle
+    // Resolve membership number (reuse existing where possible)
+    let membershipNumber: string = currentMembership?.membership_number || '';
+    if (!membershipNumber) {
+      membershipNumber = await generateMembershipNumber();
+    }
+
+    // memberships.membership_type is enum('personal','organization')
+    const dbMembershipType: 'personal' | 'organization' =
+      currentMembership?.membership_type === 'organization' ? 'organization' : 'personal';
+
     const nextCycleMembership = {
       user_id: decoded.id,
-      membership_number: currentMembership?.membership_number || `TLA${cycle.cycleYear}${Math.floor(Math.random() * 90000 + 10000)}`,
-      membership_type: isRenewal ? 'renewal' : 'new',
-      status: 'pending',
-      payment_status: 'pending',
+      membership_number: membershipNumber,
+      membership_type: dbMembershipType,
+      status: 'pending' as const,
+      payment_status: 'pending' as const,
       joined_date: cycle.cycleStart.toISOString().slice(0, 10),
       expiry_date: cycle.expiryDate.toISOString().slice(0, 10),
       amount_paid: 0,
       payment_reference: paymentReference,
       payment_method: paymentMethod,
-      cycle_year: cycle.cycleYear
+      cycle_year: cycle.cycleYear,
+      isRenewal,
     };
 
-    // Insert or update payment record
+    // 1) Insert pending payment record (membership_payments column is `reference`, not `payment_reference`)
     await connection.query(
-      `INSERT INTO membership_payments 
-       (user_id, amount, payment_method, payment_reference, payment_date, status, cycle_year, created_at)
-       VALUES (?, ?, ?, ?, ?, NOW(), 'pending', ?, NOW())`,
+      `INSERT INTO membership_payments
+       (user_id, amount, payment_method, reference, payment_date, status, cycle_year, created_at, updated_at)
+       VALUES (?, ?, ?, ?, NOW(), 'pending', ?, NOW(), NOW())`,
       [decoded.id, amount, paymentMethod, paymentReference, cycle.cycleYear]
     );
 
-    // Update or insert membership record
-    if (currentMembership) {
-      await connection.query(
-        'UPDATE memberships SET ? WHERE user_id = ?',
-        [
-          nextCycleMembership.membership_number,
-          nextCycleMembership.membership_type,
-          nextCycleMembership.status,
-          nextCycleMembership.payment_status,
-          nextCycleMembership.joined_date,
-          nextCycleMembership.expiry_date,
-          nextCycleMembership.amount_paid,
-          nextCycleMembership.payment_reference,
-          nextCycleMembership.payment_method,
-          decoded.id
-        ]
-      );
-    } else {
-      await connection.query(
-        `INSERT INTO memberships 
-         (user_id, membership_number, membership_type, status, payment_status, joined_date, expiry_date, amount_paid, payment_reference, payment_method, cycle_year)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          decoded.id,
-          nextCycleMembership.membership_number,
-          nextCycleMembership.membership_type,
-          nextCycleMembership.status,
-          nextCycleMembership.payment_status,
-          nextCycleMembership.joined_date,
-          nextCycleMembership.expiry_date,
-          nextCycleMembership.amount_paid,
-          nextCycleMembership.payment_reference,
-          nextCycleMembership.payment_method,
-          cycle.cycleYear
-        ]
-      );
-    }
+    // 2) Upsert membership row (UNIQUE KEY on user_id makes this idempotent)
+    await connection.query(
+      `INSERT INTO memberships
+         (user_id, membership_number, membership_type, status, payment_status,
+          joined_date, expiry_date, amount_paid, payment_reference, payment_method,
+          cycle_year, created_at, updated_at)
+       VALUES (?, ?, ?, 'pending', 'pending',
+               ?, ?, 0, ?, ?,
+               ?, NOW(), NOW())
+       ON DUPLICATE KEY UPDATE
+         membership_number = COALESCE(memberships.membership_number, VALUES(membership_number)),
+         membership_type   = VALUES(membership_type),
+         expiry_date       = VALUES(expiry_date),
+         payment_reference = VALUES(payment_reference),
+         payment_method    = VALUES(payment_method),
+         cycle_year        = VALUES(cycle_year),
+         updated_at        = NOW()`,
+      [
+        decoded.id,
+        nextCycleMembership.membership_number,
+        nextCycleMembership.membership_type,
+        nextCycleMembership.joined_date,
+        nextCycleMembership.expiry_date,
+        nextCycleMembership.payment_reference,
+        nextCycleMembership.payment_method,
+        nextCycleMembership.cycle_year,
+      ]
+    );
 
     // Update user_profiles with payment info
     await connection.query(

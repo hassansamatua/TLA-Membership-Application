@@ -597,7 +597,7 @@ export default function MembershipCardPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -611,7 +611,7 @@ export default function MembershipCardPage() {
           <p className="text-gray-600 mb-4">{error || 'Unable to load membership information'}</p>
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
           >
             Back to Dashboard
           </button>
@@ -632,7 +632,7 @@ export default function MembershipCardPage() {
           <div className="space-y-3">
             <button
               onClick={() => router.push('/dashboard/subscribe')}
-              className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+              className="w-full px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
             >
               Make Payment
             </button>
@@ -694,7 +694,7 @@ export default function MembershipCardPage() {
             print-color-adjust: exact !important;
           }
           
-          .card-text-green-100 {
+          .card-text-emerald-100 {
             color: #bbf7d0 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -933,7 +933,7 @@ export default function MembershipCardPage() {
                 <button
                   onClick={handleDownload}
                   disabled={downloadInProgress}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FiDownload className="mr-2 h-4 w-4" />
                   {downloadInProgress ? 'Downloading...' : 'Download Card'}
@@ -968,7 +968,7 @@ export default function MembershipCardPage() {
                 <dl className="space-y-2">
                   <div className="flex justify-between">
                     <dt className="text-gray-600">Status:</dt>
-                    <dd className="font-medium text-green-600">Active</dd>
+                    <dd className="font-medium text-emerald-600">Active</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-600">Member Since:</dt>

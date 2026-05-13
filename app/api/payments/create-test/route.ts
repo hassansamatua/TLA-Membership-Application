@@ -54,12 +54,10 @@ export async function POST(request: Request) {
     reference,
     amount: 40000, // Default test amount
     currency: 'TZS',
-    status: 'completed', // Changed from 'pending' to 'completed' for test payments
+    status: 'completed' as const,
     payment_method: 'test',
     user_id: userId,
-    membership_type: 'regular', // Changed from 'personal' to 'regular' to match new membership types
-    created_at: new Date().toISOString().slice(0, 19).replace('T', ' '),
-    updated_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
+    membership_type: 'personal' as const, // must match enum('personal','organization')
   };
   
   console.log('Test payment details:', JSON.stringify(testPayment, null, 2));
@@ -90,7 +88,7 @@ export async function POST(request: Request) {
       const [result] = await connection.query(
         `INSERT INTO payments 
          (reference, amount, currency, status, payment_method, user_id, membership_type, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           testPayment.reference,
           testPayment.amount,
@@ -99,18 +97,10 @@ export async function POST(request: Request) {
           testPayment.payment_method,
           testPayment.user_id,
           testPayment.membership_type,
-          testPayment.created_at,
-          testPayment.updated_at
         ]
       );
-      
-      console.log('Test payment created successfully:', result);
-      console.log('Inserted payment ID:', (result as any).insertId);
-      console.log('Inserted payment ID:', (result as any).insertId);
 
-      // Commit the transaction
-      await connection.commit();
-      console.log('Transaction committed successfully');
+      console.log('Test payment created successfully. Inserted ID:', (result as any).insertId);
 
       return NextResponse.json({
         success: true,

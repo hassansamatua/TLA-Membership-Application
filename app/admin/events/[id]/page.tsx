@@ -160,7 +160,7 @@ export default function EventDetailPage() {
   if (isAuthLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -177,7 +177,7 @@ export default function EventDetailPage() {
           <p className="text-gray-600 mb-6">The event you're looking for doesn't exist or has been removed.</p>
           <button
             onClick={() => router.push('/admin/events')}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
           >
             <FiArrowLeft className="mr-2 h-4 w-4" />
             Back to Events
@@ -190,7 +190,7 @@ export default function EventDetailPage() {
   const getStatusColor = (status: Event['status']) => {
     switch (status) {
       case 'upcoming': return 'bg-blue-100 text-blue-800';
-      case 'ongoing': return 'bg-green-100 text-green-800';
+      case 'ongoing': return 'bg-emerald-100 text-emerald-800';
       case 'completed': return 'bg-gray-100 text-gray-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -309,7 +309,7 @@ export default function EventDetailPage() {
                   {event.status !== 'ongoing' && (
                     <button
                       onClick={() => handleStatusUpdate('ongoing')}
-                      className="w-full text-left px-3 py-2 text-sm bg-green-50 text-green-700 rounded hover:bg-green-100"
+                      className="w-full text-left px-3 py-2 text-sm bg-emerald-50 text-emerald-700 rounded hover:bg-emerald-100"
                     >
                       Mark as Ongoing
                     </button>
@@ -341,7 +341,7 @@ export default function EventDetailPage() {
               <h3 className="text-lg font-semibold text-gray-900">Registrations</h3>
               <button
                 onClick={() => setShowRegistrations(!showRegistrations)}
-                className="text-green-600 hover:text-green-700"
+                className="text-emerald-600 hover:text-emerald-700"
               >
                 <FiEye className="h-5 w-5" />
               </button>
@@ -362,7 +362,7 @@ export default function EventDetailPage() {
                       </div>
                       <span className={`px-2 py-1 text-xs rounded ${
                         reg.status === 'registered' 
-                          ? 'bg-green-100 text-green-800'
+                          ? 'bg-emerald-100 text-emerald-800'
                           : reg.status === 'attended'
                           ? 'bg-blue-100 text-blue-800'
                           : 'bg-red-100 text-red-800'

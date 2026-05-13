@@ -170,7 +170,7 @@ export default function DashboardLayout({
   if (!mounted || authLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -179,101 +179,122 @@ export default function DashboardLayout({
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-slate-50 flex dark:bg-gray-950">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        {/* User Info */}
-        <div className="flex flex-col items-center justify-center p-4 bg-green-600 text-white">
-          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-2">
-            {user?.profile?.personalInfo?.profilePicture ? (
-              <img src={user.profile.personalInfo.profilePicture} alt="Profile" className="w-12 h-12 rounded-full object-cover" />
-            ) : (
-              <FiUser className="h-6 w-6 text-green-600" />
-            )}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-gray-200 bg-white transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 dark:border-white/10 dark:bg-gray-900 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* User identity */}
+        <div className="border-b border-gray-200 px-5 py-5 dark:border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-50 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:ring-emerald-500/30">
+              {user?.profile?.personalInfo?.profilePicture ? (
+                <img
+                  src={user.profile.personalInfo.profilePicture}
+                  alt="Profile"
+                  className="h-11 w-11 rounded-full object-cover"
+                />
+              ) : (
+                <FiUser className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+                {user?.name || 'Member'}
+              </p>
+              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                {user?.email || 'Member'}
+              </p>
+            </div>
           </div>
-          <h1 className="text-sm font-bold">{user?.name || 'User'}</h1>
-          <p className="text-xs opacity-90">Member</p>
         </div>
 
         {/* Navigation */}
-        <nav className="mt-4 px-2">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
-            
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                  isActive
-                    ? 'bg-green-100 text-green-700 border-r-4 border-green-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
                 onClick={() => setSidebarOpen(false)}
                 target={item.external ? '_blank' : '_self'}
-                rel={item.external ? 'noopener noreferrer' : ''}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                className={`group flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/30'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-100'
+                }`}
               >
-                <div className="flex items-center">
-                  <Icon className="mr-3 h-4 w-4 flex-shrink-0" />
-                  <span className="text-sm flex-shrink-0">{item.label}</span>
-                  {item.name === 'News' && unreadNewsCount > 0 && (
-                    <span className="ml-2 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0">
-                      {unreadNewsCount > 99 ? '99+' : unreadNewsCount.toString()}
-                    </span>
-                  )}
-                </div>
+                <span className="flex items-center gap-3 min-w-0">
+                  <Icon
+                    className={`h-4 w-4 shrink-0 ${
+                      isActive
+                        ? 'text-emerald-600 dark:text-emerald-300'
+                        : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200'
+                    }`}
+                  />
+                  <span className="truncate">{item.label}</span>
+                </span>
+                {item.name === 'News' && unreadNewsCount > 0 && (
+                  <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+                    {unreadNewsCount > 99 ? '99+' : unreadNewsCount}
+                  </span>
+                )}
+                {item.external && (
+                  <FiExternalLink className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+                )}
               </Link>
             );
           })}
         </nav>
 
         {/* Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+        <div className="border-t border-gray-200 p-3 dark:border-white/10">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors duration-200"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-700 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
           >
-            <FiLogOut className="mr-3 h-4 w-4" />
-            Logout
+            <FiLogOut className="h-4 w-4" />
+            Sign out
           </button>
         </div>
-      </div>
+      </aside>
 
-      {/* Mobile sidebar overlay */}
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+          className="fixed inset-0 z-40 bg-gray-900/40 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Main content */}
-      <div className="flex-1 lg:ml-0">
-        {/* Top bar */}
-        <header className="bg-white shadow-sm lg:hidden">
-          <div className="flex items-center justify-between px-4 py-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600"
-            >
-              <FiMenu className="h-6 w-6" />
-            </button>
-            <h2 className="text-lg font-semibold text-gray-800">Dashboard</h2>
-            <div className="w-6"></div>
-          </div>
+      <div className="flex flex-1 min-w-0 flex-col">
+        {/* Top bar (mobile + tablet) */}
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-200 bg-white/80 px-4 py-3 backdrop-blur-md lg:hidden dark:border-white/10 dark:bg-gray-900/80">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5"
+            aria-label="Open navigation"
+          >
+            <FiMenu className="h-5 w-5" />
+          </button>
+          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Dashboard</span>
+          <span className="w-9" aria-hidden="true" />
         </header>
 
         {/* Page content */}
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </div>
     </div>
   );

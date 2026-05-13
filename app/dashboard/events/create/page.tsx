@@ -113,7 +113,7 @@ export default function CreateEventPage() {
   if (!isAuthenticated || (user && !user.isAdmin)) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -148,7 +148,7 @@ export default function CreateEventPage() {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Enter event title"
                   required
                 />
@@ -165,7 +165,7 @@ export default function CreateEventPage() {
                   rows={3}
                   value={formData.description}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Describe your event"
                 />
               </div>
@@ -183,7 +183,7 @@ export default function CreateEventPage() {
                     value={formData.startDate}
                     onChange={handleChange}
                     min={new Date().toISOString().split('T')[0]}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     required
                   />
                 </div>
@@ -200,7 +200,7 @@ export default function CreateEventPage() {
                       name="startTime"
                       value={formData.startTime}
                       onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                       required
                     />
                   </div>
@@ -217,7 +217,7 @@ export default function CreateEventPage() {
                       value={formData.endTime}
                       onChange={handleChange}
                       min={formData.startTime}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                       required
                     />
                   </div>
@@ -234,7 +234,7 @@ export default function CreateEventPage() {
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Event location"
                   />
                 </div>
@@ -251,7 +251,7 @@ export default function CreateEventPage() {
                     min="1"
                     value={formData.capacity}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 </div>
 
@@ -272,7 +272,7 @@ export default function CreateEventPage() {
                       step="1000"
                       value={formData.fee}
                       onChange={handleChange}
-                      className="focus:ring-green-500 focus:border-green-500 block w-full pl-16 pr-12 sm:text-sm border-gray-300 rounded-md py-2 border"
+                      className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-16 pr-12 sm:text-sm border-gray-300 rounded-md py-2 border"
                       placeholder="Enter fee amount"
                     />
                   </div>
@@ -287,7 +287,7 @@ export default function CreateEventPage() {
               <button
                 type="button"
                 onClick={() => router.push('/dashboard/events')}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
               >
                 <FiX className="-ml-1 mr-2 h-5 w-5" />
                 Cancel
@@ -295,7 +295,7 @@ export default function CreateEventPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <FiSave className="-ml-1 mr-2 h-5 w-5" />
                 {isLoading ? 'Creating...' : 'Create Event'}

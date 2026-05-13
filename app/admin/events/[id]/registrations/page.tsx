@@ -118,7 +118,7 @@ export default function AdminEventRegistrationsPage({ params }: { params: Promis
     const statusConfig = {
       registered: { color: 'bg-blue-100 text-blue-800', icon: FiClock, label: 'Registered' },
       cancelled: { color: 'bg-red-100 text-red-800', icon: FiX, label: 'Cancelled' },
-      attended: { color: 'bg-green-100 text-green-800', icon: FiCheck, label: 'Attended' },
+      attended: { color: 'bg-emerald-100 text-emerald-800', icon: FiCheck, label: 'Attended' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.registered;
@@ -135,7 +135,7 @@ export default function AdminEventRegistrationsPage({ params }: { params: Promis
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <FiLoader className="animate-spin h-8 w-8 text-green-500" />
+        <FiLoader className="animate-spin h-8 w-8 text-emerald-500" />
       </div>
     );
   }
@@ -181,7 +181,7 @@ export default function AdminEventRegistrationsPage({ params }: { params: Promis
                       <div className="text-sm text-gray-600">Confirmed</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">{statistics.attended}</div>
+                      <div className="text-2xl font-bold text-emerald-600">{statistics.attended}</div>
                       <div className="text-sm text-gray-600">Attended</div>
                     </div>
                   </>
@@ -253,7 +253,7 @@ export default function AdminEventRegistrationsPage({ params }: { params: Promis
                             <>
                               <button
                                 onClick={() => updateRegistrationStatus(registration.registration_id, 'attended')}
-                                className="text-green-600 hover:text-green-900"
+                                className="text-emerald-600 hover:text-emerald-900"
                                 title="Mark as Attended"
                               >
                                 <FiCheck className="h-4 w-4" />

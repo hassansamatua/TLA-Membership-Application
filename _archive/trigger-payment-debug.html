@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trigger Payment Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 15px 30px; margin: 10px; background: #dc3545; color: white; border: none; cursor: pointer; font-size: 16px; }
+        button:hover { background: #c82333; }
+        .result { margin: 10px 0; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Payment Debug Trigger</h1>
+    
+    <div class="info">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Click the button below to trigger a payment activation test</li>
+            <li>Check the server console (terminal where npm run dev is running)</li>
+            <li>Look for the enhanced debugging logs starting with "=== PAYMENT SUCCESS API START ==="</li>
+            <li>The debugging will show exactly where the payment search is failing</li>
+        </ol>
+    </div>
+    
+    <button onclick="triggerPaymentDebug()">🚀 Trigger Payment Debug</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function triggerPaymentDebug() {
+            const resultDiv = document.getElementById('result');
+            const testRef = 'TEST-DEBUG-' + Date.now();
+            
+            resultDiv.innerHTML = '<div class="info">🔄 Triggering payment debug with reference: ' + testRef + '</div>';
+            
+            console.log('=== CLIENT DEBUG START ===');
+            console.log('Triggering payment debug with reference:', testRef);
+            
+            try {
+                // Step 1: Create a test payment
+                console.log('Step 1: Creating test payment...');
+                const createResponse = await fetch('/api/payments/create-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: testRef })
+                });
+                
+                const createData = await createResponse.json();
+                console.log('Create payment response:', createData);
+                
+                if (!createResponse.ok) {
+                    resultDiv.innerHTML = '<div class="error">❌ Create payment failed: ' + JSON.stringify(createData, null, 2) + '</div>';
+                    return;
+                }
+                
+                resultDiv.innerHTML = '<div class="success">✅ Payment created successfully! Now activating...</div>';
+                
+                // Step 2: Wait for database to commit
+                console.log('Step 2: Waiting for database to commit...');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Step 3: Try to activate membership (this should trigger the enhanced debugging)
+                console.log('Step 3: Activating membership...');
+                console.log('CHECK SERVER CONSOLE FOR ENHANCED DEBUGGING LOGS!');
+                
+                const activateResponse = await fetch('/api/membership/payment-success', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentReference: testRef })
+                });
+                
+                const activateData = await activateResponse.json();
+                console.log('Activate membership response:', activateData);
+                
+                if (activateResponse.ok) {
+                    resultDiv.innerHTML = '<div class="success">🎉 SUCCESS! Payment activation worked!</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ Payment activation failed (expected - check server console for debugging): ' + JSON.stringify(activateData, null, 2) + '</div>';
+                }
+                
+                console.log('=== CLIENT DEBUG END ===');
+                
+            } catch (error) {
+                console.error('Test error:', error);
+                resultDiv.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>

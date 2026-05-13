@@ -142,7 +142,7 @@ export default function PhoneNumberInput({
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
               placeholder={paymentMethod === 'bankcard' ? '1234 5678 9012 3456' : '0652542346'}
-              className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+              className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
                 errors.phone ? 'border-red-500' : 'border-gray-300'
               }`}
               maxLength={paymentMethod === 'bankcard' ? 19 : 10}
@@ -179,16 +179,16 @@ export default function PhoneNumberInput({
 
         {/* Mobile Money Notice */}
         {paymentMethod !== 'bankcard' && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
             <div className="flex items-start space-x-3">
-              <FiCheck className="h-5 w-5 text-green-600 mt-0.5" />
+              <FiCheck className="h-5 w-5 text-emerald-600 mt-0.5" />
               <div>
-                <p className="font-medium text-green-800">Mobile Money Payment</p>
-                <p className="text-sm text-green-600 mt-1">
+                <p className="font-medium text-emerald-800">Mobile Money Payment</p>
+                <p className="text-sm text-emerald-600 mt-1">
                   After entering your number, you'll be redirected to AzamPay.
                   Your {config.name} app will show a payment prompt to confirm the transaction.
                 </p>
-                <p className="text-sm text-green-600 mt-1">
+                <p className="text-sm text-emerald-600 mt-1">
                   No PIN entry required in this system - all security happens on your phone.
                 </p>
               </div>
@@ -209,7 +209,7 @@ export default function PhoneNumberInput({
         <button
           onClick={handlePhoneSubmit}
           disabled={isLoading || !phoneNumber || disabled}
-          className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">

@@ -116,26 +116,137 @@ export default function ReportsPage() {
     }
   };
 
-  const handleExport = (format: 'csv' | 'pdf') => {
-    const data = {
-      summary: reportData,
-      membership: membershipAnalytics,
-      payments: paymentAnalytics,
-      activities: activityAnalytics
+  /**
+   * Produce a real, multi-section CSV report from the in-memory analytics.
+   * Sections: Summary, Membership types, Monthly signups, Payments,
+   * Activities. Falls back gracefully when a section is missing. The old
+   * implementation emitted raw JSON regardless of the requested format and
+   * is replaced here.
+   */
+  const handleExport = (format: 'csv' | 'json') => {
+    const today = new Date().toISOString().split('T')[0];
+
+    if (format === 'json') {
+      // Keep a true JSON export available for debugging / data pipelines.
+      const data = {
+        generatedAt: new Date().toISOString(),
+        summary: reportData,
+        membership: membershipAnalytics,
+        payments: paymentAnalytics,
+        activities: activityAnalytics,
+      };
+      downloadBlob(
+        new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
+        `tla-report-${today}.json`
+      );
+      toast.success('Report exported as JSON');
+      return;
+    }
+
+    const lines: string[] = [];
+    const esc = (v: unknown) => {
+      if (v === null || v === undefined) return '';
+      const s = String(v).replace(/"/g, '""');
+      return /[",\n]/.test(s) ? `"${s}"` : s;
     };
-    
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
+    const row = (...cells: unknown[]) => lines.push(cells.map(esc).join(','));
+
+    row('Tanzania Library Association - Membership Report');
+    row('Generated at', new Date().toISOString());
+    row('Period', period);
+    row();
+
+    if (reportData) {
+      row('SUMMARY');
+      row('Metric', 'Value');
+      row('Total Members', reportData.totalMembers);
+      row('Active Members', reportData.activeMembers);
+      row('Total Revenue (TZS)', reportData.totalRevenue);
+      row('Renewal Rate (%)', reportData.renewalRate);
+      row();
+
+      if (reportData.membershipTypes?.length) {
+        row('MEMBERSHIP TYPES');
+        row('Type', 'Count');
+        for (const t of reportData.membershipTypes) row(t.type || 'Unknown', t.count);
+        row();
+      }
+      if (reportData.monthlySignups?.length) {
+        row('MONTHLY SIGNUPS');
+        row('Month', 'New Members');
+        for (const m of reportData.monthlySignups) row(m.month, m.count);
+        row();
+      }
+    }
+
+    if (paymentAnalytics) {
+      row('PAYMENTS');
+      const summary = paymentAnalytics.summary || paymentAnalytics;
+      for (const [k, v] of Object.entries(summary)) {
+        if (typeof v === 'object' && v !== null) continue;
+        row(k, v as any);
+      }
+      row();
+      const breakdown =
+        paymentAnalytics.byCycle ||
+        paymentAnalytics.cyclePayments ||
+        paymentAnalytics.byMonth ||
+        paymentAnalytics.monthly ||
+        [];
+      if (Array.isArray(breakdown) && breakdown.length) {
+        const keys = Object.keys(breakdown[0]);
+        row('PAYMENT BREAKDOWN');
+        row(...keys);
+        for (const item of breakdown) row(...keys.map((k) => item[k]));
+        row();
+      }
+    }
+
+    if (membershipAnalytics?.activeMembersList?.length) {
+      const list: any[] = membershipAnalytics.activeMembersList;
+      const keys = Object.keys(list[0]);
+      row('ACTIVE MEMBERS');
+      row(...keys);
+      for (const m of list) row(...keys.map((k) => m[k]));
+      row();
+    }
+
+    if (activityAnalytics) {
+      row('ACTIVITIES');
+      const items =
+        activityAnalytics.items ||
+        activityAnalytics.activities ||
+        activityAnalytics.recent ||
+        [];
+      if (Array.isArray(items) && items.length) {
+        const keys = Object.keys(items[0]);
+        row(...keys);
+        for (const it of items) row(...keys.map((k) => it[k]));
+      } else {
+        for (const [k, v] of Object.entries(activityAnalytics)) {
+          if (typeof v === 'object' && v !== null) continue;
+          row(k, v as any);
+        }
+      }
+      row();
+    }
+
+    downloadBlob(
+      new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' }),
+      `tla-report-${period}-${today}.csv`
+    );
+    toast.success('Report exported as CSV');
+  };
+
+  const downloadBlob = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `comprehensive-report-${new Date().toISOString().split('T')[0]}.${format}`;
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    
-    toast.success(`Comprehensive report exported as ${format.toUpperCase()}`);
   };
 
   if (loading) {
@@ -159,7 +270,7 @@ export default function ReportsPage() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1">
                   <span className="text-sm font-medium">Period: {period}</span>
                 </div>
-                <div className="bg-green-400/30 backdrop-blur-sm rounded-lg px-3 py-1">
+                <div className="bg-emerald-400/30 backdrop-blur-sm rounded-lg px-3 py-1">
                   <span className="text-sm font-medium">Live Data</span>
                 </div>
               </div>
@@ -204,17 +315,18 @@ export default function ReportsPage() {
           <div className="flex gap-2">
             <button
               onClick={() => handleExport('csv')}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors"
             >
               <FiDownload className="mr-2" />
               Export CSV
             </button>
             <button
-              onClick={() => handleExport('pdf')}
+              onClick={() => handleExport('json')}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+              title="Export raw report data as JSON"
             >
               <FiFileText className="mr-2" />
-              Export PDF
+              Export JSON
             </button>
           </div>
         </div>
@@ -265,16 +377,16 @@ export default function ReportsPage() {
               </div>
               
               <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                <div className="h-2 bg-gradient-to-r from-green-500 to-green-600"></div>
+                <div className="h-2 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600 mb-1">Active Members</p>
-                      <p className="text-3xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">{reportData.activeMembers.toLocaleString()}</p>
+                      <p className="text-3xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{reportData.activeMembers.toLocaleString()}</p>
                       <p className="text-xs text-gray-500 mt-1">Currently active</p>
                     </div>
-                    <div className="p-4 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
-                      <FiTrendingUp className="h-6 w-6 text-green-600" />
+                    <div className="p-4 bg-emerald-100 rounded-xl group-hover:bg-emerald-200 transition-colors">
+                      <FiTrendingUp className="h-6 w-6 text-emerald-600" />
                     </div>
                   </div>
                 </div>
@@ -440,7 +552,7 @@ export default function ReportsPage() {
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-800">
                                   {member.membership_type || 'personal'}
                                 </span>
                               </td>
@@ -583,8 +695,8 @@ export default function ReportsPage() {
               
               <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0 bg-green-100 rounded-md p-3">
-                    <FiTrendingUp className="h-6 w-6 text-green-600" />
+                  <div className="flex-shrink-0 bg-emerald-100 rounded-md p-3">
+                    <FiTrendingUp className="h-6 w-6 text-emerald-600" />
                   </div>
                   <div className="ml-5">
                     <p className="text-sm font-medium text-gray-500">Success Rate</p>
@@ -656,7 +768,7 @@ export default function ReportsPage() {
                   <div className="text-sm text-gray-500">Weekly Active</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{activityAnalytics.engagementMetrics?.monthly_active_users || 0}</div>
+                  <div className="text-2xl font-bold text-emerald-600">{activityAnalytics.engagementMetrics?.monthly_active_users || 0}</div>
                   <div className="text-sm text-gray-500">Monthly Active</div>
                 </div>
               </div>

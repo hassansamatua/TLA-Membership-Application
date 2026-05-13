@@ -1,6 +1,81 @@
-// Membership pricing logic based on TLA requirements
-// NEW USER: 40,000 TZS
-// CONTINUING USER: 30,000 TZS
+// Membership pricing (legacy entry point).
+//
+// This module is kept for backwards-compatibility with existing imports
+// (notably `app/dashboard/payment/page.tsx`). All numeric logic is now
+// delegated to the canonical helpers in `./enhancedMembershipCycles`:
+//
+//   - Fees:    getMembershipFee()
+//   - Penalty: calculateEnhancedPenalties() (1,000 TZS per whole month
+//              elapsed since April 1; new members are exempt)
+//   - Cycle:   Feb 1 -> Jan 31; grace period ends Mar 31
+//
+// The previous implementation here used `yearsOverdue * 10,000` and other
+// non-canonical figures that no longer match the rules in the project
+// requirements; this rewrite fixes the regression while keeping the same
+// public function names and return shapes.
+
+// NOTE: We intentionally do NOT import from `./enhancedMembershipCycles`
+// here because that module pulls in `./db` (mysql2 + node `fs`/`tls`).
+// This file is consumed by the client component
+// `app/dashboard/payment/page.tsx`, so we keep it server-agnostic by
+// inlining the pure config + math. Keep this in sync with
+// ENHANCED_MEMBERSHIP_CONFIG and calculateEnhancedPenalties.
+const ENHANCED_MEMBERSHIP_CONFIG = {
+  LIBRARIAN_FIRST_YEAR: 40000,
+  LIBRARIAN_RENEWAL: 30000,
+  ORGANIZATION_FEE: 50000,
+  REGULAR_FIRST_YEAR: 40000,
+  REGULAR_RENEWAL: 30000,
+  PENALTY_PER_MONTH: 1000,
+  GRACE_PERIOD_END_MONTH: 3,
+  GRACE_PERIOD_END_DAY: 31,
+  PENALTY_START_MONTH: 4, // April (1-indexed)
+} as const;
+
+function getMembershipFee(args: {
+  category: 'librarian' | 'organization' | 'regular';
+  isNewUser: boolean;
+}): { baseAmount: number } {
+  const { category, isNewUser } = args;
+  if (category === 'organization') {
+    return { baseAmount: ENHANCED_MEMBERSHIP_CONFIG.ORGANIZATION_FEE };
+  }
+  if (category === 'librarian') {
+    return {
+      baseAmount: isNewUser
+        ? ENHANCED_MEMBERSHIP_CONFIG.LIBRARIAN_FIRST_YEAR
+        : ENHANCED_MEMBERSHIP_CONFIG.LIBRARIAN_RENEWAL,
+    };
+  }
+  return {
+    baseAmount: isNewUser
+      ? ENHANCED_MEMBERSHIP_CONFIG.REGULAR_FIRST_YEAR
+      : ENHANCED_MEMBERSHIP_CONFIG.REGULAR_RENEWAL,
+  };
+}
+
+function calculateEnhancedPenalties(args: {
+  cycleYear: number;
+  now: Date;
+  isNewUser: boolean;
+}): { penaltyAmount: number } {
+  const { cycleYear, now, isNewUser } = args;
+  if (isNewUser) return { penaltyAmount: 0 };
+  const penaltyStart = new Date(
+    cycleYear,
+    ENHANCED_MEMBERSHIP_CONFIG.PENALTY_START_MONTH - 1,
+    1
+  );
+  if (now < penaltyStart) return { penaltyAmount: 0 };
+  // Whole calendar months elapsed since April 1 of cycleYear.
+  const months =
+    (now.getFullYear() - penaltyStart.getFullYear()) * 12 +
+    (now.getMonth() - penaltyStart.getMonth()) +
+    1; // +1 so that April itself counts as month #1
+  return {
+    penaltyAmount: Math.max(0, months) * ENHANCED_MEMBERSHIP_CONFIG.PENALTY_PER_MONTH,
+  };
+}
 
 export interface MembershipPricing {
   baseAmount: number;
@@ -13,45 +88,33 @@ export interface MembershipPricing {
   gracePeriodEnd: Date;
 }
 
+function categoryFor(
+  membershipType: 'personal' | 'organization'
+): 'librarian' | 'organization' | 'regular' {
+  return membershipType === 'organization' ? 'organization' : 'regular';
+}
+
 export function calculateMembershipPricing(
   membershipType: 'personal' | 'organization',
   isNewUser: boolean,
   currentYear: number = new Date().getFullYear()
 ): MembershipPricing {
-  // Enhanced pricing based on user categories
-  const basePrices = {
-    personal: {
-      new: 40000,      // New members pay 40,000 TZS for their first payment
-      continuing: 30000 // Renewal/continuing members pay 30,000 TZS
-    },
-    organization: 50000 // Updated from 150,000 to 50,000 TZS
-  };
+  const category = categoryFor(membershipType);
+  const { baseAmount } = getMembershipFee({ category, isNewUser });
 
-  // Force new user pricing if it's their first payment
-  const effectiveIsNewUser = isNewUser;
-  
-  const baseAmount = membershipType === 'personal' 
-    ? (effectiveIsNewUser ? basePrices.personal.new : basePrices.personal.continuing)
-    : basePrices.organization;
-
-  // Year cycle: February to January
-  const yearStart = new Date(currentYear, 1, 1); // February 1st
-  const yearEnd = new Date(currentYear + 1, 0, 31); // January 31st next year
-  const gracePeriodEnd = new Date(currentYear, 2, 31); // March 31st
-  
+  const gracePeriodEnd = new Date(
+    currentYear,
+    ENHANCED_MEMBERSHIP_CONFIG.GRACE_PERIOD_END_MONTH - 1,
+    ENHANCED_MEMBERSHIP_CONFIG.GRACE_PERIOD_END_DAY
+  );
   const today = new Date();
   const isLate = today > gracePeriodEnd;
 
-  // Calculate penalty (1,000 TZS per month after April 1, for continuing users only)
-  let penaltyAmount = 0;
-  if (isLate && !effectiveIsNewUser) {
-    // Only apply penalty to continuing members who are late
-    const penaltyStartDate = new Date(currentYear, 3, 1); // April 1st
-    if (today >= penaltyStartDate) {
-      const monthsLate = Math.max(0, Math.floor((today.getTime() - penaltyStartDate.getTime()) / (1000 * 60 * 60 * 24 * 30)));
-      penaltyAmount = monthsLate * 1000; // 1,000 TZS per month
-    }
-  }
+  const { penaltyAmount } = calculateEnhancedPenalties({
+    cycleYear: currentYear,
+    now: today,
+    isNewUser,
+  });
 
   const totalDue = baseAmount + penaltyAmount;
 
@@ -59,14 +122,19 @@ export function calculateMembershipPricing(
     baseAmount,
     penaltyAmount,
     totalDue,
-    isNewUser: effectiveIsNewUser,
+    isNewUser,
     membershipType,
     year: currentYear,
     isLate,
-    gracePeriodEnd
+    gracePeriodEnd,
   };
 }
 
+/**
+ * Lightweight status helper used by the user dashboard for the "where am I
+ * in the cycle" widget. Uses the canonical penalty formula
+ * (1,000 TZS per whole calendar month past April 1).
+ */
 export function getMembershipStatus(
   lastPaymentDate: Date | null,
   membershipType: 'personal' | 'organization',
@@ -80,50 +148,63 @@ export function getMembershipStatus(
 } {
   const today = new Date();
   const currentYear = today.getFullYear();
-  
-  // Year cycle: February to January
-  const yearStart = new Date(currentYear, 1, 1); // February 1st
-  const gracePeriodEnd = new Date(currentYear, 2, 31); // March 31st
-  const nextPaymentDue = new Date(currentYear + 1, 1, 1); // Next February 1st
+  const category = categoryFor(membershipType);
+
+  const gracePeriodEnd = new Date(
+    currentYear,
+    ENHANCED_MEMBERSHIP_CONFIG.GRACE_PERIOD_END_MONTH - 1,
+    ENHANCED_MEMBERSHIP_CONFIG.GRACE_PERIOD_END_DAY
+  );
+  const nextPaymentDue = new Date(currentYear + 1, 1, 1); // next Feb 1
+
+  // Canonical penalty math, applied uniformly regardless of branch below.
+  // `baseAmount` is resolved for type-completeness; the local helper does
+  // not need it but we keep the call so signature drift here is obvious.
+  void getMembershipFee({ category, isNewUser });
+  const { penaltyAmount: canonicalPenalty } = calculateEnhancedPenalties({
+    cycleYear: currentYear,
+    now: today,
+    isNewUser,
+  });
 
   let status: 'active' | 'grace-period' | 'overdue' | 'expired';
   let daysUntilDue = 0;
   let penaltyAmount = 0;
 
   if (!lastPaymentDate) {
-    // No payment ever made
     if (today <= gracePeriodEnd) {
       status = 'grace-period';
-      daysUntilDue = Math.ceil((gracePeriodEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      daysUntilDue = Math.ceil(
+        (gracePeriodEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      );
     } else {
       status = 'overdue';
-      const yearsOverdue = Math.floor((today.getTime() - gracePeriodEnd.getTime()) / (365 * 24 * 60 * 60 * 1000));
-      penaltyAmount = yearsOverdue * 10000;
+      penaltyAmount = canonicalPenalty;
     }
   } else {
-    // Has previous payment
     const paymentYear = lastPaymentDate.getFullYear();
     const paymentMonth = lastPaymentDate.getMonth();
-    
-    // Check if payment covers current year
-    if (paymentYear === currentYear && paymentMonth >= 1) { // Paid in current year cycle
+
+    if (paymentYear === currentYear && paymentMonth >= 1) {
+      // Paid Feb..Dec of current year -> covers current Feb..Jan cycle
       status = 'active';
-      daysUntilDue = Math.ceil((nextPaymentDue.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      daysUntilDue = Math.ceil(
+        (nextPaymentDue.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      );
     } else if (paymentYear === currentYear - 1 && paymentMonth >= 1) {
-      // Paid last year, check if still in grace period
+      // Paid for previous cycle; we're either in grace or overdue for new one
       if (today <= gracePeriodEnd) {
         status = 'grace-period';
-        daysUntilDue = Math.ceil((gracePeriodEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        daysUntilDue = Math.ceil(
+          (gracePeriodEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        );
       } else {
         status = 'overdue';
-        const yearsOverdue = Math.floor((today.getTime() - gracePeriodEnd.getTime()) / (365 * 24 * 60 * 60 * 1000));
-        penaltyAmount = yearsOverdue * 10000;
+        penaltyAmount = canonicalPenalty;
       }
     } else {
-      // Payment too old or doesn't cover current year
       status = 'expired';
-      const yearsOverdue = currentYear - paymentYear;
-      penaltyAmount = yearsOverdue * 10000;
+      penaltyAmount = canonicalPenalty;
     }
   }
 
@@ -132,6 +213,6 @@ export function getMembershipStatus(
     daysUntilDue,
     penaltyAmount,
     nextPaymentDue,
-    gracePeriodEnd
+    gracePeriodEnd,
   };
 }

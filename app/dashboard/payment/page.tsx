@@ -1,12 +1,21 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FiCreditCard, FiCheckCircle, FiAlertCircle, FiLoader, FiArrowLeft, FiCalendar, FiTrendingUp } from 'react-icons/fi';
-import { calculateMembershipPricing, getMembershipStatus } from '@/lib/membership-pricing';
+import {
+  FiCreditCard,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiLoader,
+  FiArrowLeft,
+  FiCalendar,
+} from 'react-icons/fi';
 import PaymentMethodSelector from '@/components/PaymentMethodSelector';
 import PhoneNumberInput from '@/components/PhoneNumberInput';
+import CheckoutStepper from '@/components/payment/CheckoutStepper';
+import CycleSelector, { CyclePricingRow } from '@/components/payment/CycleSelector';
+import OrderSummary from '@/components/payment/OrderSummary';
 
 const paymentMethods = [
   { id: 'azampesa', displayName: 'AzamPesa' },
@@ -14,149 +23,75 @@ const paymentMethods = [
   { id: 'halopesa', displayName: 'HaloPesa' },
   { id: 'airtelmoney', displayName: 'Airtel Money' },
   { id: 'mixxbyyas', displayName: 'Mixx By Yas' },
-  { id: 'bankcard', displayName: 'Bank Card' }
+  { id: 'bankcard', displayName: 'Bank Card' },
 ];
 
-// Payment History Component
+const STEPS = [
+  { id: 'cycle', label: 'Choose cycles', description: 'Pay current or prepay' },
+  { id: 'method', label: 'Payment method', description: 'All networks supported' },
+  { id: 'phone', label: 'Phone number', description: 'For the mobile prompt' },
+  { id: 'review', label: 'Review & pay', description: 'Confirm and authorise' },
+];
+
+// Lightweight payment history list reused at the bottom of the page.
 function PaymentHistory() {
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPaymentHistory = async () => {
+    (async () => {
       try {
-        const response = await fetch('/api/membership/status', { credentials: 'include' });
-        const data = await response.json();
-        
-        if (data.success && data.payments) {
-          setPayments(data.payments);
+        const r = await fetch('/api/membership/status', { credentials: 'include' });
+        const d = await r.json();
+        if (d?.success) {
+          const list = Array.isArray(d.recentPayments) ? d.recentPayments : [];
+          setPayments(list);
+          if (list.length === 0) setError(null);
         } else {
-          setError('Failed to load payment history');
+          setError(d?.error || 'Could not load payment history');
         }
-      } catch (err) {
-        setError('Error loading payment history');
+      } catch (e: any) {
+        setError(e?.message || 'Failed to load payment history');
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchPaymentHistory();
+    })();
   }, []);
-
-  const getCycleYear = (paymentDate: string) => {
-    const date = new Date(paymentDate);
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    
-    // Membership cycles ALWAYS run from February 1 to January 31
-    // Regardless of when payment is made, it covers the cycle year
-    if (month === 0) { // January
-      // Payment in January covers the current year cycle (Feb-Jan)
-      return `${year}-${year + 1}`;
-    } else { // February or later
-      // Payment in Feb+ covers the current year cycle (Feb-Jan)
-      return `${year}-${year + 1}`;
-    }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return `TZS ${amount.toLocaleString()}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <FiLoader className="animate-spin h-8 w-8 text-gray-400" />
+      <div className="flex items-center justify-center py-6">
+        <FiLoader className="animate-spin h-6 w-6 text-gray-400" />
       </div>
     );
   }
-
-  if (error) {
+  if (error || payments.length === 0) {
     return (
-      <div className="text-center py-8">
-        <FiAlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-        <p className="text-red-600">{error}</p>
-      </div>
+      <p className="text-sm text-gray-500 py-2">
+        {error || 'No payments yet.'}
+      </p>
     );
   }
-
-  if (payments.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <FiCalendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-600">No payment history found</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      {payments.map((payment, index) => (
-        <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center mb-2">
-                <FiCheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                <span className="font-semibold text-gray-900">
-                  {payment.source === 'membership_payment' ? 'Membership Payment' : 'Payment'}
-                </span>
-                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                  {payment.status}
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-600">Cycle Year</p>
-                  <p className="font-medium">{getCycleYear(payment.payment_date || payment.paid_at)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Amount Paid</p>
-                  <p className="font-medium">{formatCurrency(payment.amount)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Payment Date</p>
-                  <p className="font-medium">{formatDate(payment.payment_date || payment.paid_at)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Payment Method</p>
-                  <p className="font-medium">
-                    {paymentMethods.find(m => m.id === payment.payment_method)?.displayName || payment.payment_method}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Reference</p>
-                  <p className="font-medium text-xs">{payment.reference}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Type</p>
-                  <p className="font-medium capitalize">{payment.source?.replace('_', ' ')}</p>
-                </div>
-              </div>
-              
-              {/* Penalty Information */}
-              {payment.penalty_amount && payment.penalty_amount > 0 && (
-                <div className="mt-3 p-3 bg-red-50 rounded border border-red-200">
-                  <p className="text-red-800 text-sm font-medium">Late Payment Penalty Applied</p>
-                  <p className="text-red-600 text-xs mt-1">
-                    Penalty: {formatCurrency(payment.penalty_amount)}
-                  </p>
-                </div>
-              )}
-            </div>
+    <ul className="divide-y divide-gray-200">
+      {payments.slice(0, 5).map((p, i) => (
+        <li key={i} className="flex items-center justify-between py-3 text-sm">
+          <div>
+            <p className="font-medium text-gray-900">
+              {p.source === 'membership_payment' ? 'Membership payment' : 'Payment'}
+            </p>
+            <p className="text-xs text-gray-500">
+              {new Date(p.payment_date || p.paid_at || p.created_at).toLocaleDateString()}
+              {p.cycle_year ? ` · cycle ${p.cycle_year}` : ''}
+            </p>
           </div>
-        </div>
+          <p className="font-semibold text-emerald-700">
+            TZS {Number(p.amount || 0).toLocaleString()}
+          </p>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
@@ -164,569 +99,456 @@ export default function PaymentPage() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const [loading, setLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
-  const [membershipType, setMembershipType] = useState<'personal' | 'organization'>('personal');
-  const [pricing, setPricing] = useState<any>(null);
-  const [membershipStatus, setMembershipStatus] = useState<any>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
-  const [showPhoneInput, setShowPhoneInput] = useState(false);
-  const [userPhoneNumber, setUserPhoneNumber] = useState<string>('');
-  const [showPaymentHistory, setShowPaymentHistory] = useState(false);
 
-  // Auto-detect membership type from user profile
+  // Status payload from /api/membership/status — drives the whole page.
+  const [statusData, setStatusData] = useState<any>(null);
+
+  // Step state. Steps: 0=cycle, 1=method, 2=phone, 3=review.
+  const [stepIndex, setStepIndex] = useState(0);
+  const [selectedCycleYears, setSelectedCycleYears] = useState<number[]>([]);
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [authorized, setAuthorized] = useState(false);
+
+  // Derived: cycle pricing rows + helper booleans.
+  const cycles: CyclePricingRow[] = useMemo(
+    () => statusData?.pricingPerCycle || [],
+    [statusData]
+  );
+  const membershipType: 'personal' | 'organization' =
+    statusData?.userCategory === 'organization' ? 'organization' : 'personal';
+
+  // Load membership status (cycles + pricing) on mount.
   useEffect(() => {
-    const fetchUserMembershipType = async () => {
-      try {
-        const response = await fetch('/api/membership/status', { credentials: 'include' });
-        const data = await response.json();
-        
-        if (data.success && data.plan) {
-          setMembershipType(data.plan.type);
-        }
-      } catch (error) {
-        console.error('Error fetching membership type:', error);
-        // Fallback to URL parameter or default to personal
-        const typeParam = searchParams.get('type');
-        setMembershipType(typeParam === 'organization' ? 'organization' : 'personal');
-      }
-    };
-
-    fetchUserMembershipType();
-  }, [searchParams]);
-
-  useEffect(() => {
-    // Check if user is logged in
     if (!user) {
       router.push('/login');
       return;
     }
-
-    // Check if user is new or continuing
-    const calculatePricing = async () => {
+    (async () => {
       try {
-        // Fetch membership status and payment history
-        const response = await fetch('/api/membership/status', { 
+        const res = await fetch('/api/membership/status', {
           credentials: 'include',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
+          headers: { 'Cache-Control': 'no-cache' },
         });
-        const data = await response.json();
-        
-        console.log('Membership status data:', data);
-        console.log('Membership object:', data.membership);
-        console.log('Payments array:', data.payments);
-        
-        // Check if user has any completed payments in any cycle year
-        let hasAnyPayment = false;
-        
-        // Check if we have any payments in the response
-        if (data.payments && data.payments.length > 0) {
-          // Check for any completed payment regardless of the year
-          hasAnyPayment = data.payments.some((p: any) => p.status === 'completed');
-          console.log('Has any payment:', hasAnyPayment, data.payments);
-        }
-        
-        // Check membership record for any payment
-        let hasMembershipPayment = false;
-        if (data.membership && data.membership.payment_status === 'paid' && data.membership.payment_date) {
-          hasMembershipPayment = true;
-          console.log('Has membership payment:', data.membership);
-        }
-        
-        // User is new if they have no payments at all and no membership payment record
-        const isNewUser = !hasAnyPayment && !hasMembershipPayment;
-        
-        // Force new user status if this is their first payment
-        // This ensures new users always pay 40,000 TZS for their first payment
-        if (isNewUser && !data.membership) {
-          console.log('First time user - applying new user pricing');
-        }
-        console.log('Is new user:', isNewUser, { hasAnyPayment, hasMembershipPayment });
-        
-        console.log('User status:', { isNewUser, membership: data.membership });
-        
-        // Calculate pricing - force isNewUser to true if no membership exists
-        const effectiveIsNewUser = !data.membership || isNewUser;
-        console.log('Pricing calculation:', { 
-          membershipType, 
-          isNewUser, 
-          effectiveIsNewUser,
-          hasMembership: !!data.membership,
-          hasAnyPayment
-        });
-        
-        const pricingData = calculateMembershipPricing(membershipType, effectiveIsNewUser);
-        console.log('Pricing data:', pricingData);
-        setPricing(pricingData);
+        const data = await res.json();
+        setStatusData(data);
 
-        // Get membership status - use API's active status and membership data
-        const membershipData = data.membership;
-        const isActive = data.fees?.totalDue === 0 || (data.fees?.baseAmount === 0 && data.fees?.penaltyAmount === 0); // API sets fees to 0 for active members
-        let statusData = null;
-        
-        console.log('Is user active (from API):', isActive, 'fees:', data.fees);
-        console.log('Membership data exists:', !!membershipData);
-        console.log('Membership status:', membershipData?.status, 'payment status:', membershipData?.paymentStatus);
-        
-        if (isActive && membershipData) {
-          // User has active membership
-          const expiryDate = new Date(membershipData.expiryDate);
-          const today = new Date();
-          
-          statusData = {
-            status: 'active',
-            daysUntilDue: Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
-            penaltyAmount: 0,
-            nextPaymentDue: new Date(today.getFullYear() + 1, 1, 1), // Next February 1st
-            gracePeriodEnd: new Date(today.getFullYear(), 2, 31), // March 31st
-            expiryDate: membershipData.expiryDate
-          };
-        } else {
-          // Use the calculated status for non-active users
-          const lastPaymentDate = data.membership?.payment_date ? new Date(data.membership.payment_date) : null;
-          statusData = getMembershipStatus(lastPaymentDate, membershipType, isNewUser);
+        // Default selection: the current unpaid cycle. If everything is
+        // paid up, preselect the next unpaid future cycle.
+        const cs: CyclePricingRow[] = data?.pricingPerCycle || [];
+        const firstUnpaid = cs.find((c) => !c.isPaid);
+        if (firstUnpaid) {
+          setSelectedCycleYears([firstUnpaid.cycleYear]);
         }
-        
-        setMembershipStatus(statusData);
-        console.log('Final membership status:', statusData, 'from membership data:', membershipData);
-
-      } catch (error) {
-        console.error('Error calculating pricing:', error);
-        // Fallback pricing - assume new user
-        const fallbackPricing = calculateMembershipPricing(membershipType, true);
-        setPricing(fallbackPricing);
+      } catch (e: any) {
+        setError(e?.message || 'Failed to load membership status');
       } finally {
         setLoading(false);
       }
-    };
+    })();
+  }, [user, router]);
 
-    calculatePricing();
-  }, [user, membershipType, router]);
+  // Prefill phone from user profile when we hit the phone step.
+  useEffect(() => {
+    if (!user) return;
+    const u = user as any;
+    const phone =
+      u.phone ||
+      u.profile?.phone ||
+      (typeof u.profile?.contact_info === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(u.profile.contact_info).phone;
+            } catch {
+              return null;
+            }
+          })()
+        : u.profile?.contact_info?.phone) ||
+      '';
+    if (phone) setPhoneNumber(phone);
+  }, [user]);
 
-  const handlePayment = async () => {
-    if (!pricing || !user || !selectedPaymentMethod) {
-      setError('Please select a payment method');
-      return;
-    }
+  const selectedCycles = cycles.filter((c) =>
+    selectedCycleYears.includes(c.cycleYear)
+  );
+  const totalAmount = selectedCycles.reduce((s, c) => s + c.totalDue, 0);
+  const targetCycleYear =
+    selectedCycleYears.length > 0 ? Math.min(...selectedCycleYears) : null;
+  // Selected cycles MUST be contiguous starting at targetCycleYear so the
+  // server can extend expiry to Jan 31 of (target + count - 1) + 1.
+  const cycleCount = selectedCycleYears.length;
 
-    // Check if user already paid for current cycle
-    if (membershipStatus && membershipStatus.status === 'active') {
-      setError('You have already paid for the current membership cycle. Your membership is active until ' + new Date(membershipStatus.expiryDate).toLocaleDateString());
-      return;
-    }
-
-    // Show phone number input instead of direct payment
-    setShowPhoneInput(true);
+  const toggleCycle = (cy: number) => {
+    setSelectedCycleYears((prev) => {
+      const set = new Set(prev);
+      if (set.has(cy)) set.delete(cy);
+      else set.add(cy);
+      return Array.from(set).sort((a, b) => a - b);
+    });
   };
 
-  const handlePhoneNumberSubmit = async (phoneNumber: string) => {
-    if (!pricing || !user || !selectedPaymentMethod || !phoneNumber) {
-      setError('Missing payment information');
-      return;
+  const validateContiguous = (): string | null => {
+    if (selectedCycleYears.length === 0) return 'Select at least one cycle.';
+    const sorted = [...selectedCycleYears].sort((a, b) => a - b);
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i] !== sorted[i - 1] + 1) {
+        return 'Selected cycles must be consecutive (e.g. 2026 + 2027, not 2026 + 2028).';
+      }
     }
+    return null;
+  };
 
-    // Check if user already paid for current cycle
-    if (membershipStatus && membershipStatus.status === 'active') {
-      setError('You have already paid for the current membership cycle. Your membership is active until ' + new Date(membershipStatus.expiryDate).toLocaleDateString());
-      return;
-    }
-
-    setPaymentLoading(true);
+  const goNext = () => {
     setError(null);
-    setUserPhoneNumber(phoneNumber);
+    if (stepIndex === 0) {
+      const err = validateContiguous();
+      if (err) return setError(err);
+    }
+    if (stepIndex === 1 && !selectedMethod) {
+      return setError('Pick a payment method to continue.');
+    }
+    if (stepIndex === 2 && !phoneNumber) {
+      return setError('Enter the phone number to receive the payment prompt.');
+    }
+    setStepIndex((i) => Math.min(STEPS.length - 1, i + 1));
+  };
 
+  const goBack = () => {
+    setError(null);
+    setStepIndex((i) => Math.max(0, i - 1));
+  };
+
+  const submitPayment = async () => {
+    setError(null);
+    if (!user || !selectedMethod || !phoneNumber || !targetCycleYear || cycleCount < 1) {
+      setError('Missing payment information.');
+      return;
+    }
+    if (!authorized) {
+      setError('Please authorise the mobile money debit to continue.');
+      return;
+    }
+    setPaymentLoading(true);
     try {
-      console.log('🔍 Starting AzamPay checkout with:', {
-        membershipType,
-        amount: pricing.totalDue,
-        userId: user.id,
-        paymentMethod: selectedPaymentMethod,
-        phoneNumber,
-        customerName: user.name,
-        customerEmail: user.email,
-      });
-
-      // Use AzamPay checkout API with mobile money details - no PIN needed
-      const response = await fetch('/api/payments/azampay/checkout', {
+      const res = await fetch('/api/payments/azampay/checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           membershipType,
-          amount: pricing.totalDue,
-          userId: user.id,
-          paymentMethod: selectedPaymentMethod,
+          amount: totalAmount,
+          userId: (user as any).id,
+          paymentMethod: selectedMethod,
           phoneNumber,
-          customerName: user.name,
-          customerEmail: user.email,
+          customerName: (user as any).name,
+          customerEmail: (user as any).email,
+          targetCycleYear,
+          cycleCount,
         }),
       });
-
-      console.log('📡 AzamPay checkout response status:', response.status);
-      console.log('📡 AzamPay checkout response ok:', response.ok);
-
-      const data = await response.json();
-      console.log('📡 AzamPay checkout response data:', data);
-
-      if (!response.ok) {
-        console.error('❌ AzamPay checkout failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: data.error || 'Unknown error'
-        });
-        throw new Error(data.error || `Failed to create payment checkout (HTTP ${response.status})`);
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Checkout failed (HTTP ${res.status})`);
       }
-
-      // Handle fallback scenario
-      if (data.fallback) {
-        console.log('ℹ️ Using fallback scenario');
-        setPaymentUrl('fallback');
-        setError(data.error);
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
         return;
       }
-
-      // Success case
-      if (data.checkoutUrl) {
-        console.log('✅ Payment checkout created successfully');
-        setPaymentUrl(data.checkoutUrl);
-        
-        // Show user message about phone prompt
-        setError(`Redirecting to AzamPay... Check your ${selectedPaymentMethod} app for payment confirmation.`);
-        
-        // Log provider integration details
-        console.log(`Payment initiated with ${selectedPaymentMethod}:`, {
-          provider: selectedPaymentMethod,
-          phone: phoneNumber,
-          amount: pricing.totalDue,
-          ussd: selectedPaymentMethod === 'mpesa' ? '*150*01#' :
-                selectedPaymentMethod === 'azampesa' ? '*150*01#' :
-                selectedPaymentMethod === 'halopesa' ? '*150*02#' :
-                selectedPaymentMethod === 'airtelmoney' ? '*150*03#' :
-                selectedPaymentMethod === 'tigopesa' ? '*150*04#' : '*150#'
-        });
-        
-        // Redirect after a short delay to show the message
-        setTimeout(() => {
-          window.location.href = data.checkoutUrl;
-        }, 2000);
-      } else {
-        console.error('❌ No checkout URL received:', data);
-        throw new Error('No payment URL received from AzamPay');
-      }
-    } catch (err) {
-      console.error('❌ Payment submission error:', err);
-      setError(err instanceof Error ? err.message : 'Payment failed');
+      throw new Error('No checkout URL returned from gateway.');
+    } catch (e: any) {
+      setError(e?.message || 'Payment failed.');
     } finally {
       setPaymentLoading(false);
     }
   };
 
-  const handlePhoneInputCancel = () => {
-    setShowPhoneInput(false);
-    setUserPhoneNumber('');
-  };
-
-  if (!user) {
+  if (!user || loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <FiLoader className="animate-spin h-10 w-10 text-emerald-600" />
       </div>
     );
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-      </div>
-    );
-  }
+  // January-only reminder banner: identical content to the cron email.
+  const today = new Date();
+  const isJanuary = today.getMonth() === 0;
+  const upcomingCycleYear = today.getFullYear();
+  const activeExpiry = statusData?.membership?.expiryDate
+    ? new Date(statusData.membership.expiryDate)
+    : null;
+  const activeCovers = activeExpiry
+    ? activeExpiry >= new Date(upcomingCycleYear + 1, 0, 31)
+    : false;
+  const showJanuaryBanner = isJanuary && !activeCovers;
+
+  const providerLabel =
+    paymentMethods.find((m) => m.id === selectedMethod)?.displayName || null;
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-32 lg:pb-12">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 flex items-center justify-between">
           <button
-            onClick={() => showPhoneInput ? handlePhoneInputCancel() : router.push('/dashboard')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            onClick={() => router.push('/dashboard')}
+            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
           >
-            <FiArrowLeft className="mr-2" />
-            {showPhoneInput ? 'Back to Payment Methods' : 'Back to Dashboard'}
+            <FiArrowLeft className="mr-2 h-4 w-4" />
+            Back to dashboard
           </button>
-          
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {showPhoneInput ? 'Confirm Payment' : 
-             (pricing?.year && pricing?.year > new Date().getFullYear() ? 
-               'Next Cycle Membership Payment' : 'Membership Payment')}
-          </h1>
-          <p className="text-gray-600">
-            {showPhoneInput 
-              ? `Complete your ${paymentMethods.find(m => m.id === selectedPaymentMethod)?.displayName} payment`
-              : `${membershipType === 'personal' ? 'Personal' : 'Organization'} Membership for ${pricing?.year}`
-            }
-          </p>
+          <span className="text-xs text-gray-500">
+            Tanzania Library Association · Membership checkout
+          </span>
         </div>
 
-        {/* Error Message */}
+        {showJanuaryBanner && (
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <FiCalendar className="h-5 w-5 text-amber-500 mt-0.5" />
+            <div>
+              <h3 className="text-sm font-semibold text-amber-900">
+                New cycle starts February 1
+              </h3>
+              <p className="text-sm text-amber-800 mt-1">
+                Pay between Feb 1 and Mar 31 to avoid the TZS 1,000/month late
+                penalty starting April 1.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Stepper */}
+        <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <CheckoutStepper
+            steps={STEPS}
+            currentIndex={stepIndex}
+            onStepClick={(i) => setStepIndex(i)}
+          />
+        </div>
+
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="flex">
-              <FiAlertCircle className="h-5 w-5 text-red-400 mt-0.5" />
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Payment Error</h3>
-                <p className="text-sm text-red-700 mt-1">{error}</p>
-              </div>
-            </div>
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+            <FiAlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+            <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
 
-        {/* Payment Loading */}
-        {paymentLoading && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-md p-4">
-            <div className="flex">
-              <FiLoader className="h-5 w-5 text-blue-400 animate-spin mt-0.5" />
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">Processing Payment</h3>
-                <p className="text-sm text-blue-700 mt-1">
-                  {showPhoneInput ? 'Securing your payment...' : 'Redirecting you to secure payment gateway...'}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Phone Number Input Step */}
-        {showPhoneInput && selectedPaymentMethod && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <PhoneNumberInput
-              paymentMethod={selectedPaymentMethod}
-              onPhoneNumberSubmit={handlePhoneNumberSubmit}
-              onCancel={handlePhoneInputCancel}
-              disabled={membershipStatus && membershipStatus.status === 'active'}
-            />
-          </div>
-        )}
-
-        {/* Regular Payment Flow */}
-        {!showPhoneInput && (
-          <>
-            {membershipStatus && membershipStatus.status === 'active' ? (
-              /* Active Member - Show only active status and next cycle payment */
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="text-center">
-                  <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <FiCheckCircle className="h-12 w-12 text-green-600 mx-auto mb-2" />
-                    <h3 className="text-lg font-semibold text-green-800 mb-2">Membership Active</h3>
-                    <p className="text-green-700 mb-4">
-                      Your membership is active until {new Date(membershipStatus.expiryDate).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
-                    </p>
-                    <p className="text-sm text-gray-600 mb-4">
-                      You can pay for the next cycle to continue your membership without interruption.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      // Clear current membership status and recalculate for next cycle
-                      setMembershipStatus(null);
-                      const nextYear = new Date().getFullYear() + 1;
-                      const nextYearPricing = calculateMembershipPricing(membershipType, false, nextYear);
-                      setPricing(nextYearPricing);
-                    }}
-                    className="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors mb-3"
-                  >
-                    <FiTrendingUp className="mr-2 h-5 w-5" />
-                    Pay for Next Cycle
-                  </button>
-                  <button
-                    onClick={() => setShowPaymentHistory(true)}
-                    className="w-full flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-                  >
-                    <FiCalendar className="mr-2 h-5 w-5" />
-                    See Payment History
-                  </button>
-                  <div className="mt-4 text-center text-sm text-gray-600">
-                    <p>Next cycle: February {new Date().getFullYear() + 1} - January {new Date().getFullYear() + 2}</p>
-                    <p>Amount: TZS {membershipType === 'personal' ? '30,000' : '150,000'}</p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Non-Active Member - Show full payment flow */
-              <>
-                {/* Payment Method Selection */}
-                <PaymentMethodSelector
-                  selectedMethod={selectedPaymentMethod}
-                  onMethodSelect={setSelectedPaymentMethod}
-                  amount={pricing?.totalDue || 0}
+        {/* Two-column layout: steps + sticky summary */}
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+          {/* Left: stepper content */}
+          <div className="space-y-6">
+            {stepIndex === 0 && (
+              <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <CycleSelector
+                  cycles={cycles}
+                  selectedYears={selectedCycleYears}
+                  onToggle={toggleCycle}
+                  maxSelectable={statusData?.maxCycleCount || 3}
                 />
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={goNext}
+                    className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </section>
+            )}
 
-                {/* Pricing Details */}
-                {pricing && (
-                  <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Details</h2>
-                    
-                    <div className="space-y-4">
-                      {/* Base Amount */}
-                      <div className="flex justify-between items-center py-3 border-b">
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {pricing.isNewUser ? 'New Member' : 'Continuing Member'} - {membershipType === 'personal' ? 'Personal' : 'Organization'}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Membership period: February {pricing.year} - January {pricing.year + 1}
-                          </p>
-                        </div>
-                        <p className="text-xl font-bold text-gray-900">
-                          TZS {pricing.baseAmount.toLocaleString()}
-                        </p>
-                      </div>
+            {stepIndex === 1 && (
+              <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <PaymentMethodSelector
+                  selectedMethod={selectedMethod}
+                  onMethodSelect={setSelectedMethod}
+                  amount={totalAmount}
+                />
+                <div className="mt-6 flex justify-between">
+                  <button
+                    onClick={goBack}
+                    className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={goNext}
+                    className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </section>
+            )}
 
-                      {/* Penalty */}
-                      {pricing.penaltyAmount > 0 && (
-                        <div className="flex justify-between items-center py-3 border-b">
-                          <div>
-                            <p className="font-medium text-red-600">Late Payment Penalty</p>
-                            <p className="text-sm text-gray-600">
-                              {pricing.penaltyAmount / 10000} year(s) × TZS 10,000
-                            </p>
-                          </div>
-                          <p className="text-xl font-bold text-red-600">
-                            TZS {pricing.penaltyAmount.toLocaleString()}
-                          </p>
-                        </div>
-                      )}
+            {stepIndex === 2 && selectedMethod && (
+              <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 className="text-base font-semibold text-gray-900">
+                  Phone number for the payment prompt
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Use the number registered with{' '}
+                  <span className="font-medium">{providerLabel}</span>. You'll
+                  approve the debit on that handset.
+                </p>
+                <div className="mt-4">
+                  <PhoneNumberInput
+                    paymentMethod={selectedMethod}
+                    onPhoneNumberSubmit={(p: string) => {
+                      setPhoneNumber(p);
+                      setStepIndex(3);
+                    }}
+                    onCancel={goBack}
+                  />
+                </div>
+              </section>
+            )}
 
-                      {/* Total */}
-                      <div className="flex justify-between items-center py-3">
-                        <p className="text-lg font-semibold text-gray-900">Total Amount Due</p>
-                        <p className="text-2xl font-bold text-green-600">
-                          TZS {pricing.totalDue.toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
+            {stepIndex === 3 && (
+              <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 className="text-base font-semibold text-gray-900">
+                  Review &amp; pay
+                </h2>
+                <dl className="mt-4 grid grid-cols-2 gap-y-3 text-sm">
+                  <dt className="text-gray-500">Membership type</dt>
+                  <dd className="text-right font-medium text-gray-900">
+                    {membershipType === 'organization'
+                      ? 'Organization'
+                      : 'Personal'}
+                  </dd>
+                  <dt className="text-gray-500">Cycles</dt>
+                  <dd className="text-right font-medium text-gray-900">
+                    {selectedCycleYears.join(', ')} ({cycleCount} cycle
+                    {cycleCount === 1 ? '' : 's'})
+                  </dd>
+                  <dt className="text-gray-500">Payment method</dt>
+                  <dd className="text-right font-medium text-gray-900">
+                    {providerLabel}
+                  </dd>
+                  <dt className="text-gray-500">Phone number</dt>
+                  <dd className="text-right font-medium text-gray-900">
+                    {phoneNumber}
+                  </dd>
+                </dl>
 
-                    {/* Status Information */}
-                    {membershipStatus && (
-                      <div className={`mt-4 p-4 rounded-lg ${
-                        membershipStatus.status === 'active' ? 'bg-green-50 border border-green-200' :
-                        membershipStatus.status === 'grace-period' ? 'bg-yellow-50 border border-yellow-200' :
-                        membershipStatus.status === 'overdue' ? 'bg-red-50 border border-red-200' :
-                        'bg-gray-50 border border-gray-200'
-                      }`}>
-                        <div className="flex items-center">
-                          <FiCalendar className="h-5 w-5 mr-2" />
-                          <div>
-                            <p className="font-medium capitalize">
-                              {membershipStatus.status.replace('-', ' ')}
-                            </p>
-                            {membershipStatus.status === 'grace-period' && (
-                              <p className="text-sm text-gray-600">
-                                {membershipStatus.daysUntilDue} days remaining until grace period ends
-                              </p>
-                            )}
-                            {membershipStatus.status === 'overdue' && (
-                              <p className="text-sm text-red-600">
-                                Payment is overdue. Penalty of TZS {membershipStatus.penaltyAmount.toLocaleString()} applies.
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                <label className="mt-6 flex items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={authorized}
+                    onChange={(e) => setAuthorized(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span className="text-gray-700">
+                    I authorise Tanzania Library Association to debit TZS{' '}
+                    <span className="font-semibold">
+                      {totalAmount.toLocaleString()}
+                    </span>{' '}
+                    from my {providerLabel} account for the selected
+                    membership cycle{cycleCount > 1 ? 's' : ''}.
+                  </span>
+                </label>
+
+                {paymentLoading && (
+                  <div className="mt-4 flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+                    <FiLoader className="h-4 w-4 animate-spin" />
+                    Awaiting confirmation on your phone… you'll be redirected
+                    automatically.
                   </div>
                 )}
 
-                {/* Payment Button */}
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="mt-6 flex justify-between">
                   <button
-                    onClick={handlePayment}
-                    disabled={paymentLoading || !pricing || !selectedPaymentMethod || (membershipStatus && membershipStatus.status === 'active')}
-                    className="w-full flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                    onClick={goBack}
+                    disabled={paymentLoading}
+                    className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={submitPayment}
+                    disabled={paymentLoading || !authorized}
+                    className={`inline-flex items-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all ${
+                      paymentLoading || !authorized
+                        ? 'bg-gray-300 cursor-not-allowed'
+                        : 'bg-emerald-600 hover:bg-emerald-700'
+                    }`}
                   >
                     {paymentLoading ? (
                       <>
-                        <FiLoader className="animate-spin mr-2 h-5 w-5" />
-                        Processing...
+                        <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                        Processing
                       </>
                     ) : (
                       <>
-                        <FiCreditCard className="mr-2 h-5 w-5" />
-                        Pay TZS {pricing?.totalDue.toLocaleString() || '0'}
-                        {selectedPaymentMethod && ` with ${paymentMethods.find(m => m.id === selectedPaymentMethod)?.displayName}`}
+                        <FiCreditCard className="mr-2 h-4 w-4" />
+                        Pay TZS {totalAmount.toLocaleString()}
                       </>
                     )}
                   </button>
-
-                  <div className="mt-4 text-center text-sm text-gray-600">
-                    <p>Secure payment powered by AzamPay</p>
-                    <p>You will be prompted to enter your mobile money details</p>
-                  </div>
                 </div>
-              </>
+              </section>
             )}
-          </>
-        )}
 
-        {/* Information Section */}
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Membership Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-medium text-gray-800 mb-2">Payment Schedule</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Membership year: February to January</li>
-                <li>• Grace period: Until March 31st</li>
-                <li>• Late penalty: TZS 10,000 per year</li>
-                <li>• New members: TZS 40,000 (Personal)</li>
-                <li>• Continuing: TZS 30,000 (Personal)</li>
-                <li>• Organization: TZS 150,000</li>
+            {/* Recent payments */}
+            <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="text-base font-semibold text-gray-900 mb-2">
+                Recent payments
+              </h3>
+              <PaymentHistory />
+            </section>
+
+            {/* Membership info */}
+            <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm text-sm text-gray-600">
+              <h3 className="text-base font-semibold text-gray-900 mb-3">
+                Membership rules
+              </h3>
+              <ul className="space-y-1">
+                <li>• Cycle runs February 1 — January 31.</li>
+                <li>• Pay anytime between Feb 1 and Mar 31 with no penalty.</li>
+                <li>
+                  • From April 1, late penalty is TZS 1,000 per month elapsed.
+                </li>
+                <li>
+                  • Prepay up to 3 cycles in one transaction — no discount, no
+                  hidden fees.
+                </li>
+                <li>
+                  • Receipt is sent automatically by <strong>email and SMS</strong>{' '}
+                  the moment payment confirms.
+                </li>
+                <li>
+                  • All mobile networks supported via AzamPay: AzamPesa, M-Pesa,
+                  HaloPesa, Airtel Money, Mixx By Yas, plus bank card.
+                </li>
               </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-800 mb-2">Accepted Payment Methods</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Mobile Money (M-Pesa, Tigo Pesa, Airtel Money, HaloPesa)</li>
-                <li>• Bank Cards (Visa, Mastercard)</li>
-                <li>• Bank Transfer</li>
-              </ul>
-            </div>
+            </section>
           </div>
+
+          {/* Right: sticky summary (also bottom sheet on mobile) */}
+          <OrderSummary
+            cycles={cycles}
+            selectedYears={selectedCycleYears}
+            providerLabel={providerLabel}
+            ctaLabel={
+              stepIndex < 3
+                ? `Continue · TZS ${totalAmount.toLocaleString()}`
+                : `Pay TZS ${totalAmount.toLocaleString()}`
+            }
+            ctaDisabled={
+              selectedCycleYears.length === 0 ||
+              (stepIndex === 3 && !authorized) ||
+              !!validateContiguous()
+            }
+            ctaLoading={paymentLoading}
+            onCta={() => {
+              if (stepIndex < 3) goNext();
+              else submitPayment();
+            }}
+          />
         </div>
       </div>
-
-      {/* Payment History Modal */}
-      {showPaymentHistory && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Payment History</h2>
-                <button
-                  onClick={() => setShowPaymentHistory(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <FiArrowLeft className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
-              <PaymentHistory />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

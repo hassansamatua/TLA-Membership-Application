@@ -9,7 +9,7 @@ export default function PaymentSuccessPage() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'failed' | 'error'>('loading');
   const [message, setMessage] = useState<string>('Processing your payment...');
   const [reference, setReference] = useState<string>('');
 
@@ -105,17 +105,21 @@ export default function PaymentSuccessPage() {
         setStatus('success');
         setMessage('Payment successful! Your membership has been activated.');
       } else {
-        console.error('Failed to activate test membership:', data.error || 'Unknown error');
+        const serverMessage =
+          data?.message || data?.error || data?.details || 'Unknown error';
+        console.error('Failed to activate test membership:', serverMessage);
         console.error('Response status:', response.status);
         console.error('Response data:', data);
-        
+
         // Retry logic
         if (retryCount < 3) {
           console.log(`Activation failed, retrying... (${retryCount + 1}/3)`);
           await activateTestMembership(ref, retryCount + 1);
         } else {
           setStatus('error');
-          setMessage('Payment activation failed after multiple attempts. Please try again.');
+          setMessage(
+            `Payment activation failed after multiple attempts: ${serverMessage}`
+          );
         }
       }
     } catch (error: any) {
@@ -162,7 +166,7 @@ export default function PaymentSuccessPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -176,8 +180,8 @@ export default function PaymentSuccessPage() {
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
           )}
           {status === 'success' && (
-            <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center">
-              <FiCheckCircle className="h-8 w-8 text-green-600" />
+            <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center">
+              <FiCheckCircle className="h-8 w-8 text-emerald-600" />
             </div>
           )}
           {status === 'failed' && (
@@ -190,7 +194,7 @@ export default function PaymentSuccessPage() {
         {/* Status Message */}
         <div className="text-center mb-6">
           <h1 className={`text-2xl font-bold mb-2 ${
-            status === 'success' ? 'text-green-600' : 
+            status === 'success' ? 'text-emerald-600' : 
             status === 'failed' ? 'text-red-600' : 'text-blue-600'
           }`}>
             {status === 'loading' && 'Processing Payment'}
@@ -213,7 +217,7 @@ export default function PaymentSuccessPage() {
             <>
               <button
                 onClick={() => router.push('/dashboard/membership-card')}
-                className="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                className="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
               >
                 <FiCreditCard className="mr-2 h-4 w-4" />
                 View Membership Card

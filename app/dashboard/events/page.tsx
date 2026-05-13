@@ -100,7 +100,7 @@ export default function EventsPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -108,7 +108,7 @@ export default function EventsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -137,7 +137,7 @@ export default function EventsPage() {
             {user?.isAdmin && (
               <button
                 onClick={() => router.push('/dashboard/events/create')}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
               >
                 <FiPlus className="mr-2 h-4 w-4" />
                 Create Event
@@ -161,7 +161,7 @@ export default function EventsPage() {
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
                 {/* Event Image - removed since no image_url field */}
-                <div className="h-48 bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
+                <div className="h-48 bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
                   <FiCalendar className="h-16 w-16 text-white" />
                 </div>
 
@@ -169,7 +169,7 @@ export default function EventsPage() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className={`text-xs font-medium px-2 py-1 rounded ${
-                      isUpcoming(event) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      isUpcoming(event) ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'
                     }`}>
                       {isUpcoming(event) ? 'Upcoming' : 'Past Event'}
                     </span>
@@ -231,7 +231,7 @@ export default function EventsPage() {
                             </button>
                             <button
                               onClick={() => router.push(`/dashboard/events/${event.id}/edit`)}
-                              className="text-green-600 hover:text-green-800"
+                              className="text-emerald-600 hover:text-emerald-800"
                               title="Edit Event"
                             >
                               <FiEdit className="h-4 w-4" />
@@ -254,7 +254,7 @@ export default function EventsPage() {
                           setSelectedEvent(event);
                           setShowRegistrationModal(true);
                         }}
-                        className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+                        className="w-full bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 transition-colors"
                       >
                         Register Now
                       </button>
@@ -353,7 +353,7 @@ export default function EventsPage() {
                   {isUpcoming(selectedEvent) && !isFullyBooked(selectedEvent) && (
                     <button
                       onClick={() => setShowRegistrationModal(true)}
-                      className="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700"
+                      className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700"
                     >
                       Register Now
                     </button>
@@ -392,7 +392,7 @@ export default function EventsPage() {
                 </button>
                 <button
                   onClick={() => handleRegister(selectedEvent.id)}
-                  className="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700"
+                  className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700"
                 >
                   Confirm Registration
                 </button>

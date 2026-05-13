@@ -184,7 +184,7 @@ export default function PaymentManagementPage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -224,8 +224,8 @@ export default function PaymentManagementPage() {
 
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <FiCalendar className="h-6 w-6 text-green-600" />
+            <div className="p-2 bg-emerald-100 rounded-lg">
+              <FiCalendar className="h-6 w-6 text-emerald-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Payment Window</p>
@@ -265,7 +265,7 @@ export default function PaymentManagementPage() {
                   placeholder="Search members..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
               <div className="max-h-96 overflow-y-auto">
@@ -275,7 +275,7 @@ export default function PaymentManagementPage() {
                     onClick={() => handleUserSelect(user.id)}
                     className={`p-3 border rounded-lg cursor-pointer mb-2 transition-colors ${
                       selectedUserId === user.id
-                        ? 'border-green-500 bg-green-50'
+                        ? 'border-emerald-500 bg-emerald-50'
                         : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -335,12 +335,12 @@ export default function PaymentManagementPage() {
                 )}
 
                 {!paymentData.user.isExpired && paymentData.user.membershipStatus === 'active' && (
-                  <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
                     <div className="flex items-center">
-                      <FiCheck className="h-5 w-5 text-green-600 mr-2" />
+                      <FiCheck className="h-5 w-5 text-emerald-600 mr-2" />
                       <div>
-                        <p className="font-medium text-green-800">Membership Active</p>
-                        <p className="text-sm text-green-600">
+                        <p className="font-medium text-emerald-800">Membership Active</p>
+                        <p className="text-sm text-emerald-600">
                           All payments are up to date
                         </p>
                       </div>
@@ -391,7 +391,7 @@ export default function PaymentManagementPage() {
                         key={year.year}
                         className={`p-3 border rounded-lg ${
                           year.isPaid 
-                            ? 'border-green-200 bg-green-50' 
+                            ? 'border-emerald-200 bg-emerald-50' 
                             : 'border-gray-200'
                         }`}
                       >
@@ -402,7 +402,7 @@ export default function PaymentManagementPage() {
                               checked={selectedYears.includes(year.year)}
                               onChange={() => handleYearToggle(year.year)}
                               disabled={year.isPaid}
-                              className="mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded disabled:opacity-50"
+                              className="mr-3 h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded disabled:opacity-50"
                             />
                             <div>
                               <p className="font-medium text-gray-900">
@@ -415,7 +415,7 @@ export default function PaymentManagementPage() {
                           </div>
                           <div className="text-right">
                             <p className={`text-sm font-medium ${
-                              year.isPaid ? 'text-green-600' : 'text-gray-900'
+                              year.isPaid ? 'text-emerald-600' : 'text-gray-900'
                             }`}>
                               {year.isPaid ? 'Paid' : formatPaymentAmount(MEMBERSHIP_FEE + (year.penalty || 0))}
                             </p>
@@ -471,7 +471,7 @@ export default function PaymentManagementPage() {
                           onClick={() => setPaymentMethod(method)}
                           className={`p-3 border rounded-lg text-left transition-colors ${
                             paymentMethod === method
-                              ? 'border-green-500 bg-green-50 text-green-700'
+                              ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
@@ -489,7 +489,7 @@ export default function PaymentManagementPage() {
                     <button
                       onClick={handlePayment}
                       disabled={isProcessing}
-                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isProcessing ? 'Processing...' : 'Process Payment'}
                     </button>

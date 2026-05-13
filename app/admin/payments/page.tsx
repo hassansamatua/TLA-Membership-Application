@@ -151,7 +151,7 @@ export default function AdminPaymentsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
+      case 'completed': return 'bg-emerald-100 text-emerald-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'failed': return 'bg-red-100 text-red-800';
       case 'refunded': return 'bg-gray-100 text-gray-800';
@@ -185,7 +185,7 @@ export default function AdminPaymentsPage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -215,8 +215,8 @@ export default function AdminPaymentsPage() {
         
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-full">
-              <FiCheck className="h-6 w-6 text-green-600" />
+            <div className="p-3 bg-emerald-100 rounded-full">
+              <FiCheck className="h-6 w-6 text-emerald-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Completed</p>
@@ -263,7 +263,7 @@ export default function AdminPaymentsPage() {
                 placeholder="Search by user name, email, or transaction ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
           </div>
@@ -277,7 +277,7 @@ export default function AdminPaymentsPage() {
             </button>
             <button
               onClick={exportPayments}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
             >
               <FiDownload className="mr-2 h-4 w-4" />
               Export
@@ -292,7 +292,7 @@ export default function AdminPaymentsPage() {
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               >
                 <option value="">All Status</option>
                 <option value="completed">Completed</option>
@@ -306,7 +306,7 @@ export default function AdminPaymentsPage() {
               <select
                 value={filters.membershipType}
                 onChange={(e) => setFilters({ ...filters, membershipType: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               >
                 <option value="">All Types</option>
                 <option value="personal">Personal</option>
@@ -319,7 +319,7 @@ export default function AdminPaymentsPage() {
                 type="date"
                 value={filters.dateFrom}
                 onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
             <div>
@@ -328,7 +328,7 @@ export default function AdminPaymentsPage() {
                 type="date"
                 value={filters.dateTo}
                 onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
           </div>
@@ -369,7 +369,7 @@ export default function AdminPaymentsPage() {
                 <tr>
                   <td colSpan={7} className="px-6 py-4 text-center">
                     <div className="flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div>
                     </div>
                   </td>
                 </tr>
@@ -447,7 +447,7 @@ export default function AdminPaymentsPage() {
                         {payment.status === 'failed' && (
                           <button
                             onClick={() => handleRetry(payment.id)}
-                            className="text-green-600 hover:text-green-900"
+                            className="text-emerald-600 hover:text-emerald-900"
                             title="Retry Payment"
                           >
                             <FiRefreshCw className="h-4 w-4" />
@@ -592,7 +592,7 @@ export default function AdminPaymentsPage() {
                         handleRetry(selectedPayment.id);
                         setShowPaymentModal(false);
                       }}
-                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                      className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
                     >
                       <FiRefreshCw className="inline mr-2 h-4 w-4" />
                       Retry Payment

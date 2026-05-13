@@ -98,7 +98,7 @@ export default function AdminPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -111,7 +111,7 @@ export default function AdminPage() {
     <div>
       {/* Welcome Section */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-green-700 to-green-600 rounded-2xl p-8 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-2xl p-8 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
@@ -132,15 +132,15 @@ export default function AdminPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-          <div className="h-2 bg-green-900 "></div>
+          <div className="h-2 bg-emerald-900 "></div>
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Total Users</p>
-                <p className="text-3xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">{stats.totalUsers}</p>
+                <p className="text-3xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{stats.totalUsers}</p>
                 <p className="text-xs text-gray-500 mt-1">Registered members</p>
               </div>
-              <div className="p-4 bg-blue-100 rounded-xl group-hover:bg-green-200 transition-colors">
+              <div className="p-4 bg-blue-100 rounded-xl group-hover:bg-emerald-200 transition-colors">
                 <FiUsers className="h-6 w-6 text-black-600" />
               </div>
             </div>
@@ -148,16 +148,16 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-          <div className="h-2 bg-gradient-to-r from-green-500 to-green-600"></div>
+          <div className="h-2 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Active Members</p>
-                <p className="text-3xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">{stats.activeMembers}</p>
+                <p className="text-3xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{stats.activeMembers}</p>
                 <p className="text-xs text-gray-500 mt-1">Currently active</p>
               </div>
-              <div className="p-4 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
-                <FiActivity className="h-6 w-6 text-green-600" />
+              <div className="p-4 bg-emerald-100 rounded-xl group-hover:bg-emerald-200 transition-colors">
+                <FiActivity className="h-6 w-6 text-emerald-600" />
               </div>
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-          <div className="h-2 bg-gradient-to-r from-green-500 to-emerald-500"></div>
+          <div className="h-2 bg-gradient-to-r from-emerald-500 to-emerald-500"></div>
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -275,12 +275,12 @@ export default function AdminPage() {
           </button>
           <button
             onClick={() => router.push('/admin/payments')}
-            className="group relative overflow-hidden bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="group relative overflow-hidden bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl p-6 hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             <div className="relative z-10">
               <FiCreditCard className="h-8 w-8 mb-3" />
               <div className="font-semibold">Manage Payments</div>
-              <div className="text-xs text-green-100 mt-1">View payment history</div>
+              <div className="text-xs text-emerald-100 mt-1">View payment history</div>
             </div>
             <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
           </button>

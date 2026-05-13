@@ -123,7 +123,7 @@ export default function DashboardSidebar() {
           
           <div className="flex justify-between text-xs">
             <span className="text-gray-600">Status:</span>
-            <span className={`font-medium ${membershipStatus?.canAccessIdCard ? 'text-green-600' : 'text-red-600'}`}>
+            <span className={`font-medium ${membershipStatus?.canAccessIdCard ? 'text-emerald-600' : 'text-red-600'}`}>
               {membershipStatus?.canAccessIdCard ? 'Paid / Active' : 'Payment Required'}
             </span>
           </div>
@@ -144,7 +144,7 @@ export default function DashboardSidebar() {
         
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
-            className="bg-green-500 h-2 rounded-full transition-all duration-300" 
+            className="bg-emerald-500 h-2 rounded-full transition-all duration-300" 
             style={{ width: `${profileCompletion}%` }}
           ></div>
         </div>

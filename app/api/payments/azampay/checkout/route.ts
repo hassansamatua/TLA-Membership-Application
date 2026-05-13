@@ -5,7 +5,20 @@ import { getUserById } from '@/lib/auth';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { membershipType, amount, userId, paymentMethod, phoneNumber, customerName, customerEmail } = body;
+    const {
+      membershipType,
+      amount,
+      userId,
+      paymentMethod,
+      phoneNumber,
+      customerName,
+      customerEmail,
+      // New multi-cycle fields from the redesigned checkout. Both are
+      // optional so legacy callers (single-cycle current payment) keep
+      // working. cycleCount is hard-capped at 3 per business rules.
+      targetCycleYear: rawTargetCycle,
+      cycleCount: rawCycleCount,
+    } = body;
 
     if (!membershipType || !amount || !userId || !paymentMethod || !phoneNumber) {
       return NextResponse.json(
@@ -13,6 +26,14 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const targetCycleYear = Number.isFinite(Number(rawTargetCycle))
+      ? Number(rawTargetCycle)
+      : null;
+    const cycleCount = Math.min(
+      3,
+      Math.max(1, Number.isFinite(Number(rawCycleCount)) ? Number(rawCycleCount) : 1)
+    );
 
     // Get user details
     const user = await getUserById(userId);
@@ -73,12 +94,19 @@ export async function POST(request: NextRequest) {
     try {
       // Create payment record with the checkout reference
       await connection.query(
-        `INSERT INTO payments (reference, user_id, membership_type, amount, currency, status, payment_method, phone_number, checkout_url, created_at)
-         VALUES (?, ?, ?, ?, 'TZS', 'pending', ?, ?, ?, NOW())`,
-        [paymentReference, userId, membershipType, amount, paymentMethod, phoneNumber, checkoutResponse.data.checkoutUrl]
+        `INSERT INTO payments
+           (reference, user_id, membership_type, amount, currency, status,
+            payment_method, phone_number, checkout_url,
+            cycle_year, target_cycle_year, cycle_count, created_at)
+         VALUES (?, ?, ?, ?, 'TZS', 'pending', ?, ?, ?, ?, ?, ?, NOW())`,
+        [
+          paymentReference, userId, membershipType, amount,
+          paymentMethod, phoneNumber, checkoutResponse.data.checkoutUrl,
+          targetCycleYear, targetCycleYear, cycleCount,
+        ]
       );
       
-      console.log('Payment record created with reference:', paymentReference);
+      console.log('Payment record created with reference:', paymentReference, '(cycles:', cycleCount, 'starting', targetCycleYear, ')');
       
     } catch (dbError: any) {
       console.error('Database error:', dbError);
@@ -112,11 +140,18 @@ export async function POST(request: NextRequest) {
             )
           `);
           
-          // Try inserting again
+          // Try inserting again with the new cycle metadata
           await connection.query(
-            `INSERT INTO payments (reference, user_id, membership_type, amount, currency, status, payment_method, phone_number, checkout_url, created_at)
-             VALUES (?, ?, ?, ?, 'TZS', 'pending', ?, ?, ?, NOW())`,
-            [paymentReference, userId, membershipType, amount, paymentMethod, phoneNumber, checkoutResponse.data.checkoutUrl]
+            `INSERT INTO payments
+               (reference, user_id, membership_type, amount, currency, status,
+                payment_method, phone_number, checkout_url,
+                cycle_year, target_cycle_year, cycle_count, created_at)
+             VALUES (?, ?, ?, ?, 'TZS', 'pending', ?, ?, ?, ?, ?, ?, NOW())`,
+            [
+              paymentReference, userId, membershipType, amount,
+              paymentMethod, phoneNumber, checkoutResponse.data.checkoutUrl,
+              targetCycleYear, targetCycleYear, cycleCount,
+            ]
           );
         } catch (createError) {
           console.error('Failed to create table:', createError);

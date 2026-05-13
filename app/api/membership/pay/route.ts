@@ -118,19 +118,25 @@ export async function POST(request: Request) {
       const joinedDate = existingMembership?.joined_date || toDateOnlyIso(now);
       const expiryDate = toDateOnlyIso(cycle.expiryDate);
 
-      const invoiceNumber = `INV-${Date.now()}`;
+      const reference = `INV-${Date.now()}-${decoded.id}`;
+      const dbMembershipType: 'personal' | 'organization' = planType;
 
       await connection.query(
-        `INSERT INTO payments (user_id, transaction_id, amount, payment_method, status, payment_date, due_date, invoice_number, description)
-         VALUES (?, ?, ?, ?, 'completed', NOW(), ?, ?, ?)` ,
+        `INSERT INTO payments
+           (reference, user_id, membership_type, amount, currency, status,
+            payment_method, transaction_id, created_at, paid_at, updated_at,
+            cycle_year, penalty_amount, is_new_member)
+         VALUES (?, ?, ?, ?, 'TZS', 'completed', ?, ?, NOW(), NOW(), NOW(), ?, ?, ?)`,
         [
+          reference,
           decoded.id,
-          transactionId,
+          dbMembershipType,
           totalDue,
           paymentMethod,
-          toDateOnlyIso(cycle.dueDate),
-          invoiceNumber,
-          `Membership payment (${planType}${newUser ? ' new' : ' renewal'}) for cycle ${cycle.cycleYear}`
+          transactionId,
+          cycle.cycleYear,
+          penaltyAmount,
+          newUser ? 1 : 0,
         ]
       );
 

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadCount } from "@/contexts/UnreadCountContext";
 import { FiUser, FiCalendar, FiMail, FiPhone, FiMapPin, FiBriefcase, FiCheckCircle, FiAlertCircle, FiArrowRight, FiCreditCard, FiBell } from "react-icons/fi";
+import { Surface, PageHeader, StatTile, StatusBadge } from "@/components/ui";
 
 type MembershipStatusResponse = {
   success: boolean;
@@ -35,6 +36,7 @@ type MembershipStatusResponse = {
     expiryDate: string;
     amountPaid: number | string;
   } | null;
+  paidCycles?: number[];
   canAccessIdCard?: boolean;
 };
 
@@ -165,7 +167,7 @@ export default function DashboardPage() {
   if (isLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -174,13 +176,13 @@ export default function DashboardPage() {
     { 
       title: 'View Profile', 
       description: 'View and edit your profile information',
-      icon: <FiUser className="h-6 w-6 text-green-600" />,
+      icon: <FiUser className="h-6 w-6 text-emerald-600" />,
       action: () => router.push('/dashboard/profile')
     },
     { 
       title: 'Upcoming Events', 
       description: 'Check your scheduled events and activities',
-      icon: <FiCalendar className="h-6 w-6 text-green-600" />,
+      icon: <FiCalendar className="h-6 w-6 text-emerald-600" />,
       action: () => router.push('/dashboard/events')
     },
     { 
@@ -192,116 +194,143 @@ export default function DashboardPage() {
     },
   ];
 
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={logout}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </div>
+  const fmtDate = (d?: string) =>
+    d
+      ? new Date(d).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : 'N/A';
 
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        {/* Welcome Banner */}
-        <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
-          <div className="px-4 py-5 sm:p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">Welcome back, {user?.name}!</h2>
-                <p className="mt-1 text-sm text-gray-600">Here's what's happening with your account today.</p>
-              </div>
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-950">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <PageHeader
+          eyebrow="Member dashboard"
+          title={`Welcome back, ${user?.name?.split(' ')[0] || 'Member'}`}
+          description="Here's a snapshot of your membership, recent activity, and what's next."
+          icon={<FiUser className="h-5 w-5" />}
+          actions={
+            <>
               {user?.isAdmin && (
-                <div className="mt-4 md:mt-0">
-                  <a
-                    href="/admin"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                  >
-                    Go to Admin Panel
-                  </a>
-                </div>
+                <a
+                  href="/admin"
+                  className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+                >
+                  Admin panel
+                </a>
               )}
-            </div>
-          </div>
-        </div>
+              <button
+                onClick={logout}
+                className="inline-flex items-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10"
+              >
+                Sign out
+              </button>
+            </>
+          }
+        />
 
         {/* Membership Payment Status */}
-        <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex items-center justify-between">
+        <Surface className="mb-6" padding="none">
+          <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4 sm:px-6 dark:border-white/10">
             <div>
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Membership Payment</h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">Your current membership payment status.</p>
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Membership Payment</h3>
+              <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                Your current membership payment status.
+              </p>
             </div>
-            <FiCreditCard className="h-6 w-6 text-green-600" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/30">
+              <FiCreditCard className="h-5 w-5" />
+            </span>
           </div>
-          <div className="px-4 py-5 sm:p-6">
+          <div className="px-5 py-5 sm:px-6 sm:py-6">
             {isMembershipLoading ? (
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-green-500"></div>
-                <span className="ml-3 text-sm text-gray-600">Loading membership status...</span>
+              <div className="flex items-center gap-3 text-sm text-gray-600">
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-emerald-500" />
+                Loading membership status…
               </div>
             ) : membershipStatus?.success ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
-                    Cycle: <span className="font-medium text-gray-900">{membershipStatus.cycle?.year}</span>
-                  </div>
-                  <div>
-                    {membershipStatus.canAccessIdCard ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Paid / Active
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        Payment Required
-                      </span>
-                    )}
-                  </div>
+              <div className="space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Cycle{' '}
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {membershipStatus.cycle?.year}
+                    </span>
+                  </p>
+                  {membershipStatus.canAccessIdCard ? (
+                    <StatusBadge tone="emerald" icon={<FiCheckCircle className="h-3 w-3" />}>
+                      Paid / Active
+                    </StatusBadge>
+                  ) : (
+                    <StatusBadge tone="red" icon={<FiAlertCircle className="h-3 w-3" />}>
+                      Payment Required
+                    </StatusBadge>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-gray-50 rounded-md p-4">
-                    <div className="text-xs text-gray-500">Total due</div>
-                    <div className="text-lg font-semibold text-gray-900">
-                      {membershipStatus.fees?.currency || 'TZS'} {Number(membershipStatus.fees?.totalDue || 0).toLocaleString('en-US')}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">Due date: {membershipStatus.cycle?.dueDate}</div>
-                  </div>
-                  <div className="bg-gray-50 rounded-md p-4">
-                    <div className="text-xs text-gray-500">Membership #</div>
-                    <div className="text-lg font-semibold text-gray-900">
-                      {user?.membershipNumber || 'N/A'}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">Expiry: {membershipStatus.membership?.expiryDate ? 
-                    new Date(membershipStatus.membership.expiryDate).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    }) : 
-                    membershipStatus.cycle?.expiryDate ? 
-                    new Date(membershipStatus.cycle.expiryDate).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    }) : 
-                    'N/A'
-                  }</div>
-                  </div>
-                  <div className="bg-gray-50 rounded-md p-4">
-                    <div className="text-xs text-gray-500">Plan</div>
-                    <div className="text-lg font-semibold text-gray-900">
-                      {membershipStatus.plan?.type === 'organization' ? 'Organization' : (membershipStatus.plan?.newUser ? 'Personal (New)' : 'Personal (Renewal)')}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">Penalty: {membershipStatus.fees?.currency || 'TZS'} {Number(membershipStatus.fees?.penaltyAmount || 0).toLocaleString('en-US')}</div>
-                  </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <StatTile
+                    label="Total due"
+                    value={`${membershipStatus.fees?.currency || 'TZS'} ${Number(
+                      membershipStatus.fees?.totalDue || 0
+                    ).toLocaleString('en-US')}`}
+                    hint={`Due date: ${membershipStatus.cycle?.dueDate || '—'}`}
+                  />
+                  <StatTile
+                    label="Membership #"
+                    value={user?.membershipNumber || 'N/A'}
+                    hint={`Expiry: ${
+                      fmtDate(membershipStatus.membership?.expiryDate) !== 'N/A'
+                        ? fmtDate(membershipStatus.membership?.expiryDate)
+                        : fmtDate(membershipStatus.cycle?.expiryDate)
+                    }`}
+                  />
+                  <StatTile
+                    label="Plan"
+                    value={
+                      membershipStatus.plan?.type === 'organization'
+                        ? 'Organization'
+                        : membershipStatus.plan?.newUser
+                        ? 'Personal (New)'
+                        : 'Personal (Renewal)'
+                    }
+                    hint={`Penalty: ${
+                      membershipStatus.fees?.currency || 'TZS'
+                    } ${Number(membershipStatus.fees?.penaltyAmount || 0).toLocaleString('en-US')}`}
+                  />
                 </div>
+
+                {/* Cycles paid breakdown — shown when any cycle has been paid
+                    so the multi-cycle prepayment is visible at a glance. */}
+                {membershipStatus.paidCycles && membershipStatus.paidCycles.length > 0 && (
+                  <div className="mt-4 rounded-md border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/5">
+                    <div className="flex items-start gap-3">
+                      <FiCheckCircle className="h-5 w-5 text-emerald-600 mt-0.5 shrink-0 dark:text-emerald-300" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-emerald-900 dark:text-emerald-200">
+                          Cycles paid ({membershipStatus.paidCycles.length})
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {membershipStatus.paidCycles.map((cy) => (
+                            <span
+                              key={cy}
+                              className="inline-flex items-center rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/30"
+                            >
+                              {cy}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="mt-2 text-xs text-emerald-800/80 dark:text-emerald-300/80">
+                          {membershipStatus.paidCycles.length > 1
+                            ? `Prepaid through ${membershipStatus.paidCycles[membershipStatus.paidCycles.length - 1] + 1} — your card stays valid until January 31, ${membershipStatus.paidCycles[membershipStatus.paidCycles.length - 1] + 1}.`
+                            : 'You can prepay up to 2 future cycles in one transaction — no discount, no penalties.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {!membershipStatus.canAccessIdCard && (
                   <div className="flex justify-end">
@@ -311,89 +340,91 @@ export default function DashboardPage() {
                         const newUser = membershipStatus.plan?.newUser ? 'true' : 'false';
                         router.push(`/dashboard/subscribe?type=${type}&newUser=${newUser}`);
                       }}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                     >
+                      <FiCreditCard className="h-4 w-4" />
                       Pay / Renew
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-sm text-gray-700">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
                 {membershipStatus?.message || 'Membership status unavailable.'}
               </div>
             )}
           </div>
-        </div>
+        </Surface>
 
         {/* Profile Completion Card */}
         {profileCompletion < 100 && (
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r">
-            <div className="flex">
-              <div className="shrink-0">
-                <FiAlertCircle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
-              </div>
-              <div className="ml-3">
-                <div className="flex justify-between">
-                  <p className="text-sm text-yellow-700">
-                    Your profile is {profileCompletion}% complete. Complete your profile to access all features.
+          <Surface className="mb-6 border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/5" padding="md">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-amber-600 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30">
+                <FiAlertCircle className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                    Profile {profileCompletion}% complete
                   </p>
                   <button
                     onClick={() => router.push('/dashboard/complete-profile')}
-                    className="ml-4 shrink-0 text-sm font-medium text-yellow-700 hover:text-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                    className="text-sm font-semibold text-amber-800 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-200"
                   >
-                    Complete Profile <span aria-hidden="true">&rarr;</span>
+                    Complete now &rarr;
                   </button>
                 </div>
-                <div className="mt-2">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className="bg-yellow-500 h-2.5 rounded-full" 
-                      style={{ width: `${profileCompletion}%` }}
-                    ></div>
-                  </div>
+                <p className="mt-0.5 text-xs text-amber-800/80 dark:text-amber-300/80">
+                  Finish your profile to unlock all features and a printable membership card.
+                </p>
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-amber-100 dark:bg-amber-500/20">
+                  <div
+                    className="h-full rounded-full bg-amber-500 transition-all"
+                    style={{ width: `${profileCompletion}%` }}
+                  />
                 </div>
               </div>
             </div>
-          </div>
+          </Surface>
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map((action, index) => (
-            <div 
-              key={index} 
-              className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+            <button
+              key={index}
               onClick={action.action}
+              className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md dark:border-white/10 dark:bg-gray-900/60 dark:hover:border-emerald-500/30 dark:hover:bg-gray-900/80"
             >
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="shrink-0 bg-green-100 rounded-md p-3">
-                    {action.icon}
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <h3 className="text-lg font-medium text-gray-900">{action.title}</h3>
-                    <p className="mt-1 text-sm text-gray-500">{action.description}</p>
-                  </div>
-                  <div className="ml-5 shrink-0 flex items-center">
-                    <FiArrowRight className="h-5 w-5 text-gray-400" />
-                    {action.badge && (
-                      <span className="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        {action.badge}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:ring-emerald-500/30">
+                {action.icon}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center gap-2">
+                  <span className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    {action.title}
+                  </span>
+                  {action.badge && (
+                    <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+                      {action.badge}
+                    </span>
+                  )}
+                </span>
+                <span className="mt-0.5 block truncate text-xs text-gray-500 dark:text-gray-400">
+                  {action.description}
+                </span>
+              </span>
+              <FiArrowRight className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-hover:translate-x-0.5 group-hover:text-emerald-600 dark:text-gray-500 dark:group-hover:text-emerald-300" />
+            </button>
           ))}
         </div>
 
         {/* User Information */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Personal Information</h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
+        <Surface className="mb-8" padding="none">
+          <div className="border-b border-gray-200 px-5 py-4 sm:px-6 dark:border-white/10">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Personal Information</h3>
+            <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
               Your personal details and contact information.
             </p>
           </div>
@@ -401,7 +432,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
               {/* Profile Picture */}
               <div className="sm:col-span-2">
-                <dt className="text-sm font-medium text-gray-500">Profile Picture</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Profile Picture</dt>
                 <dd className="mt-1 flex items-center">
                   {user?.profile?.personalInfo?.profilePicture ? (
                     <img
@@ -416,7 +447,7 @@ export default function DashboardPage() {
                   )}
                   <button
                     onClick={() => router.push('/dashboard/complete-profile')}
-                    className="ml-4 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    className="ml-4 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10"
                   >
                     <FiUser className="-ml-0.5 mr-2 h-4 w-4" />
                     Update Photo
@@ -426,57 +457,63 @@ export default function DashboardPage() {
 
               {/* Full Name */}
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Full name</dt>
-                <dd className="mt-1 text-sm text-gray-900">
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Full name</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
                   {user?.profile?.personalInfo?.fullName || 'Not provided'}
                 </dd>
               </div>
 
               {/* Gender */}
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Gender</dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {user?.profile?.personalInfo?.gender ? 
-                    user.profile.personalInfo.gender.charAt(0).toUpperCase() + 
-                    user.profile.personalInfo.gender.slice(1) : 'Not provided'}
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                  {user?.profile?.personalInfo?.gender ? (
+                    user.profile.personalInfo.gender.charAt(0).toUpperCase() +
+                    user.profile.personalInfo.gender.slice(1)
+                  ) : (
+                    'Not provided'
+                  )}
                 </dd>
               </div>
 
               {/* Date of Birth */}
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Date of Birth</dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {user?.profile?.personalInfo?.dateOfBirth ? 
-                    new Date(user.profile.personalInfo.dateOfBirth).toLocaleDateString() : 'Not provided'}
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Date of Birth</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                  {user?.profile?.personalInfo?.dateOfBirth ? (
+                    new Date(user.profile.personalInfo.dateOfBirth).toLocaleDateString()
+                  ) : (
+                    'Not provided'
+                  )}
                 </dd>
               </div>
 
               {/* Place of Birth */}
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Place of Birth</dt>
-                <dd className="mt-1 text-sm text-gray-900">
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Place of Birth</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
                   {user?.profile?.personalInfo?.placeOfBirth || 'Not provided'}
                 </dd>
               </div>
 
               {/* Email */}
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Email address</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email address</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">{user?.email}</dd>
               </div>
 
               {/* Phone */}
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Phone</dt>
-                <dd className="mt-1 text-sm text-gray-900">
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
                   {user?.profile?.contactInfo?.phone || 'Not provided'}
                 </dd>
               </div>
 
               {/* Address */}
               <div className="sm:col-span-2">
-                <dt className="text-sm font-medium text-gray-500">Address</dt>
-                <dd className="mt-1 text-sm text-gray-900">
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
                   {user?.profile?.contactInfo?.address ? (
                     <>
                       {user.profile.contactInfo.address}, {user.profile.contactInfo.city}, {user.profile.contactInfo.country} {user.profile.contactInfo.postalCode}
@@ -487,53 +524,56 @@ export default function DashboardPage() {
 
               {/* Account Status */}
               <div className="sm:col-span-2">
-                <dt className="text-sm font-medium text-gray-500">Account status</dt>
-                <dd className="mt-1 text-sm text-gray-900">
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Account status</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
                   {user?.isApproved ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <FiCheckCircle className="mr-1 h-3 w-3" /> Active
-                    </span>
+                    <StatusBadge tone="emerald" icon={<FiCheckCircle className="h-3 w-3" />}>
+                      Active
+                    </StatusBadge>
                   ) : (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      <FiAlertCircle className="mr-1 h-3 w-3" /> Pending Approval
-                    </span>
+                    <StatusBadge tone="amber" icon={<FiAlertCircle className="h-3 w-3" />}>
+                      Pending Approval
+                    </StatusBadge>
                   )}
                 </dd>
               </div>
             </div>
-            <div className="mt-8 border-t border-gray-200 pt-5">
+            <div className="mt-8 border-t border-gray-200 pt-5 dark:border-white/10">
               <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={() => router.push('/dashboard/complete-profile')}
-                  className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
                 >
                   Edit Profile
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </Surface>
 
         {/* Upcoming Events */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Upcoming Events</h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
+        <Surface padding="none">
+          <div className="border-b border-gray-200 px-5 py-4 sm:px-6 dark:border-white/10">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Upcoming Events</h3>
+            <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
               Your upcoming events and activities.
             </p>
           </div>
           <div className="px-4 py-5 sm:p-6">
             {isEventsLoading ? (
               <div className="flex justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500" />
               </div>
             ) : upcomingEvents.length > 0 ? (
               <div className="space-y-4">
                 {upcomingEvents.slice(0, 3).map((event) => (
-                  <div key={event.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <h4 className="font-medium text-gray-900">{event.title}</h4>
-                    <p className="text-sm text-gray-600 mt-1">
+                  <div
+                    key={event.id}
+                    className="rounded-2xl border border-gray-200 p-4 transition-shadow hover:shadow-md dark:border-white/10 dark:bg-white/[0.02]"
+                  >
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">{event.title}</h4>
+                    <p className="text-sm text-gray-600 mt-1 dark:text-gray-400">
                       {new Date(event.start_time).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
@@ -541,14 +581,14 @@ export default function DashboardPage() {
                         day: 'numeric',
                       })}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">{event.location}</p>
+                    <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">{event.location}</p>
                     <div className="mt-2 flex justify-between items-center">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {event.current_attendees} / {event.capacity} attendees
                       </span>
                       <button
                         onClick={() => router.push('/dashboard/events')}
-                        className="text-sm text-green-600 hover:text-green-800 font-medium"
+                        className="text-sm text-emerald-600 hover:text-emerald-800 font-medium dark:text-emerald-300 dark:hover:text-emerald-200"
                       >
                         View Details <span aria-hidden="true">&rarr;</span>
                       </button>
@@ -558,46 +598,35 @@ export default function DashboardPage() {
                 <div className="mt-4 text-center">
                   <button
                     onClick={() => router.push('/dashboard/events')}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
                   >
-                    <FiCalendar className="-ml-1 mr-2 h-5 w-5" />
+                    <FiCalendar className="-ml-1 mr-2 h-4 w-4" />
                     View All Events
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No upcoming events</h3>
-                <p className="mt-1 text-sm text-gray-500">
+              <div className="text-center py-6">
+                <FiCalendar className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600" aria-hidden="true" />
+                <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  No upcoming events
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Get started by checking out our upcoming events.
                 </p>
-                <div className="mt-6">
+                <div className="mt-4">
                   <button
                     onClick={() => router.push('/dashboard/events')}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
                   >
-                    <FiCalendar className="-ml-1 mr-2 h-5 w-5" />
+                    <FiCalendar className="-ml-1 mr-2 h-4 w-4" />
                     View All Events
                   </button>
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </Surface>
       </main>
     </div>
   );

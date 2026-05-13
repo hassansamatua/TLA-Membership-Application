@@ -8,6 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { ThemeToggle } from "@/components/ui";
 
 function LoginContent() {
   const [email, setEmail] = useState("");
@@ -78,54 +79,63 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-md w-full p-8 mx-auto mt-20">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-          <div className="mt-6 flex justify-center">
-            <Image 
-              src="/logo.png" 
-              alt="Logo" 
-              width={96}
-              height={96}
-              className="h-24 w-auto"
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 dark:from-gray-950 dark:via-gray-950 dark:to-emerald-950/30">
+      <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+        <ThemeToggle compact />
+      </div>
+      <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-12 sm:px-6">
+        {/* Brand */}
+        <div className="mb-8 flex flex-col items-center text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-white/10">
+            <Image
+              src="/logo.png"
+              alt="Tanzania Library Association"
+              width={48}
+              height={48}
+              className="h-12 w-auto"
               priority
-              onError={(e) => {
-                console.error('Logo failed to load:', e);
-              }}
             />
           </div>
-          {registered && (
-            <p className="mt-4 text-green-700">
-              Registration successful! Please log in.
-            </p>
-          )}
+          <p className="text-[11px] font-medium uppercase tracking-wide text-emerald-700">
+            Tanzania Library Association
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold text-gray-900 sm:text-3xl">
+            Welcome back
+          </h1>
+          <p className="mt-1 text-sm text-gray-600">
+            Sign in to access your member dashboard.
+          </p>
         </div>
-        
+
+        {registered && (
+          <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            Registration successful — please sign in below.
+          </div>
+        )}
+
         {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <div className="bg-white p-8 shadow-lg rounded-lg">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
               </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm shadow-sm transition-colors placeholder:text-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                placeholder="you@example.com"
+              />
             </div>
 
             <div>
@@ -133,64 +143,54 @@ function LoginContent() {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <div className="text-sm">
-                  <p className="text-gray-600 mb-4">
-                    <Link 
-                      href="/auth/forgot-password" 
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Forgot your password?
-                    </Link>
-                  </p>
-                </div>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-xs font-medium text-emerald-700 hover:text-emerald-800"
+                >
+                  Forgot password?
+                </Link>
               </div>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm shadow-sm transition-colors placeholder:text-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                placeholder="••••••••"
+              />
             </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
-                  isLoading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
-              >
-                {isLoading ? 'Signing in...' : 'Sign in'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`flex w-full items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 ${
+                isLoading ? 'cursor-not-allowed opacity-70' : ''
+              }`}
+            >
+              {isLoading ? 'Signing in…' : 'Sign in'}
+            </button>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Link
-                href="/auth/register"
-                className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Apply Membership
-              </Link>
-            </div>
+          <div className="my-6 flex items-center gap-3 text-xs text-gray-400">
+            <span className="h-px flex-1 bg-gray-200" />
+            New to TLA?
+            <span className="h-px flex-1 bg-gray-200" />
           </div>
+
+          <Link
+            href="/auth/register"
+            className="flex w-full items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            Apply for membership
+          </Link>
         </div>
+
+        <p className="mt-6 text-center text-xs text-gray-500">
+          By signing in you agree to TLA's terms of service and privacy policy.
+        </p>
       </div>
     </div>
   );

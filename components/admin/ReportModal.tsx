@@ -61,7 +61,7 @@ export default function ReportModal({ isOpen, onClose, onGenerate }: ReportModal
                 </label>
                 <select
                   id="reportType"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   value={reportType}
                   onChange={(e) => setReportType(e.target.value)}
                   disabled={isGenerating}
@@ -83,7 +83,7 @@ export default function ReportModal({ isOpen, onClose, onGenerate }: ReportModal
                   <input
                     type="date"
                     id="startDate"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                     disabled={isGenerating}
@@ -97,7 +97,7 @@ export default function ReportModal({ isOpen, onClose, onGenerate }: ReportModal
                   <input
                     type="date"
                     id="endDate"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                     disabled={isGenerating}
@@ -109,7 +109,7 @@ export default function ReportModal({ isOpen, onClose, onGenerate }: ReportModal
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isGenerating}
                 >
                   {isGenerating ? (

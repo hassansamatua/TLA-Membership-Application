@@ -34,7 +34,7 @@ export default function PaymentGatewaysPage() {
                   onClick={() => setGateway('azampay')}
                   className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                     gateway === 'azampay' 
-                      ? 'bg-green-600 text-white' 
+                      ? 'bg-emerald-600 text-white' 
                       : 'bg-gray-200 text-gray-700'
                   }`}
                 >
@@ -112,18 +112,18 @@ export default function PaymentGatewaysPage() {
             {gateway === 'azampay' && (
               <div className="border-t pt-8">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">AzamPay Integration</h2>
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
                   <div className="flex items-center mb-4">
-                    <div className="h-6 w-6 text-green-600 mr-2">
+                    <div className="h-6 w-6 text-emerald-600 mr-2">
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 2 0 0 0 0 0-2 2v2a2 2 0 0 0 0-2 2v2a2 2 0 0 0 0-2 2V7a2 2 0 0 0 0-2 2v2a2 2 0 0 0 0-2 2V7a2 2 0 0 0 0-2 2z" />
                       </svg>
                     </div>
-                    <span className="text-sm text-green-800">
+                    <span className="text-sm text-emerald-800">
                       <strong>Production Mode</strong> - Real AzamPay API
                     </span>
                   </div>
-                  <p className="text-xs text-green-700">
+                  <p className="text-xs text-emerald-700">
                     This gateway connects to the actual AzamPay API for real payment processing.
                     Use this for production payments with real transactions.
                   </p>

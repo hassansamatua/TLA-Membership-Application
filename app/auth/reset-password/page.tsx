@@ -1,11 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FiMail, FiArrowLeft, FiCheck, FiAlertCircle, FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
 import Link from 'next/link';
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div></div>}>
+      <ResetPasswordInner />
+    </Suspense>
+  );
+}
+
+function ResetPasswordInner() {
   const [email, setEmail] = useState('');
   const [resetCode, setResetCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -148,7 +156,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center h-16 w-16 bg-green-600 rounded-full mb-8">
+          <div className="inline-flex items-center justify-center h-16 w-16 bg-emerald-600 rounded-full mb-8">
             <FiLock className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h1>
@@ -164,13 +172,13 @@ export default function ResetPasswordPage() {
 
         {message && (
           <div className={`p-4 rounded-md mb-4 ${
-            message.includes('verified') ? 'bg-green-50 border-green-200' : 
+            message.includes('verified') ? 'bg-emerald-50 border-emerald-200' : 
             message.includes('success') ? 'bg-blue-50 border-blue-200' : 
             message.includes('Failed') || message.includes('Invalid') || message.includes('expired') ? 'bg-red-50 border-red-200' : 
             'bg-yellow-50 border-yellow-200'
           }`}>
             <div className="flex items-center">
-              {message.includes('verified') && <FiCheck className="h-5 w-5 text-green-600 mr-2" />}
+              {message.includes('verified') && <FiCheck className="h-5 w-5 text-emerald-600 mr-2" />}
               {message.includes('success') && <FiCheck className="h-5 w-5 text-blue-600 mr-2" />}
               {(message.includes('Failed') || message.includes('Invalid') || message.includes('expired')) && <FiAlertCircle className="h-5 w-5 text-red-600 mr-2" />}
               <p className="text-sm">{message}</p>
@@ -188,7 +196,7 @@ export default function ResetPasswordPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="Enter your email"
                 required
               />
@@ -202,7 +210,7 @@ export default function ResetPasswordPage() {
                 type="text"
                 value={resetCode}
                 onChange={(e) => setResetCode(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="Enter 6-digit code"
                 maxLength={6}
                 required
@@ -213,11 +221,11 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading || !email || !resetCode}
-                className="w-full px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md border border-transparent"
+                className="w-full px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md border border-transparent"
               >
                 {isLoading ? (
                   <div className="inline-flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-500 border-white border-opacity-25"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-emerald-500 border-white border-opacity-25"></div>
                     <span className="ml-2">Verifying...</span>
                   </div>
                 ) : 'Verify Reset Code'}
@@ -235,7 +243,7 @@ export default function ResetPasswordPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Enter new password"
                   required
                 />
@@ -258,7 +266,7 @@ export default function ResetPasswordPage() {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Confirm new password"
                   required
                 />
@@ -276,11 +284,11 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading || !newPassword || !confirmPassword}
-                className="w-full px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md border border-transparent"
+                className="w-full px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md border border-transparent"
               >
                 {isLoading ? (
                   <div className="inline-flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-500 border-white border-opacity-25"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-emerald-500 border-white border-opacity-25"></div>
                     <span className="ml-2">Resetting...</span>
                   </div>
                 ) : 'Reset Password'}
@@ -293,14 +301,14 @@ export default function ResetPasswordPage() {
           {!isCodeVerified && (
             <button
               onClick={() => router.push('/auth/forgot-password')}
-              className="text-sm text-green-600 hover:text-green-700 font-medium"
+              className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
             >
               Request New Code
             </button>
           )}
           <button
             onClick={() => router.push('/auth/login')}
-            className="text-sm text-green-600 hover:text-green-700 font-medium"
+            className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
           >
             Back to Login
           </button>

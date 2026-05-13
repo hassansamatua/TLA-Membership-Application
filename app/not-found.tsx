@@ -16,7 +16,7 @@ export default function NotFound() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 text-center">
         <div className="flex justify-center">
           <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center">
@@ -42,7 +42,7 @@ export default function NotFound() {
           
           <Link 
             href="/"
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors duration-200"
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200"
           >
             <FiHome className="mr-2 h-5 w-5" />
             Go to Homepage
@@ -50,7 +50,7 @@ export default function NotFound() {
           
           <Link 
             href="/contact"
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 transition-colors duration-200"
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-emerald-700 bg-emerald-100 hover:bg-emerald-200 transition-colors duration-200"
           >
             Contact Support
             <FiArrowRight className="ml-2 h-5 w-5" />
@@ -58,7 +58,7 @@ export default function NotFound() {
         </div>
         
         <p className="mt-8 text-sm text-gray-500">
-          Or go back to <Link href="/" className="font-medium text-green-600 hover:text-green-500">our homepage</Link>
+          Or go back to <Link href="/" className="font-medium text-emerald-600 hover:text-emerald-500">our homepage</Link>
         </p>
       </div>
     </div>

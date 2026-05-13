@@ -59,7 +59,7 @@ export default function AboutPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -67,11 +67,11 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-green-600 to-green-700 text-white py-20">
+      <section className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">{mainHeading}</h1>
-            <p className="text-xl mb-8 text-green-100 max-w-3xl mx-auto">{description}</p>
+            <p className="text-xl mb-8 text-emerald-100 max-w-3xl mx-auto">{description}</p>
           </div>
         </div>
       </section>
@@ -81,8 +81,8 @@ export default function AboutPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center mb-8">
-              <div className="bg-green-100 p-4 rounded-full">
-                <FiTarget className="h-8 w-8 text-green-600" />
+              <div className="bg-emerald-100 p-4 rounded-full">
+                <FiTarget className="h-8 w-8 text-emerald-600" />
               </div>
               <h2 className="ml-4 text-3xl font-bold text-gray-900">Our Mission</h2>
             </div>
@@ -98,8 +98,8 @@ export default function AboutPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center mb-8">
-              <div className="bg-green-100 p-4 rounded-full">
-                <FiEye className="h-8 w-8 text-green-600" />
+              <div className="bg-emerald-100 p-4 rounded-full">
+                <FiEye className="h-8 w-8 text-emerald-600" />
               </div>
               <h2 className="ml-4 text-3xl font-bold text-gray-900">Our Vision</h2>
             </div>
@@ -115,18 +115,18 @@ export default function AboutPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-4">
-              <div className="bg-green-100 p-4 rounded-full">
-                <FiHeart className="h-8 w-8 text-green-600" />
+              <div className="bg-emerald-100 p-4 rounded-full">
+                <FiHeart className="h-8 w-8 text-emerald-600" />
               </div>
               <h2 className="ml-4 text-3xl font-bold text-gray-900">Our Values</h2>
             </div>
-            <div className="w-24 h-1 bg-green-600 mx-auto"></div>
+            <div className="w-24 h-1 bg-emerald-600 mx-auto"></div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {values.map((item, index) => (
               <div key={index} className="text-center">
-                <div className="bg-green-50 p-6 rounded-xl">
+                <div className="bg-emerald-50 p-6 rounded-xl">
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">
                     {item.split(' - ')[0]}
                   </h3>
@@ -141,15 +141,15 @@ export default function AboutPage() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="bg-green-600 py-16">
+      <section className="bg-emerald-600 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Join Us in Our Mission
           </h2>
-          <p className="text-green-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-emerald-100 mb-8 max-w-2xl mx-auto">
             Become part of Tanzania's leading library association and help us promote library services and information access throughout the country.
           </p>
-          <button className="bg-white text-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+          <button className="bg-white text-emerald-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
             Join TLA Today
           </button>
         </div>

@@ -234,7 +234,7 @@ export default function AdminRequestsPage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -257,7 +257,7 @@ export default function AdminRequestsPage() {
                 placeholder="Search users by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
           </div>
@@ -279,7 +279,7 @@ export default function AdminRequestsPage() {
             <div className="space-x-2">
               <button
                 onClick={handleBulkApprove}
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-green-600 bg-green-100 hover:bg-green-200"
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-emerald-600 bg-emerald-100 hover:bg-emerald-200"
               >
                 <FiCheck className="mr-1 h-3 w-3" />
                 Approve Selected
@@ -319,7 +319,7 @@ export default function AdminRequestsPage() {
                         setSelectedUsers([]);
                       }
                     }}
-                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                   />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -341,7 +341,7 @@ export default function AdminRequestsPage() {
                 <tr>
                   <td colSpan={5} className="px-6 py-4 text-center">
                     <div className="flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div>
                     </div>
                   </td>
                 </tr>
@@ -359,7 +359,7 @@ export default function AdminRequestsPage() {
                         type="checkbox"
                         checked={selectedUsers.includes(user.id)}
                         onChange={() => toggleUserSelection(user.id)}
-                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -396,7 +396,7 @@ export default function AdminRequestsPage() {
                         </button>
                         <button
                           onClick={() => handleApprove(user.id)}
-                          className="text-green-600 hover:text-green-900"
+                          className="text-emerald-600 hover:text-emerald-900"
                           title="Approve User"
                         >
                           <FiCheck className="h-4 w-4" />
@@ -692,7 +692,7 @@ export default function AdminRequestsPage() {
                       handleApprove(selectedUser.id);
                       setShowUserModal(false);
                     }}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                    className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
                   >
                     <FiCheck className="inline mr-2 h-4 w-4" />
                     Approve
@@ -727,7 +727,7 @@ export default function AdminRequestsPage() {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                 placeholder="Enter rejection reason..."
               />
               <div className="flex justify-end space-x-3 mt-4">

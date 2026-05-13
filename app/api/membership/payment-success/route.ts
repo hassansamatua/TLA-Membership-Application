@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
+import { generateMembershipNumber } from '@/lib/membership';
+import { getCycleYearForDate } from '@/lib/membershipCycles';
+import {
+  getCycleExpiryDateString,
+  recordCycleAndUserStatus,
+  isUserNew,
+  getMembershipFee,
+  calculateEnhancedPenalties,
+  toMySqlDate,
+} from '@/lib/enhancedMembershipCycles';
 
 async function getAuthToken(request: Request): Promise<string | null> {
   const authHeader = request.headers.get('authorization');
@@ -82,8 +92,12 @@ export async function POST(request: Request) {
     }
     
     const [paymentRows] = await connection.query(
-      'SELECT * FROM payments WHERE (reference = ? OR reference LIKE ?) AND user_id = ?',
-      [paymentReference, `%${paymentReference}%`, decoded.id]
+      `SELECT * FROM payments
+        WHERE user_id = ?
+          AND (reference = ? OR transaction_id = ?)
+        ORDER BY id DESC
+        LIMIT 1`,
+      [decoded.id, paymentReference, paymentReference]
     ) as any[];
 
     console.log('Payment query result:', {
@@ -126,56 +140,185 @@ export async function POST(request: Request) {
     console.log('Transaction started for payment processing');
 
     try {
-      const paymentId = paymentRows[0]?.id;
+      const payment = paymentRows[0];
+      const paymentId = payment?.id;
       if (!paymentId) {
         throw new Error('Payment record not found');
       }
 
-      // 1. Update payment status to completed
-      const [updateResult] = await connection.query(
-        `UPDATE payments 
-         SET status = 'completed', 
-             paid_at = NOW(),
+      const paymentAmount = Number(payment.amount) || 0;
+      const membershipType: 'personal' | 'organization' =
+        payment.membership_type === 'organization' ? 'organization' : 'personal';
+      const dbMembershipType: 'personal' | 'organization' = membershipType;
+
+      // Canonical cycle math: derive cycle from the payment date, then compute
+      // the corresponding Jan-31 expiry. This replaces the old
+      // `CURDATE() + 1 YEAR` heuristic.
+      const paymentDate: Date = payment.paid_at
+        ? new Date(payment.paid_at)
+        : payment.created_at
+        ? new Date(payment.created_at)
+        : new Date();
+      // Multi-cycle support: when the checkout route stamped
+      // `target_cycle_year` + `cycle_count`, we mark every cycle in
+      // [target .. target+count-1] as paid and extend expiry to Jan 31
+      // of (last cycle + 1). Falls back cleanly to single-cycle behaviour
+      // when the columns are NULL (legacy payments).
+      const targetCycleYearStored = (payment as any).target_cycle_year ?? null;
+      const cycleCount = Math.min(
+        3,
+        Math.max(1, Number((payment as any).cycle_count) || 1)
+      );
+      const baseCycleYear =
+        targetCycleYearStored != null
+          ? Number(targetCycleYearStored)
+          : getCycleYearForDate(paymentDate);
+      const lastCycleYear = baseCycleYear + cycleCount - 1;
+      const cycleYear = baseCycleYear; // backwards-compat alias for code below
+      const expiryDateString = getCycleExpiryDateString(lastCycleYear);
+      const joinedDateString = toMySqlDate(paymentDate);
+
+      // 1. Update payment status to completed (idempotent), and stamp cycle_year
+      //    if the column exists and is currently NULL.
+      await connection.query(
+        `UPDATE payments
+         SET status = 'completed',
+             paid_at = COALESCE(paid_at, NOW()),
+             cycle_year = COALESCE(cycle_year, ?),
              updated_at = NOW()
          WHERE id = ? AND user_id = ?`,
-        [paymentId, decoded.id]
-      ) as any;
+        [cycleYear, paymentId, decoded.id]
+      );
 
-      // 2. Update or create membership record with proper expiry_date handling
+      // 2. Resolve / generate membership number
+      const [existingRows] = await connection.query(
+        'SELECT membership_number FROM memberships WHERE user_id = ?',
+        [decoded.id]
+      ) as any[];
+      let membershipNumber: string | null = existingRows?.[0]?.membership_number || null;
+      if (!membershipNumber) {
+        const [profileRows] = await connection.query(
+          'SELECT membership_number FROM user_profiles WHERE user_id = ?',
+          [decoded.id]
+        ) as any[];
+        membershipNumber = profileRows?.[0]?.membership_number || null;
+      }
+      if (!membershipNumber) {
+        membershipNumber = await generateMembershipNumber();
+      }
+
+      // 3. Upsert membership record (relies on UNIQUE KEY on memberships.user_id).
+      //    Expiry is always pinned to Jan 31 of the cycle's end year.
       await connection.query(
-        `INSERT INTO memberships 
-         (user_id, status, payment_status, payment_date, expiry_date, created_at, updated_at)
-         VALUES (?, 'active', 'paid', NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR), NOW(), NOW())
+        `INSERT INTO memberships
+           (user_id, membership_number, membership_type, status, joined_date,
+            expiry_date, payment_status, payment_date, amount_paid,
+            payment_method, reference, payment_reference,
+            created_at, updated_at)
+         VALUES (?, ?, ?, 'active', ?,
+                 ?, 'paid', ?, ?,
+                 ?, ?, ?,
+                 NOW(), NOW())
          ON DUPLICATE KEY UPDATE
-           status = 'active',
-           payment_status = 'paid',
-           payment_date = NOW(),
-           expiry_date = CASE 
-             WHEN expiry_date IS NULL OR expiry_date < NOW() 
-             THEN DATE_ADD(NOW(), INTERVAL 1 YEAR)
+           membership_number = COALESCE(memberships.membership_number, VALUES(membership_number)),
+           membership_type   = VALUES(membership_type),
+           status            = 'active',
+           payment_status    = 'paid',
+           payment_date      = VALUES(payment_date),
+           expiry_date       = CASE
+             WHEN expiry_date IS NULL OR expiry_date < VALUES(expiry_date)
+               THEN VALUES(expiry_date)
              ELSE expiry_date
            END,
-           updated_at = NOW()`,
-        [decoded.id]
+           amount_paid       = VALUES(amount_paid),
+           payment_method    = VALUES(payment_method),
+           reference         = VALUES(reference),
+           payment_reference = VALUES(payment_reference),
+           updated_at        = NOW()`,
+        [
+          decoded.id,
+          membershipNumber,
+          dbMembershipType,
+          joinedDateString,
+          expiryDateString,
+          joinedDateString,
+          paymentAmount,
+          payment.payment_method || null,
+          payment.reference || null,
+          payment.reference || null,
+        ]
       );
+
+      // 4. Mirror payment into cycle_payment_status / user_membership_status so
+      //    `/api/membership/status` always reflects the latest cycle. When
+      //    the user prepaid multiple cycles, mark each one in the range as
+      //    paid (only the first/current cycle carries any penalty).
+      let baseAmountForCycle = Math.round(paymentAmount / cycleCount);
+      let penaltyForCycle = 0;
+      let userCategoryResolved: 'librarian' | 'organization' | 'regular' = 'regular';
+      try {
+        const wasNew = await isUserNew(decoded.id);
+        userCategoryResolved =
+          membershipType === 'organization' ? 'organization' : 'regular';
+        const { baseAmount } = getMembershipFee({
+          category: userCategoryResolved,
+          isFirstYear: wasNew,
+          isNewUser: wasNew,
+        });
+        const { penaltyAmount } = calculateEnhancedPenalties({
+          baseAmount,
+          cycleYear: baseCycleYear,
+          now: paymentDate,
+          isNewUser: wasNew,
+          category: userCategoryResolved,
+        });
+        baseAmountForCycle = baseAmount;
+        penaltyForCycle = penaltyAmount;
+      } catch {
+        // Fall back to recording the full paid amount as base if fee schedule
+        // resolution fails (legacy DBs without user_category).
+      }
+      for (let cy = baseCycleYear; cy <= lastCycleYear; cy++) {
+        await recordCycleAndUserStatus({
+          connection,
+          userId: decoded.id,
+          cycleYear: cy,
+          baseAmount: baseAmountForCycle,
+          // Only the first (current) cycle bears the penalty; future
+          // cycles being prepaid are not late, so no penalty applies.
+          penaltyAmount: cy === baseCycleYear ? penaltyForCycle : 0,
+          paymentReference: payment.reference || null,
+          paymentDate,
+        });
+      }
 
       // Commit transaction
       await connection.commit();
 
-      // Update user_profiles outside of transaction to avoid deadlock
+      // Update user_profiles (best-effort)
       try {
         await connection.query(
-          'UPDATE user_profiles SET updated_at = NOW() WHERE user_id = ?',
-          [decoded.id]
+          `UPDATE user_profiles
+             SET membership_number = COALESCE(membership_number, ?),
+                 membership_status = 'active',
+                 join_date = COALESCE(join_date, ?),
+                 updated_at = NOW()
+           WHERE user_id = ?`,
+          [membershipNumber, joinedDateString, decoded.id]
         );
       } catch (profileError) {
         console.warn('Failed to update user_profiles:', profileError);
-        // Don't fail the whole operation if profile update fails
       }
 
-      return NextResponse.json({ 
-        success: true, 
-        message: 'Payment processed successfully' 
+      return NextResponse.json({
+        success: true,
+        message: 'Payment processed successfully',
+        data: {
+          membershipNumber,
+          membershipType,
+          amountPaid: paymentAmount,
+          reference: payment.reference,
+        },
       });
 
     } catch (error) {

@@ -123,7 +123,7 @@ export default function MessagesPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -131,7 +131,7 @@ export default function MessagesPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -215,7 +215,7 @@ export default function MessagesPage() {
                             </button>
                             <button
                               onClick={() => setShowReplyBox(true)}
-                              className="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                              className="text-xs bg-emerald-600 text-white px-3 py-1 rounded hover:bg-emerald-700"
                             >
                               Reply
                             </button>

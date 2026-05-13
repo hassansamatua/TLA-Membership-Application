@@ -69,7 +69,7 @@ export default function PaymentCallback() {
       case 'loading':
         return <Loader2 className="h-12 w-12 animate-spin text-primary" />;
       case 'success':
-        return <CheckCircle2 className="h-12 w-12 text-green-500" />;
+        return <CheckCircle2 className="h-12 w-12 text-emerald-500" />;
       case 'error':
       case 'cancelled':
         return <XCircle className="h-12 w-12 text-red-500" />;

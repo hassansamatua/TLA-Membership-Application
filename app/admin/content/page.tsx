@@ -376,7 +376,7 @@ export default function AdminContentPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'published': return 'bg-green-100 text-green-800';
+      case 'published': return 'bg-emerald-100 text-emerald-800';
       case 'draft': return 'bg-yellow-100 text-yellow-800';
       case 'archived': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -401,7 +401,7 @@ export default function AdminContentPage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -433,7 +433,7 @@ export default function AdminContentPage() {
                 onClick={() => setActiveTab(tab.key as any)}
                 className={`group inline-flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.key
-                    ? 'border-green-500 text-green-600'
+                    ? 'border-emerald-500 text-emerald-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -456,13 +456,13 @@ export default function AdminContentPage() {
                 placeholder={`Search ${activeTab}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
           </div>
           <div className="flex space-x-2">
             {activeTab === 'media' && (
-              <label className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 cursor-pointer">
+              <label className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer">
                 <FiPlus className="mr-2 h-4 w-4" />
                 Upload Files
                 <input
@@ -476,7 +476,7 @@ export default function AdminContentPage() {
             {activeTab === 'home' && (
           <button
             onClick={() => openModal()}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
           >
             <FiPlus className="mr-2 h-4 w-4" />
             Add Content
@@ -485,7 +485,7 @@ export default function AdminContentPage() {
         {activeTab === 'about' && (
           <button
             onClick={() => openModal()}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
           >
             <FiPlus className="mr-2 h-4 w-4" />
             Add Content
@@ -494,7 +494,7 @@ export default function AdminContentPage() {
         {activeTab === 'contact' && (
           <button
             onClick={() => openModal()}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
           >
             <FiPlus className="mr-2 h-4 w-4" />
             Add Content
@@ -510,7 +510,7 @@ export default function AdminContentPage() {
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
@@ -550,7 +550,7 @@ export default function AdminContentPage() {
                   <tr>
                     <td colSpan={6} className="px-6 py-4 text-center">
                       <div className="flex justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div>
                       </div>
                     </td>
                   </tr>
@@ -590,7 +590,7 @@ export default function AdminContentPage() {
                           <button
                             onClick={() => handlePublishToggle(page.id, page.status)}
                             className={`${
-                              page.status === 'published' ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'
+                              page.status === 'published' ? 'text-yellow-600 hover:text-yellow-900' : 'text-emerald-600 hover:text-emerald-900'
                             }`}
                             title={page.status === 'published' ? 'Unpublish' : 'Publish'}
                           >
@@ -636,7 +636,7 @@ export default function AdminContentPage() {
                   <FiImage className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No media files</h3>
                   <p className="text-gray-500 mb-4">Upload your first media file to get started</p>
-                  <label className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 cursor-pointer">
+                  <label className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer">
                     <FiPlus className="mr-2 h-4 w-4" />
                     Upload Files
                     <input
@@ -724,7 +724,7 @@ export default function AdminContentPage() {
                   <tr>
                     <td colSpan={5} className="px-6 py-4 text-center">
                       <div className="flex justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div>
                       </div>
                     </td>
                   </tr>
@@ -814,7 +814,7 @@ export default function AdminContentPage() {
                   <p className="text-gray-500 mb-4">Configure your home page content</p>
                   <button
                     onClick={() => openModal()}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
                   >
                     <FiPlus className="mr-2 h-4 w-4" />
                     Add Content
@@ -864,7 +864,7 @@ export default function AdminContentPage() {
                   <p className="text-gray-500 mb-4">Configure your about page content</p>
                   <button
                     onClick={() => openModal()}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
                   >
                     <FiPlus className="mr-2 h-4 w-4" />
                     Add Content
@@ -914,7 +914,7 @@ export default function AdminContentPage() {
                   <p className="text-gray-500 mb-4">Configure your contact page content</p>
                   <button
                     onClick={() => openModal()}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
                   >
                     <FiPlus className="mr-2 h-4 w-4" />
                     Add Content
@@ -958,7 +958,7 @@ export default function AdminContentPage() {
                           type="text"
                           value={formData.title || ''}
                           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                           required
                         />
                       </div>
@@ -970,7 +970,7 @@ export default function AdminContentPage() {
                           type="text"
                           value={formData.slug || ''}
                           onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                           required
                         />
                       </div>
@@ -983,7 +983,7 @@ export default function AdminContentPage() {
                         value={formData.content || ''}
                         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                         rows={6}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         required
                       />
                     </div>
@@ -995,7 +995,7 @@ export default function AdminContentPage() {
                         value={formData.excerpt || ''}
                         onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                         rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1006,7 +1006,7 @@ export default function AdminContentPage() {
                         <select
                           value={formData.status || 'draft'}
                           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         >
                           <option value="draft">Draft</option>
                           <option value="published">Published</option>
@@ -1020,7 +1020,7 @@ export default function AdminContentPage() {
                         <select
                           value={formData.type || 'page'}
                           onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         >
                           <option value="page">Page</option>
                           <option value="post">Post</option>
@@ -1042,7 +1042,7 @@ export default function AdminContentPage() {
                           type="text"
                           value={formData.section_key || ''}
                           onChange={(e) => setFormData({ ...formData, section_key: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                           required
                         />
                       </div>
@@ -1053,7 +1053,7 @@ export default function AdminContentPage() {
                         <select
                           value={formData.section_type || ''}
                           onChange={(e) => setFormData({ ...formData, section_type: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                           required
                         >
                           <option value="">Select type</option>
@@ -1090,7 +1090,7 @@ export default function AdminContentPage() {
                         value={formData.content || ''}
                         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                         rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         required
                       />
                     </div>
@@ -1104,7 +1104,7 @@ export default function AdminContentPage() {
                           type="number"
                           value={formData.order_index || 0}
                           onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                         />
                       </div>
                       <div>
@@ -1113,7 +1113,7 @@ export default function AdminContentPage() {
                             type="checkbox"
                             checked={formData.is_active !== false}
                             onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                            className="rounded border-gray-300 text-green-600 focus:ring-green-500 mr-2"
+                            className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2"
                           />
                           <span className="text-sm font-medium text-gray-700">Active</span>
                         </label>
@@ -1135,7 +1135,7 @@ export default function AdminContentPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md text-white bg-green-600 hover:bg-green-700"
+                    className="px-4 py-2 border border-transparent rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
                   >
                     {isEditing ? 'Update' : 'Create'}
                   </button>

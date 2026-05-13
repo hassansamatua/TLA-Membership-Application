@@ -102,14 +102,14 @@ export default function PaymentMethodSelector({ selectedMethod, onMethodSelect, 
               onMouseLeave={() => setHoveredMethod(null)}
               className={`relative p-4 rounded-lg border-2 transition-all duration-200 ${
                 selectedMethod === method.id
-                  ? 'border-green-500 shadow-lg transform scale-105'
+                  ? 'border-emerald-500 shadow-lg transform scale-105'
                   : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
               }`}
             >
               {/* Selection indicator */}
               {selectedMethod === method.id && (
                 <div className="absolute top-2 right-2">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
                     <FiCheck className="w-4 h-4 text-white" />
                   </div>
                 </div>
@@ -152,14 +152,14 @@ export default function PaymentMethodSelector({ selectedMethod, onMethodSelect, 
 
       {/* Selected method details */}
       {selectedMethod && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
           <div className="flex items-center space-x-3">
-            <FiSmartphone className="w-5 h-5 text-green-600" />
+            <FiSmartphone className="w-5 h-5 text-emerald-600" />
             <div>
-              <p className="font-medium text-green-800">
+              <p className="font-medium text-emerald-800">
                 Selected: {paymentMethods.find(m => m.id === selectedMethod)?.displayName}
               </p>
-              <p className="text-sm text-green-600">
+              <p className="text-sm text-emerald-600">
                 Amount: TZS {amount.toLocaleString()}
               </p>
             </div>

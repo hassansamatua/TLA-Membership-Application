@@ -197,7 +197,7 @@ export default function AdminEventsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'upcoming': return 'bg-blue-100 text-blue-800';
-      case 'ongoing': return 'bg-green-100 text-green-800';
+      case 'ongoing': return 'bg-emerald-100 text-emerald-800';
       case 'completed': return 'bg-gray-100 text-gray-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -207,7 +207,7 @@ export default function AdminEventsPage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -224,7 +224,7 @@ export default function AdminEventsPage() {
             resetForm();
             setShowEventModal(true);
           }}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
         >
           <FiPlus className="mr-2 h-4 w-4" />
           Create Event
@@ -242,7 +242,7 @@ export default function AdminEventsPage() {
                 placeholder="Search events by title or location..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
           </div>
@@ -285,7 +285,7 @@ export default function AdminEventsPage() {
                     resetForm();
                     setShowEventModal(true);
                   }}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
                 >
                   <FiPlus className="mr-2 h-4 w-4" />
                   Create Event
@@ -342,7 +342,7 @@ export default function AdminEventsPage() {
                     </button>
                     <button
                       onClick={() => handleEdit(event)}
-                      className="text-green-600 hover:text-green-900"
+                      className="text-emerald-600 hover:text-emerald-900"
                       title="Edit Event"
                     >
                       <FiEdit2 className="h-4 w-4" />
@@ -401,7 +401,7 @@ export default function AdminEventsPage() {
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Enter event title"
                   />
                 </div>
@@ -415,7 +415,7 @@ export default function AdminEventsPage() {
                     rows={4}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Describe your event"
                   />
                 </div>
@@ -430,7 +430,7 @@ export default function AdminEventsPage() {
                       required
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     />
                   </div>
                   <div>
@@ -442,7 +442,7 @@ export default function AdminEventsPage() {
                       required
                       value={formData.time}
                       onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     />
                   </div>
                 </div>
@@ -456,7 +456,7 @@ export default function AdminEventsPage() {
                     required
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Event location"
                   />
                 </div>
@@ -471,7 +471,7 @@ export default function AdminEventsPage() {
                     min="1"
                     value={formData.maxAttendees || ''}
                     onChange={(e) => setFormData({ ...formData, maxAttendees: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 </div>
 
@@ -483,7 +483,7 @@ export default function AdminEventsPage() {
                     <label className="inline-flex items-center">
                       <input
                         type="radio"
-                        className="form-radio h-4 w-4 text-green-600"
+                        className="form-radio h-4 w-4 text-emerald-600"
                         checked={formData.isFree}
                         onChange={() => setFormData({ ...formData, isFree: true, fee: 0 })}
                       />
@@ -492,7 +492,7 @@ export default function AdminEventsPage() {
                     <label className="inline-flex items-center">
                       <input
                         type="radio"
-                        className="form-radio h-4 w-4 text-green-600"
+                        className="form-radio h-4 w-4 text-emerald-600"
                         checked={!formData.isFree}
                         onChange={() => setFormData({ ...formData, isFree: false })}
                       />
@@ -507,7 +507,7 @@ export default function AdminEventsPage() {
                           type="number"
                           min="0"
                           step="1000"
-                          className="focus:ring-green-500 focus:border-green-500 block w-full pl-12 pr-12 sm:text-sm border-gray-300 rounded-md py-2 border"
+                          className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-12 pr-12 sm:text-sm border-gray-300 rounded-md py-2 border"
                           value={formData.fee}
                           onChange={(e) => setFormData({ ...formData, fee: parseFloat(e.target.value) || 0 })}
                           placeholder="0.00"
@@ -530,7 +530,7 @@ export default function AdminEventsPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                    className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
                   >
                     {isEditing ? 'Update Event' : 'Create Event'}
                   </button>

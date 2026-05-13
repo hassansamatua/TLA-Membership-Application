@@ -6,6 +6,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-toastify';
 import MembershipCard from '@/components/MembershipCard';
 import {
+  generateBulkMembershipCardsPDF,
+  printBulkMembershipCards,
+} from '@/lib/membershipCardBulk';
+import {
   FiSearch,
   FiDownload,
   FiPrinter,
@@ -16,6 +20,7 @@ import {
   FiCheck,
   FiClock,
   FiAlertCircle,
+  FiFileText,
 } from 'react-icons/fi';
 
 interface MembershipCardData {
@@ -53,6 +58,7 @@ export default function AdminCardsPage() {
   const [selectedCard, setSelectedCard] = useState<MembershipCardData | null>(null);
   const [downloadInProgress, setDownloadInProgress] = useState(false);
   const [printInProgress, setPrintInProgress] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -289,6 +295,12 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
     }
   };
 
+  /**
+   * Bulk membership-card PDF export: produces a multi-page PDF where each
+   * selected card is rendered using the same template as the per-user
+   * download (one card per landscape page). Includes a CSV fallback button
+   * (`handleBulkExportCsv`) for spreadsheet-style data export.
+   */
   const handleBulkDownload = async () => {
     if (selectedCards.length === 0) {
       toast.warning('Please select at least one card');
@@ -296,11 +308,43 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
     }
 
     setDownloadInProgress(true);
+    setBulkProgress({ done: 0, total: selectedCards.length });
     try {
-      const cardsToDownload = cards.filter(c => selectedCards.includes(c.id));
+      const cardsToDownload = cards.filter((c) => selectedCards.includes(c.id));
+      await generateBulkMembershipCardsPDF(
+        cardsToDownload.map((c) => ({
+          userName: c.userName,
+          membershipNumber: c.membershipNumber,
+          membershipType: c.membershipType,
+          profilePicture: c.profilePicture ?? null,
+          userPhone: c.userPhone,
+        })),
+        {
+          onProgress: (p) => setBulkProgress({ done: p.done, total: p.total }),
+          fileName: `TLA_Membership_Cards_${new Date().toISOString().split('T')[0]}_x${cardsToDownload.length}.pdf`,
+        }
+      );
+      toast.success(`${cardsToDownload.length} membership card(s) exported to PDF`);
+      setSelectedCards([]);
+    } catch (error) {
+      console.error('Error generating bulk PDF:', error);
+      toast.error('Failed to generate bulk PDF: ' + (error as Error).message);
+    } finally {
+      setDownloadInProgress(false);
+      setBulkProgress(null);
+    }
+  };
+
+  const handleBulkExportCsv = () => {
+    if (selectedCards.length === 0) {
+      toast.warning('Please select at least one card');
+      return;
+    }
+    try {
+      const cardsToDownload = cards.filter((c) => selectedCards.includes(c.id));
       const csvContent = [
         ['Membership Number', 'Member Name', 'Email', 'Type', 'Join Date', 'Expiry Date', 'Payment Status', 'Membership Status'],
-        ...cardsToDownload.map(c => [
+        ...cardsToDownload.map((c) => [
           c.membershipNumber,
           c.userName,
           c.userEmail,
@@ -309,9 +353,9 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
           formatDate(c.expiryDate),
           c.paymentStatus,
           c.membershipStatus,
-        ])
+        ]),
       ]
-        .map(row => row.map(cell => `"${cell}"`).join(','))
+        .map((row) => row.map((cell) => `"${cell}"`).join(','))
         .join('\n');
 
       const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -321,114 +365,42 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
       a.download = `membership-cards-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
-      toast.success(`${selectedCards.length} cards downloaded successfully`);
-      setSelectedCards([]);
+      toast.success(`${cardsToDownload.length} card(s) exported to CSV`);
     } catch (error) {
-      console.error('Error downloading cards:', error);
-      toast.error('Failed to download cards');
-    } finally {
-      setDownloadInProgress(false);
+      console.error('Error exporting CSV:', error);
+      toast.error('Failed to export CSV');
     }
   };
 
-  const handleBulkPrint = () => {
+  const handleBulkPrint = async () => {
     if (selectedCards.length === 0) {
       toast.warning('Please select at least one card');
       return;
     }
 
     setPrintInProgress(true);
+    setBulkProgress({ done: 0, total: selectedCards.length });
     try {
-      const cardsToPrint = cards.filter(c => selectedCards.includes(c.id));
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        alert('Please allow popups for printing');
-        setPrintInProgress(false);
-        return;
-      }
-
-      let htmlContent = `
-        <html>
-          <head>
-            <title>Membership Cards</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-              .card-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-              .card { 
-                border: 2px solid #059669; 
-                border-radius: 10px; 
-                padding: 20px; 
-                background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-                color: white;
-                page-break-inside: avoid;
-              }
-              .card h3 { margin: 0 0 15px 0; color: #bbf7d0; }
-              .card-field { margin: 10px 0; }
-              .card-field label { font-weight: bold; color: #bbf7d0; font-size: 11px; }
-              .card-field value { display: block; font-size: 13px; }
-              .status { 
-                display: inline-block; 
-                padding: 3px 10px; 
-                border-radius: 15px;
-                font-size: 12px;
-                margin-top: 10px;
-              }
-              .status.active { background: #10b981; }
-              .status.inactive { background: #6b7280; }
-              .status.expired { background: #ef4444; }
-              @media print {
-                body { margin: 0; padding: 10px; }
-                .card-container { gap: 10px; }
-              }
-            </style>
-          </head>
-          <body>
-            <h1>Tanzania Library Association - Membership Cards</h1>
-            <div class="card-container">
-      `;
-
-      cardsToPrint.forEach(card => {
-        htmlContent += `
-          <div class="card">
-            <h3>TLA Card</h3>
-            <div class="card-field">
-              <label>Card Number:</label>
-              <value>${card.membershipNumber}</value>
-            </div>
-            <div class="card-field">
-              <label>Member:</label>
-              <value>${card.userName}</value>
-            </div>
-            <div class="card-field">
-              <label>Type:</label>
-              <value>${card.membershipType}</value>
-            </div>
-            <div class="card-field">
-              <label>Valid Until:</label>
-              <value>${formatDate(card.expiryDate)}</value>
-            </div>
-            <span class="status ${card.membershipStatus}">
-              ${card.membershipStatus.toUpperCase()}
-            </span>
-          </div>
-        `;
-      });
-
-      htmlContent += `
-            </div>
-          </body>
-        </html>
-      `;
-
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      printWindow.print();
-      toast.success(`${selectedCards.length} cards prepared for printing`);
+      const cardsToPrint = cards.filter((c) => selectedCards.includes(c.id));
+      await printBulkMembershipCards(
+        cardsToPrint.map((c) => ({
+          userName: c.userName,
+          membershipNumber: c.membershipNumber,
+          membershipType: c.membershipType,
+          profilePicture: c.profilePicture ?? null,
+          userPhone: c.userPhone,
+        })),
+        {
+          onProgress: (p) => setBulkProgress({ done: p.done, total: p.total }),
+        }
+      );
+      toast.success(`${cardsToPrint.length} card(s) sent to print preview`);
     } catch (error) {
       console.error('Error printing cards:', error);
-      toast.error('Failed to print cards');
+      toast.error('Failed to print cards: ' + (error as Error).message);
     } finally {
       setPrintInProgress(false);
+      setBulkProgress(null);
     }
   };
 
@@ -454,7 +426,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-100 text-emerald-800';
       case 'inactive':
         return 'bg-gray-100 text-gray-800';
       case 'expired':
@@ -469,7 +441,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
   const getPaymentStatusIcon = (status: string) => {
     switch (status) {
       case 'paid':
-        return <FiCheck className="h-5 w-5 text-green-600" />;
+        return <FiCheck className="h-5 w-5 text-emerald-600" />;
       case 'pending':
         return <FiClock className="h-5 w-5 text-yellow-600" />;
       case 'overdue':
@@ -482,7 +454,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -516,7 +488,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
                 placeholder="Name, email, or card number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
           </div>
@@ -527,7 +499,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
@@ -556,19 +528,36 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
             <div className="flex space-x-3">
               <button
                 onClick={handleBulkDownload}
-                disabled={downloadInProgress}
-                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                disabled={downloadInProgress || printInProgress}
+                className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors disabled:opacity-50"
               >
                 <FiDownload className="mr-2 h-4 w-4" />
-                {downloadInProgress ? 'Downloading...' : 'Download CSV'}
+                {downloadInProgress
+                  ? bulkProgress
+                    ? `Rendering ${bulkProgress.done}/${bulkProgress.total}...`
+                    : 'Generating PDF...'
+                  : 'Download PDF'}
+              </button>
+              <button
+                onClick={handleBulkExportCsv}
+                disabled={downloadInProgress || printInProgress}
+                className="inline-flex items-center px-4 py-2 bg-emerald-700 text-white rounded-md hover:bg-emerald-800 transition-colors disabled:opacity-50"
+                title="Export selected card metadata as CSV"
+              >
+                <FiFileText className="mr-2 h-4 w-4" />
+                Export CSV
               </button>
               <button
                 onClick={handleBulkPrint}
-                disabled={printInProgress}
+                disabled={printInProgress || downloadInProgress}
                 className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50"
               >
                 <FiPrinter className="mr-2 h-4 w-4" />
-                {printInProgress ? 'Printing...' : 'Print All'}
+                {printInProgress
+                  ? bulkProgress
+                    ? `Rendering ${bulkProgress.done}/${bulkProgress.total}...`
+                    : 'Preparing print...'
+                  : 'Print All'}
               </button>
               <button
                 onClick={() => setSelectedCards([])}
@@ -586,7 +575,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
           </div>
         ) : filteredCards.length === 0 ? (
           <div className="p-12 text-center">
@@ -628,7 +617,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="font-mono font-semibold text-green-600">{card.membershipNumber}</span>
+                      <span className="font-mono font-semibold text-emerald-600">{card.membershipNumber}</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">{card.userName}</div>
@@ -667,7 +656,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
                         </button>
                         <button
                           onClick={() => handleDownloadCard(card)}
-                          className="text-green-600 hover:text-green-900"
+                          className="text-emerald-600 hover:text-emerald-900"
                           title="Download Card"
                         >
                           <FiDownload className="h-4 w-4" />
@@ -742,7 +731,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
                       <dd className="text-sm font-medium">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           selectedCard.paymentStatus === 'paid'
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-emerald-100 text-emerald-800'
                             : selectedCard.paymentStatus === 'pending'
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-red-100 text-red-800'
@@ -778,7 +767,7 @@ Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
                   handleDownloadCard(selectedCard);
                   setShowCardModal(false);
                 }}
-                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
               >
                 <FiDownload className="mr-2 h-4 w-4" />
                 Download

@@ -4,14 +4,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true
   },
-  // Disable ESLint checking for deployment  
-  eslint: {
-    ignoreDuringBuilds: true
-  },
-  // Suppress middleware deprecation warning
-  experimental: {
-    serverComponentsExternalPackages: []
-  }
+  // Next.js 16 moved this out of `experimental`
+  serverExternalPackages: []
 }
 
 module.exports = nextConfig

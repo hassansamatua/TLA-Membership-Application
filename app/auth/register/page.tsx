@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import { ThemeToggle } from "@/components/ui";
 
 // List of all Tanzanian regions and their districts
 const TANZANIA_DISTRICTS: Record<string, string[]> = {
@@ -187,28 +188,47 @@ export default function RegisterPage() {
     }
   };
 
-  // Helper function to render form sections
+  // Helper function to render form sections — each section is a self-contained
+  // rounded card so the long form scans as discrete steps.
   const renderSection = (title: string, children: React.ReactNode) => (
-    <div className="mb-8">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
-      <div className="space-y-4">
-        {children}
-      </div>
-    </div>
+    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6 dark:border-white/10 dark:bg-gray-900/60">
+      <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
+      <div className="space-y-4">{children}</div>
+    </section>
   );
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl w-full p-4 mx-auto my-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-gray-900">Create a new account</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Please fill in all required fields marked with <span className="text-red-500">*</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 py-10 dark:from-gray-950 dark:via-gray-950 dark:to-emerald-950/30">
+      <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+        <ThemeToggle compact />
+      </div>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        {/* Brand + intro */}
+        <div className="mb-8 flex flex-col items-center text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-sm">
+            <span className="text-sm font-bold">TLA</span>
+          </div>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+            Membership application
           </p>
+          <h1 className="mt-1 text-2xl font-semibold text-gray-900 sm:text-3xl dark:text-gray-50">
+            Create your TLA account
+          </h1>
+          <p className="mt-2 max-w-xl text-sm text-gray-600 dark:text-gray-400">
+            Fill in the form below. Fields marked with{' '}
+            <span className="font-medium text-red-500">*</span> are required.
+            Your application will be reviewed by an administrator.
+          </p>
+          <Link
+            href="/auth/login"
+            className="mt-3 text-xs font-medium text-emerald-700 hover:text-emerald-800"
+          >
+            Already a member? Sign in instead
+          </Link>
         </div>
 
         {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -228,7 +248,7 @@ export default function RegisterPage() {
                         id="membershipTypeRegular"
                         name="membershipType"
                         type="radio"
-                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                        className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300"
                         value="regular"
                         checked={formData.membershipType === 'regular'}
                         onChange={handleChange}
@@ -242,7 +262,7 @@ export default function RegisterPage() {
                         id="membershipTypeLibrarian"
                         name="membershipType"
                         type="radio"
-                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                        className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300"
                         value="librarian"
                         checked={formData.membershipType === 'librarian'}
                         onChange={handleChange}
@@ -256,7 +276,7 @@ export default function RegisterPage() {
                         id="membershipTypeOrganization"
                         name="membershipType"
                         type="radio"
-                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                        className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300"
                         value="organization"
                         checked={formData.membershipType === 'organization'}
                         onChange={handleChange}
@@ -275,7 +295,7 @@ export default function RegisterPage() {
                     type="text"
                     name={formData.membershipType === 'organization' ? 'organizationName' : 'name'}
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.membershipType === 'organization' ? formData.organizationName : formData.name}
                     onChange={handleChange}
                     placeholder={formData.membershipType === 'organization' ? 'Enter organization name' : 'Enter your full name'}
@@ -293,7 +313,7 @@ export default function RegisterPage() {
                         type="text"
                         name="contactPersonName"
                         required
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                         value={formData.contactPersonName || ''}
                         onChange={handleChange}
                         placeholder="Contact person's full name"
@@ -307,7 +327,7 @@ export default function RegisterPage() {
                         type="email"
                         name="contactPersonEmail"
                         required
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                         value={formData.contactPersonEmail || ''}
                         onChange={handleChange}
                         placeholder="Contact person's email address"
@@ -323,7 +343,7 @@ export default function RegisterPage() {
                     type="date"
                     name="dateOfBirth"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.dateOfBirth}
                     onChange={handleChange}
                   />
@@ -335,7 +355,7 @@ export default function RegisterPage() {
                   <select
                     name="gender"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.gender}
                     onChange={handleChange}
                   >
@@ -355,7 +375,7 @@ export default function RegisterPage() {
                     required
                     minLength={16}
                     maxLength={16}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.nida}
                     onChange={handleChange}
                     placeholder="16-digit NIDA number"
@@ -377,7 +397,7 @@ export default function RegisterPage() {
                     type="email"
                     name="email"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.email}
                     onChange={handleChange}
                   />
@@ -392,7 +412,7 @@ export default function RegisterPage() {
                       name="password"
                       required
                       minLength={8}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="At least 8 characters"
@@ -419,7 +439,7 @@ export default function RegisterPage() {
                     name="confirmPassword"
                     required
                     minLength={8}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="Confirm your password"
@@ -434,7 +454,7 @@ export default function RegisterPage() {
                   <input
                     type="tel"
                     name="phoneNumber"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.phoneNumber}
                     onChange={handleChange}
                   />
@@ -445,7 +465,7 @@ export default function RegisterPage() {
                   </label>
                   <select
                     name="country"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.country}
                     onChange={handleChange}
                   >
@@ -462,7 +482,7 @@ export default function RegisterPage() {
                   </label>
                   <select
                     name="region"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.region}
                     onChange={(e) => {
                       setFormData(prev => ({
@@ -486,7 +506,7 @@ export default function RegisterPage() {
                   </label>
                   <select
                     name="district"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.district}
                     onChange={handleChange}
                     disabled={!formData.region}
@@ -506,7 +526,7 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     name="ward"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.ward}
                     onChange={handleChange}
                   />
@@ -520,7 +540,7 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     name="street"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.street}
                     onChange={handleChange}
                   />
@@ -532,7 +552,7 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     name="houseNumber"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.houseNumber}
                     onChange={handleChange}
                   />
@@ -546,7 +566,7 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     name="postalAddress"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.postalAddress}
                     onChange={handleChange}
                   />
@@ -558,7 +578,7 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     name="postalCode"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.postalCode}
                     onChange={handleChange}
                   />
@@ -578,7 +598,7 @@ export default function RegisterPage() {
                   <select
                     name="educationLevel"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.educationLevel}
                     onChange={handleChange}
                   >
@@ -601,7 +621,7 @@ export default function RegisterPage() {
                     type="text"
                     name="institutionName"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.institutionName}
                     onChange={handleChange}
                   />
@@ -618,7 +638,7 @@ export default function RegisterPage() {
                     required
                     min="1900"
                     max={new Date().getFullYear()}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.yearOfCompletion}
                     onChange={handleChange}
                   />
@@ -630,7 +650,7 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     name="skills"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.skills}
                     onChange={handleChange}
                     placeholder="e.g., Computer Skills, Languages, etc."
@@ -652,7 +672,7 @@ export default function RegisterPage() {
                     type="text"
                     name="occupation"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.occupation}
                     onChange={handleChange}
                   />
@@ -665,7 +685,7 @@ export default function RegisterPage() {
                     type="text"
                     name="employerName"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.employerName}
                     onChange={handleChange}
                   />
@@ -681,7 +701,7 @@ export default function RegisterPage() {
                     type="text"
                     name="workAddress"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.workAddress}
                     onChange={handleChange}
                   />
@@ -696,7 +716,7 @@ export default function RegisterPage() {
                   <input
                     type="tel"
                     name="workPhone"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.workPhone}
                     onChange={handleChange}
                   />
@@ -708,7 +728,7 @@ export default function RegisterPage() {
                   <input
                     type="email"
                     name="workEmail"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                     value={formData.workEmail}
                     onChange={handleChange}
                   />
@@ -742,7 +762,7 @@ export default function RegisterPage() {
                 <input
                   type="text"
                   name="membershipDate" readOnly
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   value={formData.membershipDate}
                   onChange={handleChange}
                 />
@@ -759,7 +779,7 @@ export default function RegisterPage() {
                   name="agreeToTerms"
                   type="checkbox"
                   required
-                  className="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded"
+                  className="focus:ring-emerald-500 h-4 w-4 text-emerald-600 border-gray-300 rounded"
                   checked={formData.agreeToTerms}
                   onChange={handleChange}
                 />
@@ -767,7 +787,7 @@ export default function RegisterPage() {
               <div className="ml-3 text-sm">
                 <label htmlFor="agreeToTerms" className="font-medium text-gray-700">
                   I agree to the{' '}
-                  <Link href="/terms" className="text-green-600 hover:text-green-500" target="_blank" rel="noopener noreferrer">
+                  <Link href="/terms" className="text-emerald-600 hover:text-emerald-500" target="_blank" rel="noopener noreferrer">
                     Terms and Conditions
                   </Link>{' '}
                   <span className="text-red-500">*</span>
@@ -782,7 +802,7 @@ export default function RegisterPage() {
                   name="agreeToDataProcessing"
                   type="checkbox"
                   required
-                  className="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded"
+                  className="focus:ring-emerald-500 h-4 w-4 text-emerald-600 border-gray-300 rounded"
                   checked={formData.agreeToDataProcessing}
                   onChange={handleChange}
                 />
@@ -790,7 +810,7 @@ export default function RegisterPage() {
               <div className="ml-3 text-sm">
                 <label htmlFor="agreeToDataProcessing" className="font-medium text-gray-700">
                   I consent to the processing of my personal data in accordance with the{' '}
-                  <Link href="/privacy" className="text-green-600 hover:text-green-500" target="_blank" rel="noopener noreferrer">
+                  <Link href="/privacy" className="text-emerald-600 hover:text-emerald-500" target="_blank" rel="noopener noreferrer">
                     Privacy Policy
                   </Link>{' '}
                   <span className="text-red-500">*</span>
@@ -803,7 +823,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Processing...' : 'Register'}
             </button>
@@ -811,7 +831,7 @@ export default function RegisterPage() {
 
           <div className="mt-4 text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link href="/auth/login" className="font-medium text-green-600 hover:text-green-500">
+            <Link href="/auth/login" className="font-medium text-emerald-600 hover:text-emerald-500">
               Sign in
             </Link>
           </div>

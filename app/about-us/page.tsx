@@ -115,18 +115,18 @@ export default function AboutPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-4">
-              <div className="bg-green-100 p-4 rounded-full">
-                <FiHeart className="h-8 w-8 text-green-600" />
+              <div className="bg-emerald-100 p-4 rounded-full">
+                <FiHeart className="h-8 w-8 text-emerald-600" />
               </div>
               <h2 className="ml-4 text-3xl font-bold text-gray-900">Our Values</h2>
             </div>
-            <div className="w-24 h-1 bg-green-600 mx-auto"></div>
+            <div className="w-24 h-1 bg-emerald-600 mx-auto"></div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {values.map((item, index) => (
               <div key={index} className="text-center">
-                <div className="bg-green-50 p-6 rounded-xl">
+                <div className="bg-emerald-50 p-6 rounded-xl">
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">
                     {item.split(' - ')[0]}
                   </h3>

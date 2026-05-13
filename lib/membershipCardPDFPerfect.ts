@@ -67,7 +67,7 @@ export async function generateMembershipCardPDFPerfect(cardData: MembershipCardD
         <rect width="336" height="50" fill="rgba(16, 185, 129, 0.2)" rx="16" ry="16"/>
         
         <!-- Logo Image -->
-        <image href="/logo (3).png" x="-20" y="-20" width="130" height="130" preserveAspectRatio="xMidYMid meet"/>
+        <image href="/logo.png" x="9" y="4" width="70" height="70" preserveAspectRatio="xMidYMid meet"/>
         
         <!-- Organization name -->
         <text x="190" y="30" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">TANZANIA LIBRARY AND</text>

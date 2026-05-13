@@ -138,7 +138,7 @@ export default function PaymentForm({
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">Amount</p>
-              <p className="text-2xl font-bold text-green-600">TZS {amount.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-emerald-600">TZS {amount.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function PaymentForm({
       <button
         onClick={handlePaymentSubmit}
         disabled={!selectedMethod || !phoneNumber || isProcessing}
-        className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+        className="w-full bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
       >
         {isProcessing ? (
           <>
