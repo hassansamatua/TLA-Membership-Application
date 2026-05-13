@@ -134,8 +134,9 @@ async function handleApproveUser(request: Request, userId: string) {
         // Import getCycleYearForDate to get correct membership cycle year
         const { getCycleYearForDate } = await import('@/lib/membershipCycles');
         const cycleYear = getCycleYearForDate(new Date()); // Uses membership cycle year (2025 until Feb 1, 2026)
+        const yy = cycleYear.toString().slice(-2); // 2-digit cycle year (e.g. 2026 -> "26")
         const randomNum = Math.floor(10000 + Math.random() * 90000); // 5-digit random number
-        membershipNumber = `TLA${cycleYear}${randomNum}`;
+        membershipNumber = `TLA${yy}${randomNum}`;
         
         console.log('Generated new membership number:', membershipNumber);
         
