@@ -27,7 +27,7 @@ interface Payment {
   membershipType: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  status: 'pending' | 'completed' | 'failed';
   paymentMethod: string;
   transactionId?: string;
   paymentDate: string;
@@ -87,25 +87,6 @@ export default function AdminPaymentsPage() {
     }
   };
 
-  const handleRefund = async (paymentId: number) => {
-    if (!confirm('Are you sure you want to refund this payment?')) return;
-    
-    try {
-      const response = await fetch(`/api/admin/payments/${paymentId}/refund`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to refund payment');
-      setPayments(payments.map(p => 
-        p.id === paymentId ? { ...p, status: 'refunded' } : p
-      ));
-      toast.success('Payment refunded successfully');
-    } catch (error) {
-      console.error('Error refunding payment:', error);
-      toast.error('Failed to refund payment');
-    }
-  };
-
   const handleRetry = async (paymentId: number) => {
     try {
       const response = await fetch(`/api/admin/payments/${paymentId}/retry`, {
@@ -154,7 +135,6 @@ export default function AdminPaymentsPage() {
       case 'completed': return 'bg-emerald-100 text-emerald-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'failed': return 'bg-red-100 text-red-800';
-      case 'refunded': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -164,7 +144,6 @@ export default function AdminPaymentsPage() {
       case 'completed': return <FiCheck className="h-3 w-3" />;
       case 'pending': return <FiClock className="h-3 w-3" />;
       case 'failed': return <FiX className="h-3 w-3" />;
-      case 'refunded': return <FiRefreshCw className="h-3 w-3" />;
       default: return null;
     }
   };
@@ -298,7 +277,6 @@ export default function AdminPaymentsPage() {
                 <option value="completed">Completed</option>
                 <option value="pending">Pending</option>
                 <option value="failed">Failed</option>
-                <option value="refunded">Refunded</option>
               </select>
             </div>
             <div>
@@ -435,15 +413,6 @@ export default function AdminPaymentsPage() {
                         >
                           <FiEye className="h-4 w-4" />
                         </button>
-                        {payment.status === 'completed' && (
-                          <button
-                            onClick={() => handleRefund(payment.id)}
-                            className="text-yellow-600 hover:text-yellow-900"
-                            title="Refund Payment"
-                          >
-                            <FiRefreshCw className="h-4 w-4" />
-                          </button>
-                        )}
                         {payment.status === 'failed' && (
                           <button
                             onClick={() => handleRetry(payment.id)}
@@ -574,18 +543,6 @@ export default function AdminPaymentsPage() {
                   >
                     Close
                   </button>
-                  {selectedPayment.status === 'completed' && (
-                    <button
-                      onClick={() => {
-                        handleRefund(selectedPayment.id);
-                        setShowPaymentModal(false);
-                      }}
-                      className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
-                    >
-                      <FiRefreshCw className="inline mr-2 h-4 w-4" />
-                      Refund Payment
-                    </button>
-                  )}
                   {selectedPayment.status === 'failed' && (
                     <button
                       onClick={() => {

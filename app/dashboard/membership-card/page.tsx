@@ -31,7 +31,6 @@ export default function MembershipCardPage() {
   const [membershipStatus, setMembershipStatus] = useState<MembershipStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [downloadInProgress, setDownloadInProgress] = useState(false);
   const [printInProgress, setPrintInProgress] = useState(false);
 
@@ -54,13 +53,14 @@ export default function MembershipCardPage() {
   };
 
   const forceRefresh = () => {
-    setRefreshKey(prev => prev + 1); // Force re-render
-    loadMembershipStatus(); // Reload data
+    setLoading(true);
+    setError(null);
+    loadMembershipStatus();
   };
 
   useEffect(() => {
     loadMembershipStatus();
-  }, [refreshKey]);
+  }, []);
 
   const handleDownload = async () => {
     // Prevent multiple downloads
@@ -794,9 +794,15 @@ export default function MembershipCardPage() {
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Membership Card</h1>
               <button
                 onClick={forceRefresh}
-                className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                disabled={loading}
+                className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
               >
-                Refresh Status
+                {loading ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                    Refreshing…
+                  </>
+                ) : 'Refresh Status'}
               </button>
             </div>
             <p className="mt-2 text-gray-600 dark:text-gray-400 dark:text-gray-500">Your official Tanzania Library Association membership card</p>
