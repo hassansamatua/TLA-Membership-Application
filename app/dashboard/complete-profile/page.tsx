@@ -121,7 +121,7 @@ const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<s
   });
 };
 export default function CompleteProfilePage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState('personal');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -486,7 +486,8 @@ export default function CompleteProfilePage() {
       }
 
       toast.success('Profile updated successfully');
-      await fetchProfile(); // Refresh the profile data
+      await fetchProfile(); // Refresh the local form data
+      await refreshUser(); // Refresh the global user state (sidebar, dashboard, etc.)
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to update profile');

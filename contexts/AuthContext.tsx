@@ -92,6 +92,7 @@ interface AuthContextType {
   }) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (profileData: Partial<UserProfile>) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -203,6 +204,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     setUser(null);
     router.push('/auth/login');
+  };
+
+  const refreshUser = async () => {
+    try {
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
+        cache: 'no-store'
+      });
+      if (response.ok) {
+        const userData = await response.json();
+        setUser({
+          id: userData.id,
+          name: userData.name || '',
+          email: userData.email,
+          isAdmin: toBoolean(userData.isAdmin),
+          isApproved: toBoolean(userData.isApproved),
+          membershipNumber: userData.membershipNumber ?? null,
+          profile: userData.profile || undefined
+        });
+      }
+    } catch (error) {
+      console.error('[AuthContext] refreshUser error:', error);
+    }
   };
 
   const updateProfile = async (profileData: Partial<UserProfile>) => {
@@ -347,6 +372,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     updateProfile,
+    refreshUser,
   };
 
   return (
