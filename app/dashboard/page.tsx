@@ -42,40 +42,37 @@ type MembershipStatusResponse = {
 
 const calculateProfileCompletion = (user: any) => {
   if (!user) return 0;
-  
-  console.log('📊 Dashboard Page - Calculating completion for user:', user.name, 'ID:', user.id);
-  
-  let completedFields = 0;
-  const totalFields = 10; // Total number of important fields
-  
-  // Check personal info (using flat structure)
-  if (user.name) { completedFields++; console.log('✓ Name'); }
-  if (user.date_of_birth) { completedFields++; console.log('✓ Date of Birth'); }
-  if (user.phone) { completedFields++; console.log('✓ Phone'); }
-  if (user.address) { completedFields++; console.log('✓ Address'); }
-  if (user.employment) {
-    try {
-      const employment = JSON.parse(user.employment || '{}');
-      if (employment.occupation) { completedFields++; console.log('✓ Occupation'); }
-    } catch (e) {
-      console.log('❌ Failed to parse employment');
-    }
-  }
-  if (user.education) {
-    try {
-      const education = JSON.parse(user.education || '[]');
-      if (education.length > 0) { completedFields++; console.log('✓ Education'); }
-    } catch (e) {
-      console.log('❌ Failed to parse education');
-    }
-  }
-  if (user.membership_status) { completedFields++; console.log('✓ Membership Status'); }
-  if (user.profile_picture) { completedFields++; console.log('✓ Profile Picture'); }
-  if (user.id_proof_path) { completedFields++; console.log('✓ ID Proof'); }
-  
+
+  // The user object from AuthContext exposes profile data under the nested
+  // `user.profile` object (normalized in /api/auth/me). We read from there,
+  // with flat-field fallbacks for backwards-compatibility.
+  const profile = user.profile || {};
+  const personal = profile.personalInfo || {};
+  const contact = profile.contactInfo || {};
+  const professional = profile.professionalInfo || {};
+  const documents = profile.documents || {};
+  const education = Array.isArray(profile.education) ? profile.education : [];
+
+  const checks = [
+    personal.fullName || user.name,
+    personal.dateOfBirth || user.date_of_birth,
+    contact.phone || user.phone,
+    contact.address || user.address,
+    professional.occupation,
+    education.length > 0 &&
+      (education[0].highestQualification ||
+        education[0].highestDegree ||
+        education[0].institution),
+    profile.membership?.membershipStatus || user.isApproved,
+    personal.profilePicture || user.profile_picture,
+    documents.idProof || user.id_proof_path,
+    documents.cv || user.cv_path,
+  ];
+
+  const completedFields = checks.filter(Boolean).length;
+  const totalFields = checks.length;
   const percentage = Math.round((completedFields / totalFields) * 100);
-  console.log(`📈 Dashboard Page - Completed: ${completedFields}/${totalFields} = ${percentage}%`);
-  
+
   return percentage;
 };
 

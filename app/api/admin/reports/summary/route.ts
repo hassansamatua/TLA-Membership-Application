@@ -3,30 +3,46 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { RowDataPacket } from 'mysql2/promise';
 
+/**
+ * Unified payments sub-query.
+ * Pulls rows from `payments` and appends `membership_payments` rows whose
+ * reference does NOT already appear in `payments` (avoids double-counting).
+ */
+const ALL_PAYMENTS = `(
+  SELECT id, user_id, amount, status, payment_method, created_at, reference
+  FROM payments
+  UNION ALL
+  SELECT mp.id, mp.user_id, mp.amount, mp.status, mp.payment_method, mp.created_at, mp.reference
+  FROM membership_payments mp
+  LEFT JOIN payments p ON p.reference = mp.reference AND p.reference IS NOT NULL AND p.reference != ''
+  WHERE p.id IS NULL
+)`;
+
 export async function GET() {
   try {
-    // Get database connection
     const connection = await pool.getConnection();
 
-    // Get total members count
+    // Get total members count (exclude users without email)
     const [totalMembers] = await connection.query<RowDataPacket[]>(`
-      SELECT COUNT(*) as count FROM users
+      SELECT COUNT(*) as count FROM users WHERE email IS NOT NULL AND email != ''
     `);
 
-    // Get active memberships count
+    // Get active memberships count (exclude users without email)
     const [activeMembers] = await connection.query<RowDataPacket[]>(`
-      SELECT COUNT(DISTINCT user_id) as count 
-      FROM memberships 
-      WHERE status = 'active' 
-      AND expiry_date >= CURDATE()
+      SELECT COUNT(DISTINCT m.user_id) as count 
+      FROM memberships m
+      LEFT JOIN users u ON m.user_id = u.id
+      WHERE m.status = 'active' 
+      AND m.expiry_date >= CURDATE()
+      AND u.email IS NOT NULL AND u.email != ''
     `);
 
-    // Get total revenue
+    // Get total revenue (from both payments AND membership_payments)
     const [revenue] = await connection.query<RowDataPacket[]>(`
-      SELECT COALESCE(SUM(amount), 0) as total 
-      FROM payments 
+      SELECT COALESCE(SUM(amount), 0) as total
+      FROM ${ALL_PAYMENTS} AS all_payments
       WHERE status = 'completed'
-      AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
     `);
 
     // Get renewal rate
@@ -70,7 +86,6 @@ export async function GET() {
       ORDER BY month
     `);
 
-    // Release connection
     connection.release();
 
     return NextResponse.json({

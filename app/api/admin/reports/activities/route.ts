@@ -18,6 +18,21 @@ function getDateGroup(period: string, column: string): string {
   }
 }
 
+/**
+ * Unified payments sub-query.
+ * Pulls rows from `payments` and appends `membership_payments` rows whose
+ * reference does NOT already appear in `payments` (avoids double-counting).
+ */
+const ALL_PAYMENTS = `(
+  SELECT id, user_id, amount, status, payment_method, created_at, reference
+  FROM payments
+  UNION ALL
+  SELECT mp.id, mp.user_id, mp.amount, mp.status, mp.payment_method, mp.created_at, mp.reference
+  FROM membership_payments mp
+  LEFT JOIN payments p ON p.reference = mp.reference AND p.reference IS NOT NULL AND p.reference != ''
+  WHERE p.id IS NULL
+)`;
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -88,14 +103,14 @@ export async function GET(request: Request) {
       ORDER BY period
     `);
 
-    // Payment activity patterns
+    // Payment activity patterns (from both payments AND membership_payments)
     const [paymentPatterns] = await connection.query<RowDataPacket[]>(`
       SELECT
         HOUR(created_at) as hour_of_day,
         DAYOFWEEK(created_at) as day_of_week,
         COUNT(*) as payment_count,
         SUM(amount) as total_amount
-      FROM payments
+      FROM ${ALL_PAYMENTS} AS all_payments
       WHERE status = 'completed'
         AND created_at >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
       GROUP BY HOUR(created_at), DAYOFWEEK(created_at)
@@ -115,15 +130,15 @@ export async function GET(request: Request) {
       WHERE updated_at IS NOT NULL
     `);
 
-    // Feature usage statistics
+    // Feature usage statistics (using unified payment data)
     const [featureUsage] = await connection.query<RowDataPacket[]>(`
       SELECT
         'membership_renewals' as feature,
         COUNT(*) as usage_count,
         AVG(amount) as avg_amount
-      FROM payments p
-      WHERE p.status = 'completed'
-        AND p.user_id IN (
+      FROM ${ALL_PAYMENTS} AS ap
+      WHERE ap.status = 'completed'
+        AND ap.user_id IN (
           SELECT DISTINCT user_id 
           FROM memberships 
           WHERE status = 'active'

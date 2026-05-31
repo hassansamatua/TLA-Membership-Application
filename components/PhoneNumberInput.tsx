@@ -41,6 +41,12 @@ const mobileNetworkConfigs = {
     format: '0XXXXXXXXX',
     example: '0712542346'
   },
+  mixxbyyas: {
+    name: 'Mixx By Yas',
+    prefix: ['065', '067', '071', '072'],
+    format: '0XXXXXXXXX',
+    example: '0712542346'
+  },
   bankcard: {
     name: 'Bank Card',
     prefix: [],
@@ -59,7 +65,14 @@ export default function PhoneNumberInput({
   const [errors, setErrors] = useState<{ phone?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const config = mobileNetworkConfigs[paymentMethod as keyof typeof mobileNetworkConfigs];
+  const config =
+    mobileNetworkConfigs[paymentMethod as keyof typeof mobileNetworkConfigs] ??
+    {
+      name: 'Mobile Money',
+      prefix: [] as string[],
+      format: '0XXXXXXXXX',
+      example: '0712542346',
+    };
 
   const validatePhoneNumber = (phone: string): boolean => {
     if (paymentMethod === 'bankcard') {
@@ -75,6 +88,7 @@ export default function PhoneNumberInput({
     if (!cleanPhone.startsWith('0')) return false;
     
     const networkCode = cleanPhone.substring(0, 3);
+    if (config.prefix.length === 0) return true;
     return config.prefix.includes(networkCode);
   };
 

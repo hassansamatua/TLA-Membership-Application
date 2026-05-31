@@ -161,30 +161,24 @@ export default function AdminCardsPage() {
   const handleDownloadCard = async (card: MembershipCardData) => {
     setDownloadInProgress(true);
     try {
-      const cardData = `
-Membership Card - ${card.membershipNumber}
-================================
-Name: ${card.userName}
-Email: ${card.userEmail}
-Membership Type: ${card.membershipType}
-Join Date: ${formatDate(card.joinDate)}
-Expiry Date: ${formatDate(card.expiryDate)}
-Payment Status: ${card.paymentStatus}
-Membership Status: ${card.membershipStatus}
-Amount: TZS ${card.lastPaymentAmount?.toLocaleString() || 'N/A'}
-      `.trim();
-
-      const blob = new Blob([cardData], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `card-${card.membershipNumber}.txt`;
-      a.click();
-      window.URL.revokeObjectURL(url);
+      await generateBulkMembershipCardsPDF(
+        [
+          {
+            userName: card.userName,
+            membershipNumber: card.membershipNumber,
+            membershipType: card.membershipType,
+            profilePicture: card.profilePicture ?? null,
+            userPhone: card.userPhone,
+          },
+        ],
+        {
+          fileName: `TLA_Membership_Card_${card.membershipNumber}.pdf`,
+        }
+      );
       toast.success('Card downloaded successfully');
     } catch (error) {
       console.error('Error downloading card:', error);
-      toast.error('Failed to download card');
+      toast.error('Failed to download card: ' + (error as Error).message);
     } finally {
       setDownloadInProgress(false);
     }

@@ -103,20 +103,22 @@ export async function GET(request: Request) {
     // Get active members list
     const [activeMembersList] = await connection.query<RowDataPacket[]>(`
       SELECT 
-        u.id,
-        u.name,
-        u.email,
+        m.id,
+        m.user_id,
         m.membership_number,
         m.membership_type,
         m.status,
-        m.expiry_date,
         m.joined_date,
+        m.expiry_date,
         m.payment_status,
-        m.created_at as membership_created_at
+        m.amount_paid,
+        u.name,
+        u.email
       FROM memberships m
       LEFT JOIN users u ON m.user_id = u.id
-      WHERE m.status = 'active' 
+      WHERE m.status = 'active'
       AND m.expiry_date >= CURDATE()
+      AND (u.email IS NOT NULL AND u.email != '')
       ORDER BY m.created_at DESC
       LIMIT 50
     `);

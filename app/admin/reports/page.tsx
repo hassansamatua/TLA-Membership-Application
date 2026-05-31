@@ -21,6 +21,11 @@ import {
   FiAlertTriangle,
   FiClock,
   FiUserCheck,
+  FiServer,
+  FiDatabase,
+  FiShield,
+  FiMapPin,
+  FiCreditCard as FiCard,
 } from 'react-icons/fi';
 import {
   AreaChart,
@@ -204,8 +209,9 @@ export default function ReportsPage() {
   const [membershipAnalytics, setMembershipAnalytics] = useState<any>(null);
   const [paymentAnalytics, setPaymentAnalytics] = useState<any>(null);
   const [activityAnalytics, setActivityAnalytics] = useState<any>(null);
+  const [extendedData, setExtendedData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'payments' | 'activities'>(
+  const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'payments' | 'events' | 'activities' | 'system'>(
     'overview',
   );
   const [period, setPeriod] = useState<Period>('monthly');
@@ -222,24 +228,27 @@ export default function ReportsPage() {
   const fetchAllData = async () => {
     try {
       setLoading(true);
-      const [summaryRes, membershipRes, paymentRes, activityRes] = await Promise.all([
-        fetch('/api/admin/reports/summary'),
-        fetch(`/api/admin/reports/membership?period=${period}`),
-        fetch(`/api/admin/reports/payments?period=${period}`),
-        fetch(`/api/admin/reports/activities?period=${period}`),
+      const [summaryRes, membershipRes, paymentRes, activityRes, extendedRes] = await Promise.all([
+        fetch('/api/admin/reports/summary', { credentials: 'include' }),
+        fetch(`/api/admin/reports/membership?period=${period}`, { credentials: 'include' }),
+        fetch(`/api/admin/reports/payments?period=${period}`, { credentials: 'include' }),
+        fetch(`/api/admin/reports/activities?period=${period}`, { credentials: 'include' }),
+        fetch('/api/admin/reports/extended', { credentials: 'include' }),
       ]);
 
-      const [summary, membership, payments, activity] = await Promise.all([
+      const [summary, membership, payments, activity, extended] = await Promise.all([
         summaryRes.json(),
         membershipRes.json(),
         paymentRes.json(),
         activityRes.json(),
+        extendedRes.json(),
       ]);
 
       if (summary.success) setReportData(summary.data);
       if (membership.success) setMembershipAnalytics(membership.data);
       if (payments.success) setPaymentAnalytics(payments.data);
       if (activity.success) setActivityAnalytics(activity.data);
+      if (extended.success) setExtendedData(extended.data);
     } catch (error) {
       console.error('Error fetching report data:', error);
       toast.error('Failed to load report data');
@@ -332,15 +341,50 @@ export default function ReportsPage() {
     toast.success('Report exported as CSV');
   };
 
-  const downloadBlob = (blob: Blob, fileName: string) => {
+  const downloadBlob = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handlePdfExport = async () => {
+    try {
+      const { default: html2canvas } = await import('html2canvas');
+      const { default: jsPDF } = await import('jspdf');
+
+      const element = document.getElementById('reports-content');
+      if (!element) {
+        toast.error('Could not find reports content to export');
+        return;
+      }
+
+      toast.loading('Generating PDF...');
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: isDark ? '#0f172a' : '#ffffff',
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(`TLA-Reports-${new Date().toISOString().split('T')[0]}.pdf`);
+
+      toast.success('PDF exported successfully');
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error('Failed to export PDF');
+    }
   };
 
   /* --------------------------- Derived chart data ------------------------- */
@@ -541,9 +585,30 @@ export default function ReportsPage() {
         }
       />
 
+      {/* Export buttons */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        <button
+          onClick={() => handleExport('json')}
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-white/10 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/5"
+        >
+          <FiDownload className="h-4 w-4" />
+          Export JSON
+        </button>
+        <button
+          onClick={handlePdfExport}
+          disabled={loading}
+          className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 shadow-sm hover:bg-emerald-100 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <FiFileText className="h-4 w-4" />
+          Export PDF
+        </button>
+      </div>
+
+      {/* Main content with ID for PDF export */}
+      <div id="reports-content">
       {/* Hero KPI strip */}
       {reportData && (
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           <KpiCard
             label="Total members"
             value={formatNumber(reportData.totalMembers)}
@@ -552,29 +617,39 @@ export default function ReportsPage() {
             accent="from-emerald-500 to-emerald-600"
           />
           <KpiCard
-            label="Active members"
-            value={formatNumber(reportData.activeMembers)}
-            hint={`${
-              reportData.totalMembers
-                ? Math.round((reportData.activeMembers / reportData.totalMembers) * 100)
-                : 0
-            }% of all registrations`}
-            icon={<FiUserCheck className="h-4 w-4" />}
-            accent="from-teal-500 to-emerald-600"
+            label="Paid members"
+            value={formatNumber(extendedData?.paidVsUnpaid?.paid_members)}
+            hint={`${extendedData?.paidVsUnpaid?.unpaid_members || 0} unpaid`}
+            icon={<FiCheckCircle className="h-4 w-4" />}
+            accent="from-emerald-600 to-teal-600"
           />
           <KpiCard
-            label="Revenue · last 30 days"
+            label="Revenue · 30 days"
             value={formatTZSCompact(reportData.totalRevenue)}
             hint={formatTZS(reportData.totalRevenue)}
             icon={<FiCreditCard className="h-4 w-4" />}
-            accent="from-emerald-600 to-emerald-700"
+            accent="from-teal-500 to-emerald-600"
+          />
+          <KpiCard
+            label="Penalties collected"
+            value={formatTZSCompact(extendedData?.penaltySummary?.total_penalty_collected)}
+            hint={`${extendedData?.penaltySummary?.members_with_penalty || 0} members penalized`}
+            icon={<FiAlertTriangle className="h-4 w-4" />}
+            accent="from-amber-500 to-orange-500"
+          />
+          <KpiCard
+            label="Cards eligible"
+            value={formatNumber(extendedData?.cardStats?.cards_eligible)}
+            hint={`${extendedData?.cardStats?.cards_generated || 0} numbers assigned`}
+            icon={<FiCard className="h-4 w-4" />}
+            accent="from-emerald-500 to-emerald-700"
           />
           <KpiCard
             label="Renewal rate"
-            value={`${reportData.renewalRate.toFixed(1)}%`}
+            value={`${Number(reportData.renewalRate || 0).toFixed(1)}%`}
             hint="Lapsed members who came back"
             icon={<FiTrendingUp className="h-4 w-4" />}
-            accent="from-amber-500 to-orange-500"
+            accent="from-emerald-600 to-emerald-700"
           />
         </div>
       )}
@@ -587,7 +662,9 @@ export default function ReportsPage() {
               { id: 'overview', label: 'Overview', icon: <FiPieChart className="h-4 w-4" /> },
               { id: 'members', label: 'Members', icon: <FiUsers className="h-4 w-4" /> },
               { id: 'payments', label: 'Payments', icon: <FiCreditCard className="h-4 w-4" /> },
+              { id: 'events', label: 'Events', icon: <FiCalendar className="h-4 w-4" /> },
               { id: 'activities', label: 'Engagement', icon: <FiActivity className="h-4 w-4" /> },
+              { id: 'system', label: 'System', icon: <FiServer className="h-4 w-4" /> },
             ] as const
           ).map((t) => (
             <button
@@ -694,15 +771,15 @@ export default function ReportsPage() {
                 <StatusBadge tone="emerald">Current rates</StatusBadge>
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <FeeTile label="New personal members" amount={40_000} hint="One-time joining fee" />
+                <FeeTile label="New members (Regular & Librarian)" amount={60_000} hint="One-time joining fee" />
                 <FeeTile
-                  label="Continuing personal members"
-                  amount={30_000}
+                  label="Continuing members (Regular & Librarian)"
+                  amount={50_000}
                   hint="Annual cycle fee"
                 />
                 <FeeTile
                   label="Organisational members"
-                  amount={150_000}
+                  amount={200_000}
                   hint="Annual institutional fee"
                 />
               </div>
@@ -713,6 +790,64 @@ export default function ReportsPage() {
               </p>
             </Surface>
           </div>
+
+          {/* Paid vs Unpaid + Growth Rate row */}
+          {extendedData && (
+            <>
+              <ChartCard
+                title="Paid vs Unpaid"
+                description="Current payment status of all memberships"
+                icon={<FiCheckCircle className="h-4 w-4" />}
+                empty={!extendedData.paidVsUnpaid?.total_members}
+              >
+                <ResponsiveContainer width="100%" height={280}>
+                  <RePieChart>
+                    <Pie
+                      data={[
+                        { name: 'Paid', value: Number(extendedData.paidVsUnpaid?.paid_members) || 0 },
+                        { name: 'Unpaid', value: Number(extendedData.paidVsUnpaid?.unpaid_members) || 0 },
+                      ]}
+                      cx="50%" cy="45%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value"
+                      stroke={isDark ? '#0f172a' : '#ffffff'} strokeWidth={2}
+                    >
+                      <Cell fill="#10b981" />
+                      <Cell fill="#f43f5e" />
+                    </Pie>
+                    <DarkAwareTooltip isDark={isDark} formatter={(v: number, n: string) => [`${v} members`, n]} />
+                    <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: 12, color: isDark ? '#d1d5db' : '#374151' }} />
+                  </RePieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              <div className="lg:col-span-2">
+                <ChartCard
+                  title="Paid vs Unpaid trend"
+                  description="Monthly paid & unpaid memberships over the last 12 months"
+                  icon={<FiBarChart2 className="h-4 w-4" />}
+                  empty={(extendedData.paidUnpaidTrend || []).length === 0}
+                >
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart
+                      data={(extendedData.paidUnpaidTrend || []).map((r: any) => ({
+                        month: r.month,
+                        paid: Number(r.paid) || 0,
+                        unpaid: Number(r.unpaid) || 0,
+                      }))}
+                      margin={{ top: 10, right: 16, left: -10, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
+                      <XAxis dataKey="month" stroke={axisStroke} tick={axisTick} />
+                      <YAxis stroke={axisStroke} tick={axisTick} allowDecimals={false} />
+                      <DarkAwareTooltip isDark={isDark} formatter={(v: number, n: string) => [`${v}`, n]} />
+                      <Legend verticalAlign="top" iconType="circle" wrapperStyle={{ fontSize: 12, color: isDark ? '#d1d5db' : '#374151' }} />
+                      <Bar dataKey="paid" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} name="Paid" />
+                      <Bar dataKey="unpaid" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]} name="Unpaid" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -840,7 +975,7 @@ export default function ReportsPage() {
                 />
                 <DarkAwareTooltip
                   isDark={isDark}
-                  formatter={(value: number) => [`${value.toFixed(1)}%`, 'Retention']}
+                  formatter={(value: number) => [`${Number(value || 0).toFixed(1)}%`, 'Retention']}
                 />
                 <Line
                   type="monotone"
@@ -949,6 +1084,118 @@ export default function ReportsPage() {
               )}
             </Surface>
           </div>
+
+          {/* Penalty breakdown */}
+          {extendedData && (
+            <>
+              <ChartCard
+                title="Penalty overview"
+                description="Members with vs without late-payment penalties"
+                icon={<FiShield className="h-4 w-4" />}
+                empty={!extendedData.penaltySummary?.members_with_penalty && !extendedData.penaltySummary?.members_without_penalty}
+              >
+                <ResponsiveContainer width="100%" height={280}>
+                  <RePieChart>
+                    <Pie
+                      data={[
+                        { name: 'With penalty', value: Number(extendedData.penaltySummary?.members_with_penalty) || 0 },
+                        { name: 'No penalty', value: Number(extendedData.penaltySummary?.members_without_penalty) || 0 },
+                      ]}
+                      cx="50%" cy="45%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value"
+                      stroke={isDark ? '#0f172a' : '#ffffff'} strokeWidth={2}
+                    >
+                      <Cell fill="#f59e0b" />
+                      <Cell fill="#10b981" />
+                    </Pie>
+                    <DarkAwareTooltip isDark={isDark} formatter={(v: number, n: string) => [`${v} members`, n]} />
+                    <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: 12, color: isDark ? '#d1d5db' : '#374151' }} />
+                  </RePieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              <ChartCard
+                title="Penalties by cycle"
+                description="Penalty revenue collected per membership cycle"
+                icon={<FiAlertTriangle className="h-4 w-4" />}
+                empty={(extendedData.penaltyByCycle || []).length === 0}
+              >
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart
+                    data={(extendedData.penaltyByCycle || []).map((c: any) => ({
+                      cycle: String(c.cycle_year),
+                      penalized: Number(c.penalized) || 0,
+                      noPenalty: Number(c.no_penalty) || 0,
+                      totalPenalty: Number(c.total_penalty) || 0,
+                    }))}
+                    margin={{ top: 10, right: 16, left: -10, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
+                    <XAxis dataKey="cycle" stroke={axisStroke} tick={axisTick} />
+                    <YAxis stroke={axisStroke} tick={axisTick} allowDecimals={false} />
+                    <DarkAwareTooltip isDark={isDark} formatter={(v: number, n: string) => [n === 'Penalty (TZS)' ? formatTZS(v) : `${v}`, n]} />
+                    <Legend verticalAlign="top" iconType="circle" wrapperStyle={{ fontSize: 12, color: isDark ? '#d1d5db' : '#374151' }} />
+                    <Bar dataKey="penalized" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Penalized" />
+                    <Bar dataKey="noPenalty" fill="#10b981" radius={[4, 4, 0, 0]} name="No penalty" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </>
+          )}
+
+          {/* Cards generated */}
+          {extendedData && (
+            <div className="lg:col-span-2">
+              <Surface padding="md">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20">
+                      <FiCard className="h-4 w-4" />
+                    </span>
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Membership cards</h3>
+                      <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Cards generated & eligible for download</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 dark:border-white/5 dark:bg-white/[0.03]">
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Cards eligible</p>
+                    <p className="mt-2 text-xl font-semibold text-emerald-700 dark:text-emerald-300">{formatNumber(extendedData.cardStats?.cards_eligible)}</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Active & paid members</p>
+                  </div>
+                  <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 dark:border-white/5 dark:bg-white/[0.03]">
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Numbers assigned</p>
+                    <p className="mt-2 text-xl font-semibold text-emerald-700 dark:text-emerald-300">{formatNumber(extendedData.cardStats?.cards_generated)}</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Membership numbers issued</p>
+                  </div>
+                  <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 dark:border-white/5 dark:bg-white/[0.03]">
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Total memberships</p>
+                    <p className="mt-2 text-xl font-semibold text-gray-700 dark:text-gray-300">{formatNumber(extendedData.cardStats?.total_memberships)}</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">All-time records</p>
+                  </div>
+                </div>
+                {(extendedData.cardsByType || []).length > 0 && (
+                  <div className="mt-4">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">By type</p>
+                    <div className="space-y-2">
+                      {(extendedData.cardsByType || []).map((t: any, i: number) => {
+                        const pct = t.total > 0 ? Math.round((Number(t.eligible) / Number(t.total)) * 100) : 0;
+                        return (
+                          <div key={i} className="flex items-center gap-3">
+                            <span className="w-24 text-xs font-medium text-gray-700 dark:text-gray-300">{titleCase(t.type || 'Unknown')}</span>
+                            <div className="flex-1 h-2 rounded-full bg-gray-100 dark:bg-white/5 overflow-hidden">
+                              <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{t.eligible}/{t.total}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </Surface>
+            </div>
+          )}
         </div>
       )}
 
@@ -1271,6 +1518,263 @@ export default function ReportsPage() {
           </ChartCard>
         </div>
       )}
+
+      {/* EVENTS */}
+      {activeTab === 'events' && extendedData && (
+        <div className="space-y-5">
+          {/* Event KPI strip */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <KpiCard
+              label="Total events"
+              value={formatNumber(extendedData.eventSummary?.length || 0)}
+              hint="All-time events created"
+              icon={<FiCalendar className="h-4 w-4" />}
+              accent="from-emerald-500 to-emerald-600"
+            />
+            <KpiCard
+              label="Total registrations"
+              value={formatNumber(extendedData.eventSummary?.reduce((sum: number, e: any) => sum + (Number(e.total_registrations) || 0), 0) || 0)}
+              hint="All event registrations"
+              icon={<FiUsers className="h-4 w-4" />}
+              accent="from-teal-500 to-emerald-600"
+            />
+            <KpiCard
+              label="Event income"
+              value={formatTZSCompact(extendedData.eventIncome?.reduce((sum: number, e: any) => sum + (Number(e.total_income) || 0), 0) || 0)}
+              hint="Total from event payments"
+              icon={<FiCreditCard className="h-4 w-4" />}
+              accent="from-emerald-600 to-teal-600"
+            />
+            <KpiCard
+              label="Avg attendance"
+              value={`${Math.round(extendedData.eventSummary?.reduce((sum: number, e: any) => sum + (Number(e.attended) || 0), 0) / (extendedData.eventSummary?.length || 1) || 0)}%`}
+              hint="Of registered attendees"
+              icon={<FiUserCheck className="h-4 w-4" />}
+              accent="from-emerald-500 to-emerald-700"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            <ChartCard
+              title="Event participation"
+              description="Registrations and attendance per event"
+              icon={<FiUsers className="h-4 w-4" />}
+              empty={(extendedData.eventSummary || []).length === 0}
+            >
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={(extendedData.eventSummary || []).slice(0, 10).map((e: any) => ({
+                    name: e.title?.substring(0, 20) || 'Unknown',
+                    registered: Number(e.total_registrations) || 0,
+                    attended: Number(e.attended) || 0,
+                  }))}
+                  margin={{ top: 10, right: 16, left: -10, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
+                  <XAxis dataKey="name" stroke={axisStroke} tick={axisTick} />
+                  <YAxis stroke={axisStroke} tick={axisTick} allowDecimals={false} />
+                  <DarkAwareTooltip isDark={isDark} formatter={(v: number, n: string) => [`${v}`, n]} />
+                  <Legend verticalAlign="top" iconType="circle" wrapperStyle={{ fontSize: 12, color: isDark ? '#d1d5db' : '#374151' }} />
+                  <Bar dataKey="registered" fill="#10b981" radius={[4, 4, 0, 0]} name="Registered" />
+                  <Bar dataKey="attended" fill="#0d9488" radius={[4, 4, 0, 0]} name="Attended" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard
+              title="Event income"
+              description="Revenue generated by each event"
+              icon={<FiCreditCard className="h-4 w-4" />}
+              empty={(extendedData.eventIncome || []).length === 0}
+            >
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={(extendedData.eventIncome || []).slice(0, 10).map((e: any) => ({
+                    name: e.title?.substring(0, 20) || 'Unknown',
+                    income: Number(e.total_income) || 0,
+                    payments: Number(e.completed_payments) || 0,
+                  }))}
+                  margin={{ top: 10, right: 16, left: -10, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
+                  <XAxis dataKey="name" stroke={axisStroke} tick={axisTick} />
+                  <YAxis stroke={axisStroke} tick={axisTick} />
+                  <DarkAwareTooltip isDark={isDark} formatter={(v: number, n: string) => [n === 'Income (TZS)' ? formatTZS(v) : `${v}`, n]} />
+                  <Bar dataKey="income" fill="#10b981" radius={[10, 10, 0, 0]} name="Income (TZS)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <div className="lg:col-span-2">
+              <ChartCard
+                title="Monthly event registrations"
+                description="Event registration trends over the last 12 months"
+                icon={<FiTrendingUp className="h-4 w-4" />}
+                empty={(extendedData.eventTrend || []).length === 0}
+              >
+                <ResponsiveContainer width="100%" height={280}>
+                  <AreaChart
+                    data={(extendedData.eventTrend || []).map((t: any) => ({
+                      month: t.month,
+                      registrations: Number(t.registrations) || 0,
+                      paid: Number(t.paid) || 0,
+                      events: Number(t.events_active) || 0,
+                    }))}
+                    margin={{ top: 10, right: 16, left: -10, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="eventGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
+                    <XAxis dataKey="month" stroke={axisStroke} tick={axisTick} />
+                    <YAxis stroke={axisStroke} tick={axisTick} allowDecimals={false} />
+                    <DarkAwareTooltip isDark={isDark} formatter={(v: number, n: string) => [`${v}`, n]} />
+                    <Legend verticalAlign="top" iconType="circle" wrapperStyle={{ fontSize: 12, color: isDark ? '#d1d5db' : '#374151' }} />
+                    <Area type="monotone" dataKey="registrations" stroke="#10b981" strokeWidth={2.5} fill="url(#eventGrad)" name="Registrations" />
+                    <Area type="monotone" dataKey="paid" stroke="#0d9488" strokeWidth={2} fill="transparent" name="Paid" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SYSTEM */}
+      {activeTab === 'system' && extendedData && (
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <KpiCard
+              label="Total users"
+              value={formatNumber(extendedData.systemPerf?.total_users || 0)}
+              hint="Registered accounts"
+              icon={<FiUsers className="h-4 w-4" />}
+              accent="from-emerald-500 to-emerald-600"
+            />
+            <KpiCard
+              label="Total memberships"
+              value={formatNumber(extendedData.systemPerf?.total_memberships || 0)}
+              hint="Membership records"
+              icon={<FiDatabase className="h-4 w-4" />}
+              accent="from-teal-500 to-emerald-600"
+            />
+            <KpiCard
+              label="Total payments"
+              value={formatNumber(extendedData.systemPerf?.totalPayments || 0)}
+              hint="Payment transactions"
+              icon={<FiCreditCard className="h-4 w-4" />}
+              accent="from-emerald-600 to-teal-600"
+            />
+            <KpiCard
+              label="Database size"
+              value={`${Number(extendedData.systemPerf?.dbSizeMb || 0).toFixed(1)} MB`}
+              hint={`${formatNumber(extendedData.systemPerf?.totalDbRows || 0)} total rows`}
+              icon={<FiServer className="h-4 w-4" />}
+              accent="from-emerald-500 to-emerald-700"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            <Surface padding="md">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20">
+                  <FiDatabase className="h-4 w-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Database tables</h3>
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Size and row count per table</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {(extendedData.systemPerf?.tableSizes || []).slice(0, 10).map((t: any, i: number) => (
+                  <div key={i} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-2 dark:border-white/5 dark:bg-white/[0.03]">
+                    <span className="w-32 truncate text-xs font-medium text-gray-700 dark:text-gray-300">{t.table_name}</span>
+                    <div className="flex-1 text-right">
+                      <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{formatNumber(t.row_count)} rows</span>
+                      <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">({Number(t.size_kb || 0).toFixed(1)} KB)</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Surface>
+
+            <Surface padding="md">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20">
+                  <FiActivity className="h-4 w-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">User engagement</h3>
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Activity metrics by time period</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/60 px-4 py-3 dark:border-white/5 dark:bg-white/[0.03]">
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Active today</span>
+                  <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{formatNumber(extendedData.userActivity?.active_today || 0)}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/60 px-4 py-3 dark:border-white/5 dark:bg-white/[0.03]">
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Active 7 days</span>
+                  <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{formatNumber(extendedData.userActivity?.active_7d || 0)}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/60 px-4 py-3 dark:border-white/5 dark:bg-white/[0.03]">
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Active 30 days</span>
+                  <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{formatNumber(extendedData.userActivity?.active_30d || 0)}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/60 px-4 py-3 dark:border-white/5 dark:bg-white/[0.03]">
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Active 90 days</span>
+                  <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{formatNumber(extendedData.userActivity?.active_90d || 0)}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/60 px-4 py-3 dark:border-white/5 dark:bg-white/[0.03]">
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Inactive (90+ days)</span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{formatNumber(extendedData.userActivity?.inactive || 0)}</span>
+                </div>
+                <div className="mt-2 pt-2 border-t border-gray-200 dark:border-white/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Monthly engagement rate</span>
+                    <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{extendedData.userActivity?.monthly_engagement_pct || 0}%</span>
+                  </div>
+                </div>
+              </div>
+            </Surface>
+
+            <div className="lg:col-span-2">
+              <Surface padding="md">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20">
+                    <FiCheckCircle className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Profile completion</h3>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">User profile data completeness</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="rounded-lg border border-gray-100 bg-gray-50/60 p-4 dark:border-white/5 dark:bg-white/[0.03]">
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Has profile</p>
+                    <p className="mt-2 text-xl font-semibold text-emerald-700 dark:text-emerald-300">{extendedData.profileCompletion?.profile_pct || 0}%</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{formatNumber(extendedData.profileCompletion?.has_profile || 0)}/{formatNumber(extendedData.profileCompletion?.total_users || 0)}</p>
+                  </div>
+                  <div className="rounded-lg border border-gray-100 bg-gray-50/60 p-4 dark:border-white/5 dark:bg-white/[0.03]">
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Has photo</p>
+                    <p className="mt-2 text-xl font-semibold text-emerald-700 dark:text-emerald-300">{extendedData.profileCompletion?.photo_pct || 0}%</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{formatNumber(extendedData.profileCompletion?.has_photo || 0)} users</p>
+                  </div>
+                  <div className="rounded-lg border border-gray-100 bg-gray-50/60 p-4 dark:border-white/5 dark:bg-white/[0.03]">
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Has phone</p>
+                    <p className="mt-2 text-xl font-semibold text-emerald-700 dark:text-emerald-300">{Math.round((Number(extendedData.profileCompletion?.has_phone || 0) / Number(extendedData.profileCompletion?.total_users || 1)) * 100)}%</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{formatNumber(extendedData.profileCompletion?.has_phone || 0)} users</p>
+                  </div>
+                </div>
+              </Surface>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   );
 }

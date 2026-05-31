@@ -102,20 +102,28 @@ export async function GET(request: Request) {
           paid
         );
         
-        // Universal date handling for all users
-        let finalJoinDate = row.membership_joined_date && row.membership_joined_date !== '0000-00-00' && row.membership_joined_date !== null ? 
-          (typeof row.membership_joined_date === 'object' ? row.membership_joined_date.toString().split('T')[0] : row.membership_joined_date) : 
-          (row.join_date && row.join_date !== '0000-00-00' && row.join_date !== null ? 
-            (typeof row.join_date === 'object' ? row.join_date.toString().split('T')[0] : row.join_date) : 
-            null);
-        
-        let finalExpiryDate = row.expiry_date && row.expiry_date !== '0000-00-00' && row.expiry_date !== null ? 
-          (typeof row.expiry_date === 'object' ? row.expiry_date.toString().split('T')[0] : row.expiry_date) : 
-          null;
-        
-        let finalPaymentDate = row.membership_payment_date && row.membership_payment_date !== '0000-00-00' && row.membership_payment_date !== null ? 
-          (typeof row.membership_payment_date === 'object' ? row.membership_payment_date.toString().split('T')[0] : row.membership_payment_date) : 
-          null;
+        // Universal date handling for all users.
+        // mysql2 returns DATE columns as JS Date objects (dateStrings is not
+        // enabled), so we must format them to `YYYY-MM-DD` using local
+        // components. The old `.toString().split('T')[0]` broke on the "T" in
+        // the timezone name (e.g. "East Africa Time"), producing an invalid
+        // date string that rendered as "N/A" on the client.
+        const toDateString = (val: any): string | null => {
+          if (!val || val === '0000-00-00') return null;
+          if (val instanceof Date) {
+            if (isNaN(val.getTime())) return null;
+            const y = val.getFullYear();
+            const m = String(val.getMonth() + 1).padStart(2, '0');
+            const d = String(val.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+          }
+          return String(val).split('T')[0];
+        };
+
+        let finalJoinDate =
+          toDateString(row.membership_joined_date) ?? toDateString(row.join_date);
+        let finalExpiryDate = toDateString(row.expiry_date);
+        let finalPaymentDate = toDateString(row.membership_payment_date);
         
         // Universal fix: If user has paid but no dates, use payment records to create dates
         if (paid && (!finalJoinDate || !finalExpiryDate || !finalPaymentDate)) {

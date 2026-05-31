@@ -428,8 +428,8 @@ export default function NewsManagementPage() {
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {news.map((newsItem) => (
-              <div key={newsItem.id} className="p-4">
+            {news.map((newsItem, index) => (
+              <div key={`news-${newsItem.id ?? 'na'}-${index}`} className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">

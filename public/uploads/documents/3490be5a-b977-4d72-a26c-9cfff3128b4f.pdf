@@ -1,0 +1,254 @@
+{
+  "summary": {
+    "totalMembers": 17,
+    "activeMembers": 13,
+    "totalRevenue": "1050000.00",
+    "renewalRate": 0,
+    "membershipTypes": [
+      {
+        "type": "",
+        "count": 2
+      },
+      {
+        "type": "personal",
+        "count": 10
+      },
+      {
+        "type": "organization",
+        "count": 1
+      }
+    ],
+    "monthlySignups": [
+      {
+        "month": "2025-12",
+        "count": 9
+      },
+      {
+        "month": "2026-01",
+        "count": 8
+      }
+    ]
+  },
+  "membership": {
+    "growth": [
+      {
+        "period": "2025-12",
+        "new_members": 9,
+        "unique_members": 9
+      },
+      {
+        "period": "2026-01",
+        "new_members": 8,
+        "unique_members": 8
+      }
+    ],
+    "statusDistribution": [
+      {
+        "status": "active",
+        "count": 13,
+        "percentage": "100.00"
+      }
+    ],
+    "typeTrends": [
+      {
+        "type": "personal",
+        "period": "2025-12",
+        "count": 3
+      },
+      {
+        "type": "",
+        "period": "2026-01",
+        "count": 2
+      },
+      {
+        "type": "organization",
+        "period": "2026-01",
+        "count": 1
+      },
+      {
+        "type": "personal",
+        "period": "2026-01",
+        "count": 7
+      }
+    ],
+    "demographics": [
+      {
+        "membership_type": "",
+        "count": 14,
+        "avg_days_as_member": "20.2143"
+      },
+      {
+        "membership_type": "librarian",
+        "count": 2,
+        "avg_days_as_member": "3.5000"
+      },
+      {
+        "membership_type": "organization",
+        "count": 1,
+        "avg_days_as_member": "6.0000"
+      }
+    ],
+    "activityLevels": [
+      {
+        "activity_level": "Active",
+        "count": 17
+      }
+    ],
+    "retentionData": [
+      {
+        "month": "2025-12",
+        "new_members": 3,
+        "retained_members": 0,
+        "retention_rate": "0.00"
+      },
+      {
+        "month": "2026-01",
+        "new_members": 10,
+        "retained_members": 0,
+        "retention_rate": "0.00"
+      }
+    ]
+  },
+  "payments": {
+    "metrics": {
+      "total_payments": 31,
+      "total_revenue": "1050000.00",
+      "avg_payment": "33870.967742",
+      "paying_customers": 9,
+      "successful_payments": 22,
+      "failed_payments": 0,
+      "success_rate": "70.97"
+    },
+    "trends": [
+      {
+        "period": "2026-01",
+        "payment_count": 31,
+        "total_amount": "1050000.00",
+        "unique_payers": 9,
+        "failed_count": 0
+      }
+    ],
+    "paymentMethods": [
+      {
+        "method": "Test Payment",
+        "count": 22,
+        "total_amount": "1050000.00",
+        "percentage": "70.97"
+      },
+      {
+        "method": "halopesa",
+        "count": 9,
+        "total_amount": "360000.00",
+        "percentage": "29.03"
+      }
+    ],
+    "revenueByType": [
+      {
+        "membership_type": "personal",
+        "payment_count": 16,
+        "total_revenue": "620000.00",
+        "avg_payment": "38750.000000",
+        "successful_payments": 16
+      },
+      {
+        "membership_type": "organization",
+        "payment_count": 2,
+        "total_revenue": "300000.00",
+        "avg_payment": "150000.000000",
+        "successful_payments": 2
+      },
+      {
+        "membership_type": "",
+        "payment_count": 4,
+        "total_revenue": "130000.00",
+        "avg_payment": "32500.000000",
+        "successful_payments": 4
+      }
+    ],
+    "failedPayments": [],
+    "paymentFrequency": [
+      {
+        "user_id": 2,
+        "payment_count": 6,
+        "total_spent": "220000.00",
+        "avg_payment": "36666.666667",
+        "last_payment": "2026-01-21T09:40:39.000Z",
+        "first_payment": "2026-01-15T15:22:30.000Z"
+      },
+      {
+        "user_id": 9,
+        "payment_count": 4,
+        "total_spent": "160000.00",
+        "avg_payment": "40000.000000",
+        "last_payment": "2026-01-15T16:12:45.000Z",
+        "first_payment": "2026-01-15T15:37:37.000Z"
+      },
+      {
+        "user_id": 29,
+        "payment_count": 4,
+        "total_spent": "130000.00",
+        "avg_payment": "32500.000000",
+        "last_payment": "2026-01-21T19:27:56.000Z",
+        "first_payment": "2026-01-21T17:39:16.000Z"
+      },
+      {
+        "user_id": 26,
+        "payment_count": 2,
+        "total_spent": "80000.00",
+        "avg_payment": "40000.000000",
+        "last_payment": "2026-01-15T14:34:22.000Z",
+        "first_payment": "2026-01-15T14:24:27.000Z"
+      },
+      {
+        "user_id": 27,
+        "payment_count": 2,
+        "total_spent": "300000.00",
+        "avg_payment": "150000.000000",
+        "last_payment": "2026-01-16T11:24:51.000Z",
+        "first_payment": "2026-01-16T11:23:43.000Z"
+      },
+      {
+        "user_id": 23,
+        "payment_count": 1,
+        "total_spent": "40000.00",
+        "avg_payment": "40000.000000",
+        "last_payment": "2026-01-16T10:41:39.000Z",
+        "first_payment": "2026-01-16T10:41:39.000Z"
+      },
+      {
+        "user_id": 25,
+        "payment_count": 1,
+        "total_spent": "40000.00",
+        "avg_payment": "40000.000000",
+        "last_payment": "2026-01-21T19:50:44.000Z",
+        "first_payment": "2026-01-21T19:50:44.000Z"
+      },
+      {
+        "user_id": 28,
+        "payment_count": 1,
+        "total_spent": "40000.00",
+        "avg_payment": "40000.000000",
+        "last_payment": "2026-01-16T11:55:39.000Z",
+        "first_payment": "2026-01-16T11:55:39.000Z"
+      },
+      {
+        "user_id": 19,
+        "payment_count": 1,
+        "total_spent": "40000.00",
+        "avg_payment": "40000.000000",
+        "last_payment": "2026-01-16T09:21:59.000Z",
+        "first_payment": "2026-01-16T09:21:59.000Z"
+      }
+    ],
+    "monthlyComparison": [
+      {
+        "month": "2026-01",
+        "revenue": "1050000.00",
+        "total_payments": 31,
+        "successful_payments": 22,
+        "avg_payment": "33870.967742"
+      }
+    ]
+  },
+  "activities": null
+}

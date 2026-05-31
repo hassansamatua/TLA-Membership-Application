@@ -106,7 +106,8 @@ export async function createMembershipCardTemplate(): Promise<string> {
       
       // Draw the logo if loaded successfully
       if (logoImg.complete && logoImg.naturalWidth > 0) {
-        ctx.drawImage(logoImg, -20, -20, 130, 130);
+        // EXACT match to SVG: x=9, y=4, width=70, height=70
+        ctx.drawImage(logoImg, 9, 4, 70, 70);
       } else {
         // Fallback: Draw TLA text logo
         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
@@ -135,10 +136,7 @@ export async function createMembershipCardTemplate(): Promise<string> {
     ctx.fillText('(TLA)', 175, 70);
     
     // 8. Profile picture placeholder area
-    ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
-    ctx.lineWidth = 2;
-    roundRect(ctx, 233, 67, 90, 90, 8);
-    ctx.stroke();
+    //    SVG uses fill="none" with NO stroke/border, so we draw nothing here.
     
     // 9. Labels (static text) - EXACT match to SVG
     ctx.fillStyle = '#10b981';
@@ -222,26 +220,27 @@ export async function createMembershipCardWithData(cardData: MembershipCardData)
         roundRect(ctx, 233, 67, 90, 90, 8);
         ctx.clip();
         
-        // Calculate aspect ratio to cover the area properly
+        // Crop-to-fill to match SVG preserveAspectRatio="xMidYMid slice"
+        // (the SVG preview crops the image to cover the 90x90 box, centered).
         const imgRatio = profileImg.naturalWidth / profileImg.naturalHeight;
         const targetRatio = 90 / 90; // Square target
-        
-        let drawWidth = 90;
-        let drawHeight = 90;
-        let drawX = 233;
-        let drawY = 67;
-        
+
+        let srcX = 0;
+        let srcY = 0;
+        let srcW = profileImg.naturalWidth;
+        let srcH = profileImg.naturalHeight;
+
         if (imgRatio > targetRatio) {
-          // Image is wider than tall
-          drawHeight = 90 / imgRatio;
-          drawY = 67 + (90 - drawHeight) / 2;
+          // Image is wider than tall -> crop left/right
+          srcW = profileImg.naturalHeight * targetRatio;
+          srcX = (profileImg.naturalWidth - srcW) / 2;
         } else {
-          // Image is taller than wide
-          drawWidth = 90 * imgRatio;
-          drawX = 233 + (90 - drawWidth) / 2;
+          // Image is taller than wide -> crop top/bottom
+          srcH = profileImg.naturalWidth / targetRatio;
+          srcY = (profileImg.naturalHeight - srcH) / 2;
         }
-        
-        ctx.drawImage(profileImg, drawX, drawY, drawWidth, drawHeight);
+
+        ctx.drawImage(profileImg, srcX, srcY, srcW, srcH, 233, 67, 90, 90);
         ctx.restore();
         console.log('Profile picture drawn successfully');
       } else {

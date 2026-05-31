@@ -347,6 +347,12 @@ class AzamPayService {
         code: 'TIGOPESA',
         ussd: '*150*04#',
         color: '#00A6CE'
+      },
+      mixxbyyas: {
+        name: 'Mixx By Yas',
+        code: 'TIGOPESA',
+        ussd: '*150*04#',
+        color: '#00A6CE'
       }
     };
 
