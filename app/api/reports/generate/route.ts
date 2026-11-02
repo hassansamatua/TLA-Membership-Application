@@ -1,8 +1,12 @@
+import { requireAdmin } from '@/lib/apiGuard';
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
 
 export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');

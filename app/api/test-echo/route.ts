@@ -1,6 +1,10 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     console.log('[Test-Echo] Request received');
     

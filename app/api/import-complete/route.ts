@@ -1,8 +1,12 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 // Complete database import to Aiven
 import { pool } from '@/lib/db';
 import { readFileSync } from 'fs';
 
-export async function POST() {
+export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     console.log('Starting complete database import to Aiven...');
     

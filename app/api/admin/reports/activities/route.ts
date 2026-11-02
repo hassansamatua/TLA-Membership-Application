@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/apiGuard';
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { RowDataPacket } from 'mysql2/promise';
@@ -34,6 +35,9 @@ const ALL_PAYMENTS = `(
 )`;
 
 export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   try {
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || 'monthly';

@@ -1,3 +1,4 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
@@ -5,6 +6,9 @@ import { cookies } from 'next/headers';
 import { RowDataPacket } from 'mysql2';
 
 export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   const { reference } = await request.json();
   
   if (!reference) {

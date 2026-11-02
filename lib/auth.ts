@@ -2,7 +2,9 @@ import { RowDataPacket } from 'mysql2';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+// Without JWT_SECRET in production, signing/verification fail closed instead of using a public default.
+const JWT_SECRET =
+  process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-only-insecure-jwt-secret');
 
 export async function hashPassword(password: string) {
   return await bcrypt.hash(password, 10);
@@ -11,8 +13,6 @@ export async function hashPassword(password: string) {
 export async function comparePasswords(plainPassword: string, hashedPassword: string) {
   try {
     console.log('Comparing passwords...');
-    console.log('Plain password (first 5 chars):', plainPassword.substring(0, 5) + '...');
-    console.log('Hashed password (first 10 chars):', hashedPassword.substring(0, 10) + '...');
     console.log('Hash format:', hashedPassword.substring(0, 3));
     
     // Check hash format and use appropriate comparison method

@@ -1,8 +1,12 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 // Fast database migration from SQL file to Aiven
 import { pool } from '@/lib/db';
 import { readFileSync } from 'fs';
 
-export async function POST() {
+export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     console.log('Starting FAST database migration from SQL file to Aiven...');
     

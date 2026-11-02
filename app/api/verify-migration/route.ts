@@ -1,7 +1,11 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 // Verify migration results
 import { pool } from '@/lib/db';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     console.log('Verifying migration results...');
     

@@ -1,3 +1,4 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 /**
  * Debug Email Sending
  * Test if email notifications are working
@@ -7,6 +8,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sendApprovalNotification } from '@/lib/notificationService';
 
 export async function POST(request: NextRequest) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     const { userId, userName, email, membershipType } = await request.json();
 
@@ -59,7 +63,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   return NextResponse.json({
     message: 'POST to this endpoint with { userId, userName, email, membershipType }',
     example: {

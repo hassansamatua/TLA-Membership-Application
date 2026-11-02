@@ -1,7 +1,11 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 // Simple table import to Aiven
 import { pool } from '@/lib/db';
 
-export async function POST() {
+export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     console.log('Starting simple table import to Aiven...');
     

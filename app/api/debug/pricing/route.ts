@@ -1,9 +1,13 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 import { NextResponse } from 'next/server';
 import { calculateMembershipPricing } from '@/lib/membership-pricing';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 
 export async function GET(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
