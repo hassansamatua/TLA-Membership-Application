@@ -1,8 +1,12 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 // Super-fast bulk migration
 import { pool } from '@/lib/db';
 import { readFileSync } from 'fs';
 
 export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     console.log('Starting super-fast bulk migration...');
     

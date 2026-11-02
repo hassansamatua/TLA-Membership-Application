@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     if (!user) {
       console.log('No user found with email:', email);
       return new NextResponse(
-        JSON.stringify({ message: 'No account found with this email' }),
+        JSON.stringify({ message: 'Invalid email or password' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     if (!passwordMatch) {
       console.log('Password does not match for user:', user.email);
       return new NextResponse(
-        JSON.stringify({ message: 'Incorrect password' }),
+        JSON.stringify({ message: 'Invalid email or password' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }

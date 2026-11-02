@@ -1,3 +1,4 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 /**
  * Debug Email Testing Endpoint
  * Use this to verify email configuration is working
@@ -90,9 +91,15 @@ Timestamp: ${new Date().toISOString()}
 }
 
 export async function GET(request: NextRequest) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   return handleEmailTest(request);
 }
 
 export async function POST(request: NextRequest) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   return handleEmailTest(request);
 }

@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/apiGuard';
 // app/api/send-approval-email/route.ts
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
@@ -5,6 +6,9 @@ import { Resend } from 'resend';
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function POST(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   try {
     const { email, name, membershipNumber } = await request.json();
 

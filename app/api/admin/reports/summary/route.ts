@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/apiGuard';
 // app/api/admin/reports/summary/route.ts
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
@@ -18,7 +19,10 @@ const ALL_PAYMENTS = `(
   WHERE p.id IS NULL
 )`;
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   try {
     const connection = await pool.getConnection();
 

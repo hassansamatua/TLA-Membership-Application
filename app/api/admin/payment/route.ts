@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/apiGuard';
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
@@ -39,6 +40,9 @@ async function getAuthToken(request: Request) {
 
 // GET - Get payment information for a user
 export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   const connection = await pool.getConnection();
 
   try {
@@ -152,6 +156,9 @@ export async function GET(request: Request) {
 
 // POST - Process payment
 export async function POST(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   const connection = await pool.getConnection();
 
   try {

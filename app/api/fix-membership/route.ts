@@ -1,8 +1,12 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { RowDataPacket } from 'mysql2/promise';
 
-export async function POST() {
+export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   let connection;
   try {
     connection = await pool.getConnection();

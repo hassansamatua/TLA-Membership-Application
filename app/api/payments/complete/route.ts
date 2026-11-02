@@ -1,9 +1,13 @@
+import { requireAdmin } from '@/lib/apiGuard';
 import { NextRequest, NextResponse } from 'next/server';
 import { updateMembershipPayment } from '@/lib/membership';
 import { pool } from '@/lib/db';
 import type { RowDataPacket } from 'mysql2';
 
 export async function POST(request: NextRequest) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   try {
     const body = await request.json();
     const { reference, userId } = body;
@@ -76,6 +80,9 @@ export async function POST(request: NextRequest) {
 
 // Get list of pending payments for admin
 export async function GET(request: NextRequest) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   try {
     const connection = await pool.getConnection();
     

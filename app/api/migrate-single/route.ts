@@ -1,8 +1,12 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 // Single table migration from SQL file to Aiven
 import { pool } from '@/lib/db';
 import { readFileSync } from 'fs';
 
 export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     console.log('Starting single table migration...');
     
@@ -102,7 +106,10 @@ export async function POST(request: Request) {
 }
 
 // GET method to list available tables
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     console.log('Listing available tables for migration...');
     

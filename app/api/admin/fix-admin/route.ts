@@ -1,9 +1,13 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 // app/api/admin/fix-admin/route.ts
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { hashPassword } from '@/lib/auth';
 
-export async function POST() {
+export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   try {
     if (process.env.NODE_ENV === 'production') {
       return NextResponse.json(

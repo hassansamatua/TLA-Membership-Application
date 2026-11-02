@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { RowDataPacket } from 'mysql2/promise';
 import { sendPasswordResetEmail } from '@/lib/email-simple';
+import { hashPassword } from '@/lib/auth';
+
+const GENERIC_RESET_MESSAGE = 'If an account exists for this email, a password reset code has been sent.';
 
 // POST - Send reset code
 export async function POST(request: Request) {
@@ -24,10 +27,7 @@ export async function POST(request: Request) {
     );
 
     if (!users || users.length === 0) {
-      return NextResponse.json(
-        { success: false, message: 'No account found with this email address' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: true, message: GENERIC_RESET_MESSAGE });
     }
 
     const user = users[0];
@@ -60,12 +60,7 @@ export async function POST(request: Request) {
     const emailSent = await sendPasswordResetEmail(email, resetCode);
     
     if (emailSent) {
-      return NextResponse.json({
-        success: true,
-        message: 'Password reset code sent to your email',
-        resetCode: resetCode,
-        expiryTime: expiryTime
-      });
+      return NextResponse.json({ success: true, message: GENERIC_RESET_MESSAGE });
     } else {
       return NextResponse.json({
         success: false,
@@ -130,8 +125,14 @@ export async function PUT(request: Request) {
     }
 
     // Hash the new password
-    const crypto = require('crypto');
-    const hashedPassword = crypto.createHash('sha256').update(newPassword, 'utf8').digest('hex');
+    if (typeof newPassword !== 'string' || newPassword.length < 8) {
+      return NextResponse.json(
+        { success: false, message: 'Password must be at least 8 characters long' },
+        { status: 400 }
+      );
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
 
     // Update user password
     await connection.query(

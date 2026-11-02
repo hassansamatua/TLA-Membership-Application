@@ -3,8 +3,10 @@ import { cookies } from 'next/headers';
 import { jwtVerify, SignJWT } from 'jose';
 
 // JWT secret keys - must match those used in auth.ts
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret-for-development';
+const isProduction = process.env.NODE_ENV === 'production';
+const JWT_SECRET = process.env.JWT_SECRET || (isProduction ? '' : 'dev-only-insecure-jwt-secret');
+const JWT_REFRESH_SECRET =
+  process.env.JWT_REFRESH_SECRET || (isProduction ? '' : 'dev-only-insecure-refresh-secret');
 
 if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
   console.warn('JWT_SECRET and JWT_REFRESH_SECRET not set in environment, using fallback values');

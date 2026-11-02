@@ -1,0 +1,74 @@
+# Audit progress notes (working file)
+## Phase status
+- P1/P2 discovery: done (504 files; 123 route.ts; no README; no tests; 13 commits)
+- P3 DB: dump lib/next_auth(4).sql (phpMyAdmin, MariaDB 10.1, 36 tables, contains real-looking user rows + bcrypt hashes) == _archive/aiven_ready.sql. Importing into docker mysql:8 on :3307 (disposable local container, db next_auth)
+## Findings so far (evidence)
+- middleware.ts: all /api/* bypass middleware; page auth via fetch to /api/auth/me; x-user-id header set
+- lib/auth.ts: JWT_SECRET fallback 'your-secret-key'; comparePasswords logs pw prefix + hash prefix; accepts MD5/SHA1/SHA256 unsalted
+- refresh/route.ts: fallback secrets; issues {userId} claim but verifyToken consumers require decoded.id -> refreshed tokens unusable; refreshToken cookie never set anywhere -> dead code
+- login: user enumeration (distinct msgs), cookie secure:false hardcoded, no rate limit
+- lib/db.ts: default root/'' localhost; ssl only if MYSQL_SSL_CA file exists
+- Unauthenticated destructive/dev endpoints: setup/ensure-admin (creates admin with hardcoded credentials, NO env guard), fix-membership (sets user 2 active), import-db/import-all/import-complete/migrate-*, payments/cleanup (DELETE payments/memberships, no auth), payments/complete (marks any pending payment completed, no auth), payments/azampay/checkout & mobile-money (userId+amount from body, no auth), azampay/callback (signature only in prod; re-verifies via checkPaymentStatus), admin/reports/{summary,membership,payments,activities,extended} NO auth, reports/generate NO auth (PII export), reports/send-email NO auth (email arbitrary report to any address), send-approval-email no auth, membership/next-number no auth (consumes sequence), test-db no auth, debug/send-email no auth (leaks EMAIL_* config)
+- create-admin/fix-admin/reset-admin: guarded only by NODE_ENV!=production, no auth
+- membership/pay: authenticated user self-inserts payments row status='completed' with no gateway; price from body.newUser; penalty = 10% base after Mar31 (not 1000/mo) -> payment bypass
+- membership/payment-success: marks user's own pending payment completed by reference w/o gateway verification -> bypass; leaks payment list in error
+- membership/complete-payment: client amount, marks paid, expiry = Jan31 next year from now
+- membership/pay-early: wrong cycle math (month>=3), inserts pending rows only
+- Fee rules: 3 conflicting implementations: lib/membershipCycles.ts BASE_FEE 50000 (used by approve-member initializeUserCycles, payments/process, payment-status); lib/enhancedMembershipCycles.ts 40k/30k/150k; lib/membership-pricing.ts copy of enhanced (client); membership/pay inline 40/30/150 + 10% penalty
+- membershipCycles.getMonthsSinceCycleStart: Apr => 2 months (month-1) -> penalty 2000 in April; next-year Jan => 12; calculateTotalAmountDue assumes continuous (ignores first-cycle exemption)
+- enhanced: first-cycle exemption = "no paid cycles ever" (isUserNew) -> any never-paying member is exempt forever
+- enhanced penalty mixes UTC dates and local getters
+- generateMembershipNumber (enhanced) = random 5 digits (collision possible); lib/membership.ts uses membership_sequence; next-number route uses MEM prefix -> 3 formats
+- next.config.js AND next.config.ts both present; .js has ignoreBuildErrors
+- package-lock out of sync with package.json (npm ci fails EUSAGE picomatch)
+- public/uploads committed: user documents (pdf) + profile pictures (PII)
+- CRITICAL auth/forgot-password POST returns resetCode in JSON response -> unauthenticated takeover of any account (incl admin) by email; PUT stores sha256 unsalted; no attempt limit/rate limit; user enumeration (404)
+- migrate-simple / import-tables insert hardcoded admin bcrypt hash (id 35) unauthenticated
+- DB imported: 36 tables, 1 function calculate_membership_fee, 1 trigger generate_membership_number on users; rows: users 8, users_backup 20, user_profiles 22, payments 43, membership_payments 37, memberships 17, cycle_payment_status 0, user_membership_status 0, membership_cycles 4, audit_logs 0, login_logs 0
+- admin/payment (GET/POST) & admin/payments: verifyToken only, NO isAdmin check -> any member can read any user's data (u.* incl password hash via SELECT u.*, up.*) and record payments + set users.is_approved=1 for any userId (self-approval). admin/payment uses lib/membershipPayment (another fee model: MEMBERSHIP_FEE/PENALTY_FEE)
+- DB: ZERO foreign keys in dump; 29/36 tables lack PRIMARY KEY in imported dump (check AUTO_INCREMENT); users has no user_category column though enhancedMembershipCycles queries it (falls back to 'regular' silently)
+- PHP legacy: Database.php/config.php root/'' creds; api/auth/*.php require vendor/autoload.php (no composer.json) -> not runnable; CORS localhost:3000
+- convex/_generated only, no convex functions; convex/better-auth installed unused; next-auth route present
+- npm install (not ci) succeeded: 902 packages
+- DB data: payments 43 rows: 22 completed, 13 pending, 8 status='' (invalid enum value stored -> non-strict sql_mode history); methods: 'Test Payment' 26, 'test' 8, halopesa 9 (all halopesa pending) => NO real gateway-completed payment exists in dump
+- Orphans (no FK): payments 34/43 orphan users, membership_payments 32/37, memberships 13/17, user_profiles 19/22; 5 users have no profile; duplicate payments.reference TEST-1768493858009 x2 (no UNIQUE on payments.reference in dump)
+- membership numbers inconsistent across memberships/user_profiles/users for same user (e.g. user 39: TLA2600014 / TLA202642805 / TLA2619976); formats TLA25xxxxx, TLA216102, TLA000028, TLA202642805
+- membership_cycles base_fee 50000 for 2025-2028 (DB) vs code 40k/30k/150k
+- payments/memberships/membership_payments/cycle_payment_status: id INT NOT NULL with NO PK and NO AUTO_INCREMENT in dump -> INSERT without id fails in strict mode (verify runtime)
+- users: 8 rows, 3 admins (ids 35, 36, 37; id 37 hash length 49 = malformed bcrypt); users.user_category column missing
+- tsc/eslint/npm audit running -> /tmp/tsc.log /tmp/eslint.log /tmp/audit.txt
+- Boundary tests (tsx, /tmp/bl/t.ts; TZ EAT/UTC/NY identical except toMySqlDate):
+  - legacy calculatePenalty: Apr 1 = 2000, Apr 30 = 2000, May 1 = 3000 (off-by-one: spec 1000 in April); enhanced: Apr 1 = 1000, May 1 = 2000 (matches spec)
+  - Jan 31 next year: legacy 12000 vs enhanced 10000; unpaid 2025 cycle @2026-06-15: legacy 17000 vs enh 15000; penalties never capped, continue past cycle end
+  - Mar 31 23:30 = 0 both; Feb 29 2028 = cycle 2028 OK
+  - canPayEarlyForNextCycle: Oct true, Jan false (spec Oct–Jan; Jan excluded)
+  - enh.toMySqlDate(new Date('2026-02-01T00:00') in TZ=Africa/Dar_es_Salaam) => '2026-01-31' (toISOString UTC shift; off-by-one day in production TZ)
+  - membership-pricing.calculateMembershipPricing: gracePeriodEnd = Mar 31 00:00 local => Mar 31 daytime counted late (boundary bug, 1 day early) ; uses calendar months not cycle
+  - 4th fee model lib/membershipPayment.ts: MEMBERSHIP_FEE 50000, PENALTY_FEE 10000 flat per year (used by admin/payment)
+- tsc --noEmit: exit 2 (errors incl lib/db-utils.ts toId undefined, lib/email-config.ts) ; npm install modified package-lock.json (RESTORE before finishing)
+- RUNTIME (next dev on local disposable DB, mysql8 strict sql_mode):
+  - unauth GET /api/admin/reports/summary 200 (member counts, revenue); /api/admin/reports/membership 200 (growth, demographics)
+  - unauth GET /api/membership/next-number 200 MEM2600017 (sequence consumed)
+  - unauth GET /api/test-db 500 with full stack trace (and SQL error 'current_time' reserved word -> route broken)
+  - login enumeration confirmed: 'No account found with this email' vs 'Incorrect password'
+  - forgot-password: returned 'Failed to send reset code email' (SMTP unset) -> code leak only fires when SMTP works (code path confirmed in source)
+  - payments/cleanup reachable unauth (400 Invalid action => no auth gate); payments/complete reachable unauth (404 lookup)
+  - register works (201), creates unapproved user
+  - eslint running -> /tmp/eslint.log ; tsc 147 errors (55 in admin/users/[id]); npm audit prod: 68 vulns (5 critical, 41 high, 20 moderate, 2 low) — mostly via vercel CLI dep
+  - unauth GET /api/reports/generate?type=membership 200 -> exports member names/emails/numbers/payment status (PII); rows with id=0 present (no AUTO_INCREMENT)
+  - member (non-admin, id 43) GET /api/admin/payment?userId=35 -> 200 returns admin's name/email/payment plan (IDOR / missing role check CONFIRMED); /api/admin/users -> 403 (guarded)
+  - member POST /api/membership/pay -> 500 "Field 'id' doesn't have a default value" => payment insert BROKEN against shipped schema in strict mode (prod schema may differ; unknown)
+  - member POST /api/admin/payment (self, 2027) -> 500 "Field 'id' doesn't have a default value" (exposes SQL error); no role check reached DB write
+  - page guards: unauth -> 307 /auth/login for /, /about, /contact, /dashboard (public pages behind login!); member -> /admin redirected to /dashboard (OK)
+  - database/fix_all_table_pks.sql exists to repair missing PK/AUTO_INCREMENT -> production DB may already be repaired; prod schema state UNKNOWN. database/ has 59 ad-hoc sql/bat scripts (probes, fix_admin_password, create_known_admin...), migrations/ 13 files, no migration runner
+  - eslint: 677 problems (454 errors, 223 warnings), exit 1
+  - API inventory (/tmp/api_inv.md): 121 route files; 48 with no token check; 20 no-auth routes that write DB
+  - admin/users page: TODO bulk actions/export not implemented
+- notificationService.sendSmsNotification: Twilio code commented out => SMS is a stub; email via nodemailer (email-simple/email-config/email.ts = 3 email libs + resend dep)
+- audit_logs/login_logs tables exist but no app code writes them => audit logging NOT implemented
+- approve-member: token + DB is_admin check; initializeUserCycles (legacy 50k) + INSERT IGNORE memberships + approval email
+- events/[id]/register: auth, duplicate check, capacity check (non-atomic race), no payment linkage
+- attendance table exists, 0 rows; only referenced in admin/events/[id] & reports
+- next build first attempt killed by pkill; rerun -> /tmp/build.log
+- refund route sets payments.status='refunded' (not in enum pending/completed/failed) -> fails in strict mode; in non-strict stores '' => likely origin of 8 payments rows with status=''
+- next build: BUILD_EXIT=0 (but next.config.js ignoreBuildErrors:true hides 147 TS errors)

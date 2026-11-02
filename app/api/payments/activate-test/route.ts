@@ -1,3 +1,4 @@
+import { requireMaintenanceAccess } from '@/lib/apiGuard';
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
@@ -25,6 +26,9 @@ async function getAuthToken(request: Request): Promise<string | null> {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireMaintenanceAccess(request);
+  if (denied) return denied;
+
   let connection;
   
   try {
