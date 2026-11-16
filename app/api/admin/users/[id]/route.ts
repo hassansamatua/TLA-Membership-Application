@@ -217,13 +217,13 @@ export async function GET(
           [finalMembershipNumber, userId]
         );
         
-        console.log('New TLA membership number stored in both tables:', finalMembershipNumber);
+        console.log('New ZaLIKA membership number stored in both tables:', finalMembershipNumber);
       } catch (dbError) {
         console.error('Failed to store membership number:', dbError);
         // Continue without storing, but log the error
       }
     } else if (finalMembershipNumber) {
-      // Convert existing MEM numbers to TLA format if they exist
+      // Convert existing MEM numbers to ZaLIKA format if they exist
       if (finalMembershipNumber.startsWith('MEM')) {
         const existingYear = finalMembershipNumber.substring(3, 5); // Extract YY from MEMYYxxxx
         const existingNumber = finalMembershipNumber.substring(5); // Extract xxxxx
@@ -241,7 +241,7 @@ export async function GET(
             [finalMembershipNumber, userId]
           );
           
-          console.log('Converted MEM to TLA format:', finalMembershipNumber);
+          console.log('Converted MEM to ZaLIKA format:', finalMembershipNumber);
         } catch (dbError) {
           console.error('Failed to convert membership number format:', dbError);
         }

@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
          JOIN users u ON m.sender_id = u.id
          WHERE m.receiver_id = ? OR m.sender_id = ?
          ORDER BY m.created_at DESC`,
-        [userId]
+        [userId, userId]
       );
 
       return NextResponse.json({ messages });

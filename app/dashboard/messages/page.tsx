@@ -151,7 +151,7 @@ export default function MessagesPage() {
           
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Messages</h1>
           <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500">
-            Communication with TLA administration and members
+            Communication with ZaLIKA administration and members
           </p>
         </div>
 

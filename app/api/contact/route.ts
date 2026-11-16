@@ -66,7 +66,7 @@ export async function POST(request: Request) {
           <p><strong>Message:</strong></p>
           <p>${message.replace(/\n/g, '<br>')}</p>
           <hr>
-          <p><small>This message was sent from the Tanzania Library Association contact form.</small></p>
+          <p><small>This message was sent from the Zanzibar Library and Knowledge Association contact form.</small></p>
         `,
       };
       

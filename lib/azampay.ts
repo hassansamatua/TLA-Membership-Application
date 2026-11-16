@@ -1,5 +1,6 @@
 // AzamPay Payment Gateway Integration
 // Based on official AzamPay API documentation
+import { createVerify } from 'node:crypto';
 const AZAMPAY_CONFIG = {
   sandbox: {
     authenticatorBaseUrl: 'https://authenticator-sandbox.azampay.co.tz',
@@ -13,12 +14,13 @@ const AZAMPAY_CONFIG = {
 
 // Configuration - using hardcoded test values for demo
 const AZAMPAY_CREDENTIALS = {
-  clientId: '1702339234',  // Working test client ID
-  clientSecret: '0a5c8e3e6c4e449951b4cd3e3c4e449951b4c4e449951b4c',  // Working test client secret
-  appName: 'TLA Membership System',
-  callbackUrl: 'http://localhost:3000/api/payments/azampay/callback',
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
-  testMode: true  // Always use test mode for demo
+  clientId: process.env.AZAMPAY_CLIENT_ID || '',
+  clientSecret: process.env.AZAMPAY_CLIENT_SECRET || '',
+  appName: process.env.AZAMPAY_APP_NAME || '',
+  apiKey: process.env.AZAMPAY_API_KEY || '',
+  callbackUrl: process.env.AZAMPAY_CALLBACK_URL || '',
+  environment: process.env.AZAMPAY_ENVIRONMENT === 'production' ? 'production' : 'sandbox',
+  testMode: process.env.AZAMPAY_TEST_MODE === 'true'
 };
 
 interface AzamPayAuthResponse {
@@ -31,28 +33,30 @@ interface AzamPayAuthResponse {
 }
 
 interface AzamPayCheckoutRequest {
+  accountNumber: string;
   amount: string;
   currency: string;
-  merchantName: string;
-  orderId: string;
-  customerEmail: string;
-  customerPhone: string;
-  redirectUrl: string;
-  callbackUrl: string;
-  vendorId?: string;
-  paymentMethod?: string;
-  providerCode?: string;
-  ussd?: string;
+  provider: string;
+  externalId: string;
+  additionalProperties?: Record<string, unknown>;
 }
 
 interface AzamPayCheckoutResponse {
-  data: {
-    checkoutUrl: string;
-    reference: string;
+  data?: {
+    checkoutUrl?: string;
+    reference?: string;
     transactionId?: string;
-  };
+    pgReferenceId?: string;
+    referenceId?: string;
+    [key: string]: unknown;
+  } | string;
   success: boolean;
   message: string;
+  checkoutUrl?: string;
+  reference?: string;
+  transactionId?: string;
+  pgReferenceId?: string;
+  referenceId?: string;
 }
 
 interface AzamPayPaymentStatus {
@@ -78,24 +82,23 @@ class AzamPayService {
     this.credentials = AZAMPAY_CREDENTIALS;
   }
 
+  private requireCredentials() {
+    if (!this.credentials.testMode && (!this.credentials.clientId || !this.credentials.clientSecret || !this.credentials.appName || !this.credentials.apiKey || !this.credentials.callbackUrl)) {
+      throw new Error('Payment gateway is not configured');
+    }
+  }
+
   /**
    * Get authentication token from AzamPay
    */
   async getAuthToken(): Promise<string> {
     // Test mode - return fake token
     if (this.credentials.testMode) {
-      console.log('AzamPay Test Mode: Using fake authentication token');
-      const fakeToken = 'demo-test-token-' + Date.now();
-      console.log('🔑 Generated fake token:', fakeToken);
-      return fakeToken;
+      return 'test-mode-token';
     }
 
+    this.requireCredentials();
     try {
-      console.log('🔍 AzamPay Auth Request:', {
-        url: `${this.config.authenticatorBaseUrl}/AppRegistration/GenerateToken`,
-        clientId: this.credentials.clientId,
-        appName: this.credentials.appName,
-      });
       
       const response = await fetch(`${this.config.authenticatorBaseUrl}/AppRegistration/GenerateToken`, {
         method: 'POST',
@@ -106,16 +109,12 @@ class AzamPayService {
           clientId: this.credentials.clientId,
           clientSecret: this.credentials.clientSecret,
           appName: this.credentials.appName,
+          apiKey: this.credentials.apiKey,
         }),
       });
 
-      console.log('🔍 AzamPay Auth Response Status:', response.status);
-      console.log('🔍 AzamPay Auth Response Status Text:', response.statusText);
-      console.log('🔍 AzamPay Auth Response Headers:', Object.fromEntries(response.headers.entries()));
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ AzamPay Auth Error Response:', errorText);
         
         if (response.status === 423 || response.statusText === 'Locked') {
           throw new Error('AzamPay app is locked. Please complete app registration with valid callback URL in AzamPay dashboard.');
@@ -125,7 +124,6 @@ class AzamPayService {
       }
 
       const data: AzamPayAuthResponse = await response.json();
-      console.log('🔍 AzamPay Auth Success:', { success: data.success, tokenLength: data.data?.accessToken?.length });
       
       if (!data.success || !data.data?.accessToken) {
         throw new Error(`AzamPay auth failed: ${data.message}`);
@@ -160,34 +158,27 @@ class AzamPayService {
     }
 
     try {
-      const token = await this.getAuthToken();
+      this.requireCredentials();
 
-      console.log('🔍 AzamPay Checkout Request:', {
-        url: `${this.config.checkoutBaseUrl}/Checkout/CreateCheckout`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(paymentData),
-      });
+      // AzamPay sandbox auth is intermittently flaky — retry once with a fresh token on 401/403.
+      let response: Response | null = null;
+      for (let attempt = 0; attempt < 2 && !response?.ok; attempt++) {
+        const token = await this.getAuthToken();
+        response = await fetch(`${this.config.checkoutBaseUrl}/azampay/mno/checkout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'X-API-KEY': this.credentials.apiKey,
+          },
+          body: JSON.stringify(paymentData),
+          signal: AbortSignal.timeout(45_000),
+        });
+        if (![401, 403].includes(response.status)) break;
+      }
 
-      const response = await fetch(`${this.config.checkoutBaseUrl}/Checkout/CreateCheckout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(paymentData),
-      });
-
-      console.log('🔍 AzamPay Checkout Response Status:', response.status);
-      console.log('🔍 AzamPay Checkout Response Status Text:', response.statusText);
-      console.log('🔍 AzamPay Checkout Response Headers:', Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
+      if (!response!.ok) {
         const errorText = await response.text();
-        console.error('❌ AzamPay Checkout Error Response:', errorText);
         
         if (response.status === 423 || response.statusText === 'Locked') {
           throw new Error('AzamPay app is locked. Please complete app registration with valid callback URL in AzamPay dashboard.');
@@ -197,13 +188,11 @@ class AzamPayService {
       }
 
       const data: AzamPayCheckoutResponse = await response.json();
-      console.log('🔍 AzamPay Checkout Success:', { success: data.success, reference: data.data?.reference });
-      console.log('🔍 AzamPay Checkout Response Data:', data);
       
-      if (!data.success || !data.data?.checkoutUrl) {
+      if (!data.success) {
         throw new Error(`AzamPay checkout failed: ${data.message}`);
       }
-      
+
       return data;
     } catch (error) {
       console.error('❌ AzamPay checkout error:', error);
@@ -217,22 +206,10 @@ class AzamPayService {
   async checkPaymentStatus(reference: string): Promise<AzamPayPaymentStatus> {
     // Test mode - return fake successful payment
     if (this.credentials.testMode || reference.startsWith('TEST-')) {
-      console.log('AzamPay Test Mode: Returning fake successful payment status');
-      return {
-        data: {
-          reference,
-          status: 'SUCCESS',
-          amount: '40000',
-          currency: 'TZS',
-          transactionId: 'TEST-TXN-' + Date.now(),
-          paymentMethod: 'Test Payment',
-          timestamp: new Date().toISOString(),
-        },
-        success: true,
-        message: 'Test payment successful'
-      };
+      throw new Error('Unverified test payments cannot activate membership');
     }
 
+    this.requireCredentials();
     try {
       const token = await this.getAuthToken();
 
@@ -240,17 +217,16 @@ class AzamPayService {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'X-API-KEY': this.credentials.apiKey,
         },
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('AzamPay status check error response:', errorText);
-        throw new Error(`AzamPay status check failed: ${response.statusText} - ${errorText}`);
+        throw new Error(`AzamPay status check failed: ${response.statusText}`);
       }
 
       const data: AzamPayPaymentStatus = await response.json();
-      console.log('AzamPay status check response:', { success: data.success, status: data.data?.status });
       
       if (!data.success) {
         throw new Error(`AzamPay status check failed: ${data.message}`);
@@ -283,33 +259,23 @@ class AzamPayService {
     orderId: string;
     paymentMethod?: string;
   }): Promise<AzamPayCheckoutResponse> {
+    const providerConfig = this.getProviderConfig(paymentMethod || 'azampesa');
+    if (providerConfig.code === 'UNKNOWN') throw new Error('Unsupported payment method');
     const checkoutData: AzamPayCheckoutRequest = {
+      accountNumber: userPhone,
       amount: amount.toString(),
       currency: 'TZS',
-      merchantName: 'Tanzania Library Association',
-      orderId,
-      customerEmail: userEmail,
-      customerPhone: userPhone,
-      redirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/payment/success`,
-      callbackUrl: this.credentials.callbackUrl,
-      vendorId: userId,
+      provider: providerConfig.code,
+      externalId: orderId,
+      additionalProperties: {
+        callbackUrl: this.credentials.callbackUrl,
+        redirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/payment/success?reference=${encodeURIComponent(orderId)}`,
+        vendorId: userId,
+        membershipType,
+        customerEmail: userEmail,
+      },
     };
 
-    // Add provider-specific handling for mobile money integration
-    if (paymentMethod) {
-      const providerConfig = this.getProviderConfig(paymentMethod);
-      checkoutData.paymentMethod = paymentMethod;
-      checkoutData.providerCode = providerConfig.code;
-      
-      console.log(`AzamPay integration with ${providerConfig.name}:`, {
-        provider: paymentMethod,
-        code: providerConfig.code,
-        ussd: providerConfig.ussd,
-        phone: userPhone
-      });
-    }
-
-    console.log('Creating AzamPay checkout with data:', checkoutData);
     return this.createCheckout(checkoutData);
   }
 
@@ -320,37 +286,37 @@ class AzamPayService {
     const providers = {
       azampesa: {
         name: 'AzamPesa',
-        code: 'AZAMPESA',
+        code: 'Azampesa',
         ussd: '*150*01#',
         color: '#0052CC'
       },
       mpesa: {
         name: 'M-Pesa',
-        code: 'MPESA',
+        code: 'Mpesa',
         ussd: '*150*01#',
         color: '#35B039'
       },
       halopesa: {
         name: 'HaloPesa',
-        code: 'HALOPESA',
+        code: 'Halopesa',
         ussd: '*150*02#',
         color: '#8B3A9C'
       },
       airtelmoney: {
         name: 'Airtel Money',
-        code: 'AIRTELMONEY',
+        code: 'Airtel',
         ussd: '*150*03#',
         color: '#ED1C24'
       },
       tigopesa: {
         name: 'Tigo Pesa',
-        code: 'TIGOPESA',
+        code: 'Tigo',
         ussd: '*150*04#',
         color: '#00A6CE'
       },
       mixxbyyas: {
         name: 'Mixx By Yas',
-        code: 'TIGOPESA',
+        code: 'Tigo',
         ussd: '*150*04#',
         color: '#00A6CE'
       }
@@ -383,11 +349,36 @@ class AzamPayService {
   /**
    * Verify webhook signature (for security)
    */
-  verifyWebhookSignature(payload: string, signature: string): boolean {
-    // Implement signature verification logic
-    // This depends on how AzamPay signs their webhooks
-    // For now, return true for sandbox testing
-    return this.config === AZAMPAY_CONFIG.sandbox;
+  async verifyWebhookPayload(payload: Record<string, unknown>): Promise<boolean> {
+    try {
+      this.requireCredentials();
+      const signature = String(payload.signature || '');
+      if (!signature) return false;
+      const signedPayload = [
+        payload.utilityref,
+        payload.externalreference,
+        payload.transactionstatus,
+        payload.operator,
+      ].map(value => String(value ?? '')).join('');
+      if (!signedPayload) return false;
+
+      const keyResponse = await fetch(`${this.config.checkoutBaseUrl}/azampay/v1/public-key?format=Pem`, {
+        headers: { 'X-API-KEY': this.credentials.apiKey },
+      });
+      if (!keyResponse.ok) return false;
+      const keyBody: unknown = await keyResponse.json().catch(() => null);
+      const publicKey = typeof keyBody === 'object' && keyBody
+        ? String((keyBody as Record<string, unknown>).data || (keyBody as Record<string, unknown>).key || '')
+        : String(keyBody || '');
+      if (!publicKey.includes('BEGIN PUBLIC KEY')) return false;
+
+      return createVerify('RSA-SHA256')
+        .update(signedPayload)
+        .end()
+        .verify(publicKey, signature, 'base64');
+    } catch {
+      return false;
+    }
   }
 }
 

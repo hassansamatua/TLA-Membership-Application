@@ -60,7 +60,7 @@ const toBoolean = (value: unknown) => {
   return false;
 };
 
-// Helper function to generate membership number in TLA YY XXXXX format
+// Helper function to generate membership number in ZaLIKA YY XXXXX format
 function generateMembershipNumber(): string {
   const year = new Date().getFullYear().toString().slice(-2); // Last two digits of current year
   const randomNumber = Math.floor(10000 + Math.random() * 90000).toString(); // 5-digit random number

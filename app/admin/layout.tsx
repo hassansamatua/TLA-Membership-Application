@@ -112,7 +112,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex items-center justify-center h-16 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white flex-shrink-0">
           <div className="text-center">
             <h1 className="text-xl font-bold">Admin Panel</h1>
-            <p className="text-xs text-emerald-100 mt-1">TLA Management</p>
+            <p className="text-xs text-emerald-100 mt-1">ZaLIKA Management</p>
           </div>
         </div>
         
@@ -198,7 +198,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
             <div className="text-center">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Admin Panel</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">TLA Management System</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">ZaLIKA Management System</p>
             </div>
             <div className="w-9" aria-hidden="true" />
           </div>

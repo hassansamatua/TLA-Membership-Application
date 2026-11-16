@@ -7,22 +7,7 @@ export async function POST(req: Request) {
     const formData = await req.json();
     
     // Debug: Log received form data
-    console.log('=== REGISTRATION FORM DATA RECEIVED ===');
-    console.log('Full formData:', JSON.stringify(formData, null, 2));
-    console.log('dateOfBirth:', formData.dateOfBirth);
-    console.log('gender:', formData.gender);
-    console.log('street:', formData.street);
-    console.log('district:', formData.district);
-    console.log('region:', formData.region);
-    console.log('country:', formData.country);
-    console.log('postalCode:', formData.postalCode);
-    console.log('occupation:', formData.occupation);
-    console.log('employerName:', formData.employerName);
-    console.log('educationLevel:', formData.educationLevel);
-    console.log('institutionName:', formData.institutionName);
-    console.log('yearOfCompletion:', formData.yearOfCompletion);
-    console.log('skills:', formData.skills);
-    console.log('=== END FORM DATA ===');
+
     
     // Extract user data for users table
     const userData = {
@@ -194,7 +179,7 @@ export async function POST(req: Request) {
         Object.values(validProfileData)
       );
       
-      console.log('Profile data saved successfully:', JSON.stringify(validProfileData, null, 2));
+
 
       // Commit the transaction
       await connection.commit();

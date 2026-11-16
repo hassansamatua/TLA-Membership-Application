@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
     try {
       // Mark message as read
       await connection.query(
-        'UPDATE messages SET read_at = NOW() WHERE id = ?',
-        [messageId]
+        'UPDATE messages SET read_at = NOW() WHERE id = ? AND receiver_id = ?',
+        [messageId, userId]
       );
       
       // Get message details for reply
@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
          FROM messages m
          JOIN users u1 ON m.sender_id = u1.id
          JOIN users u2 ON m.receiver_id = u2.id
-         WHERE m.id = ?`,
-        [messageId]
+         WHERE m.id = ? AND (m.sender_id = ? OR m.receiver_id = ?)`,
+        [messageId, userId, userId]
       );
 
       if (messageInfo.length === 0) {

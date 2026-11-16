@@ -19,7 +19,7 @@ export default function TestMembershipCard() {
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">TLA Membership Card Test</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">ZaLIKA Membership Card Test</h1>
           <p className="text-gray-600 mb-8">
             Test the membership card download and print functionality. The card below can be downloaded as PDF or printed directly.
           </p>
@@ -92,7 +92,7 @@ export default function TestMembershipCard() {
                 <p><strong>Print Optimization:</strong> CSS print media queries ensure proper formatting</p>
                 <p><strong>Card Dimensions:</strong> 336px × 212px (maintains aspect ratio for printing)</p>
                 <p><strong>Color Accuracy:</strong> Print color adjustment ensures exact color matching</p>
-                <p><strong>File Naming:</strong> TLA_Membership_Card_[Number]_[Date].pdf</p>
+                <p><strong>File Naming:</strong> ZaLIKA_Membership_Card_[Number]_[Date].pdf</p>
               </div>
             </div>
 

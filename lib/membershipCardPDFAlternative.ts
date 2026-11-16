@@ -39,15 +39,15 @@ export async function generateMembershipCardPDFNative(cardData: MembershipCardDa
       pdf.line(i, 0, i + cardHeight, cardHeight);
     }
 
-    // TLA Logo area (simplified text representation)
+    // ZaLIKA Logo area (simplified text representation)
     pdf.setFontSize(6);
     pdf.setTextColor(255, 255, 255);
-    pdf.text('TANZANIA LIBRARY', cardWidth * 0.6, 8);
+    pdf.text('ZANZIBAR LIBRARY', cardWidth * 0.6, 8);
     pdf.text('AND INFORMATION', cardWidth * 0.6, 11);
     pdf.text('ASSOCIATION', cardWidth * 0.6, 14);
     pdf.setFontSize(5);
     pdf.setTextColor(16, 185, 129);
-    pdf.text('(TLA)', cardWidth * 0.55, 16);
+    pdf.text('(ZaLIKA)', cardWidth * 0.55, 16);
 
     // Profile picture area
     const profileX = cardWidth - 20;
@@ -110,10 +110,10 @@ export async function generateMembershipCardPDFNative(cardData: MembershipCardDa
     // Bottom text
     pdf.setTextColor(255, 255, 255, 0.7);
     pdf.setFontSize(3);
-    pdf.text('Authorized Membership Card • TLA', 3, cardHeight - 2);
+    pdf.text('Authorized Membership Card • ZaLIKA', 3, cardHeight - 2);
 
     // Save the PDF
-    const fileName = `TLA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `ZaLIKA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(fileName);
     
     console.log('Native PDF generated successfully!');
@@ -146,8 +146,8 @@ export async function generateMembershipCardPDFFallback(cardData: MembershipCard
     
     tempDiv.innerHTML = `
       <div style="background: rgba(16, 185, 129, 0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-        <div style="font-size: 12px; font-weight: bold; text-align: center;">TANZANIA LIBRARY AND INFORMATION ASSOCIATION</div>
-        <div style="font-size: 10px; color: #10b981; text-align: center;">(TLA)</div>
+        <div style="font-size: 12px; font-weight: bold; text-align: center;">ZANZIBAR LIBRARY AND KNOWLEDGE ASSOCIATION</div>
+        <div style="font-size: 10px; color: #10b981; text-align: center;">(ZaLIKA)</div>
       </div>
       
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -178,7 +178,7 @@ export async function generateMembershipCardPDFFallback(cardData: MembershipCard
       </div>
       
       <div style="position: absolute; bottom: 5px; left: 10px; right: 10px; text-align: center; font-size: 8px; color: rgba(255, 255, 255, 0.7);">
-        Authorized Membership Card • TLA
+        Authorized Membership Card • ZaLIKA
       </div>
     `;
     
@@ -207,7 +207,7 @@ export async function generateMembershipCardPDFFallback(cardData: MembershipCard
     const imgData = canvas.toDataURL('image/png', 1.0);
     pdf.addImage(imgData, 'PNG', 0, 0, 336, 212);
 
-    const fileName = `TLA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `ZaLIKA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(fileName);
     
     console.log('Fallback PDF generated successfully!');

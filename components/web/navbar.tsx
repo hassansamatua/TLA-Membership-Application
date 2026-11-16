@@ -46,7 +46,7 @@ export function Navbar() {
                             <div className="relative w-[120px] h-[30px] sm:w-[140px] sm:h-[40px]">
                                 <Image
                                     src="/logo.png"
-                                    alt="TLA Logo"
+                                    alt="ZaLIKA Logo"
                                     fill
                                     priority
                                     unoptimized

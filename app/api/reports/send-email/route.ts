@@ -5,6 +5,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 export async function POST(request: Request) {
   try {
+    if (!resend) return NextResponse.json({ error: 'Email service unavailable' }, { status: 503 });
     const { email, reportType, from, to, columns } = await request.json();
     
     if (!email) {
@@ -22,7 +23,8 @@ export async function POST(request: Request) {
     if (columns?.length > 0) params.append('columns', columns.join(','));
 
     const reportResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/reports/generate?${params.toString()}`
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/reports/generate?${params.toString()}`,
+      { headers: { authorization: request.headers.get('authorization') || '', cookie: request.headers.get('cookie') || '' } }
     );
     
     if (!reportResponse.ok) {

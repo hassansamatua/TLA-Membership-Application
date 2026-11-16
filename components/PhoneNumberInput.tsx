@@ -43,9 +43,9 @@ const mobileNetworkConfigs = {
   },
   mixxbyyas: {
     name: 'Mixx By Yas',
-    prefix: ['065', '067', '071', '072'],
+    prefix: ['065', '067', '071', '072', '077'],
     format: '0XXXXXXXXX',
-    example: '0712542346'
+    example: '0772542346'
   },
   bankcard: {
     name: 'Bank Card',

@@ -39,7 +39,7 @@ export default function HomePage() {
 
   // Fallback static content
   const staticContent = {
-    mainHeading: "Welcome to Tanzania Library and Information Association",
+    mainHeading: "Welcome to Zanzibar Library and Knowledge Association",
     mainSubheading: "Empowering Knowledge, Connecting Communities",
     membershipHeading: "Membership Benefits",
     membershipItems: [
@@ -78,7 +78,7 @@ export default function HomePage() {
                 onClick={() => router.push('/auth/login')}
                 className="bg-white text-emerald-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
               >
-                Join TLA
+                Join ZaLIKA
               </button>
               <button 
                 onClick={() => router.push('/about')}
@@ -125,7 +125,7 @@ export default function HomePage() {
       <section className="bg-emerald-600 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Join Tanzania Library Association?
+            Ready to Join Zanzibar Library and Knowledge Association?
           </h2>
           <p className="text-emerald-100 mb-8 max-w-2xl mx-auto">
             Become part of our professional community and access exclusive resources, networking opportunities, and professional development.

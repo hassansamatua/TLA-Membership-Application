@@ -66,13 +66,14 @@ export async function generateMembershipCardPDFPerfect(cardData: MembershipCardD
         <!-- Top header bar with green -->
         <rect width="336" height="50" fill="rgba(16, 185, 129, 0.2)" rx="16" ry="16"/>
         
-        <!-- Logo Image -->
+        <!-- Logo Image on a white badge so it reads on the dark card -->
+        <rect x="4" y="3" width="80" height="72" rx="12" fill="rgba(255,255,255,0.95)"/>
         <image href="/logo.png" x="9" y="4" width="70" height="70" preserveAspectRatio="xMidYMid meet"/>
         
         <!-- Organization name -->
-        <text x="190" y="30" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">TANZANIA LIBRARY AND</text>
-        <text x="190" y="50" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">INFORMATION ASSOCIATION</text>
-        <text x="175" y="70" font-family="Arial" font-size="10" fill="#10b981" text-anchor="middle" font-weight="600">(TLA)</text>
+        <text x="190" y="30" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">ZANZIBAR LIBRARY AND</text>
+        <text x="190" y="50" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">KNOWLEDGE ASSOCIATION</text>
+        <text x="175" y="70" font-family="Arial" font-size="10" fill="#10b981" text-anchor="middle" font-weight="600">(ZaLIKA)</text>
         
         <!-- Profile picture area -->
         <g>
@@ -115,7 +116,7 @@ export async function generateMembershipCardPDFPerfect(cardData: MembershipCardD
         
         <!-- Bottom accent bar with green -->
         <rect y="192" width="336" height="20" fill="rgba(16, 185, 129, 0.15)"/>
-        <text x="16" y="205" font-family="Arial, sans-serif" font-size="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • TLA</text>
+        <text x="16" y="205" font-family="Arial, sans-serif" font-size="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • ZaLIKA</text>
       </svg>
     `;
     
@@ -147,7 +148,7 @@ export async function generateMembershipCardPDFPerfect(cardData: MembershipCardD
     pdf.addImage(imgData, 'PNG', 0, 0, 336, 212);
 
     // Generate filename
-    const fileName = `TLA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `ZaLIKA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(fileName);
     
     console.log('Perfect PDF generated successfully!');

@@ -110,7 +110,7 @@ export default function OrderSummary({
 
       <p className="flex items-center justify-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400 dark:text-gray-500">
         <FiShield className="h-3 w-3" />
-        Secured by AzamPay · Tanzania Library Association
+        Secured by AzamPay · Zanzibar Library and Knowledge Association
       </p>
     </div>
   );

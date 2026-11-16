@@ -12,7 +12,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">1. Introduction</h2>
           <p className="mb-4">
-            Welcome to Tanzania Library Association. These terms and conditions outline the rules and regulations for the use of our website and services.
+            Welcome to Zanzibar Library and Knowledge Association. These terms and conditions outline the rules and regulations for the use of our website and services.
           </p>
           <p>
             By accessing this website, we assume you accept these terms and conditions in full. Do not continue to use our services if you do not accept all of the terms and conditions stated on this page.
@@ -45,14 +45,14 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. Intellectual Property</h2>
           <p className="mb-4">
-            All content on this website, including text, graphics, logos, and images, is the property of Tanzania Library Association and is protected by copyright laws.
+            All content on this website, including text, graphics, logos, and images, is the property of Zanzibar Library and Knowledge Association and is protected by copyright laws.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Limitation of Liability</h2>
           <p className="mb-4">
-            Tanzania Library Association will not be liable for any indirect, incidental, special, consequential or punitive damages resulting from your use of or inability to use the services.
+            Zanzibar Library and Knowledge Association will not be liable for any indirect, incidental, special, consequential or punitive damages resulting from your use of or inability to use the services.
           </p>
         </section>
 
@@ -69,7 +69,7 @@ export default function TermsPage() {
             If you have any questions about these Terms and Conditions, please contact us at:
           </p>
           <p className="mt-2">
-            Tanzania Library Association<br />
+            Zanzibar Library and Knowledge Association<br />
             Email: info@tanzanialibrary.org<br />
             Phone: +255 XXX XXX XXX
           </p>

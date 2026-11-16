@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       name: 'token',
       value: token,
       httpOnly: true,
-      secure: false, // Set to false for localhost development
+      secure: process.env.NODE_ENV === 'production', // Set to false for localhost development
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: '/',
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     // Log cookie being set for debugging
     console.log('Cookie set successfully:', {
       name: 'token',
-      value: token.substring(0, 20) + '...',
+      value: '[redacted]',
       httpOnly: true,
       secure: false,
       sameSite: 'lax',

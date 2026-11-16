@@ -139,13 +139,9 @@ export async function GET(request: Request) {
           query += ' ORDER BY m.expiry_date ASC';
         }
         
-        // Add debug logging
-        console.log('Executing membership query:', query);
-        console.log('With params:', params);
         
         try {
           const [rows] = await pool.query<RowDataPacket[]>(query, params);
-          console.log('Raw database results:', JSON.stringify(rows, null, 2));
           
           // Transform the rows to ensure proper JSON serialization
           const formattedRows = rows.map((row) => {
@@ -163,7 +159,6 @@ export async function GET(request: Request) {
             return formattedRow;
           });
           
-          console.log('Formatted rows:', JSON.stringify(formattedRows, null, 2));
           
           return NextResponse.json({
             success: true,
@@ -175,9 +170,8 @@ export async function GET(request: Request) {
           
         } catch (error) {
           console.error('Database query error:', error);
-          const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
           return NextResponse.json(
-            { error: 'Failed to execute database query', details: errorMessage },
+            { error: 'Failed to execute database query' },
             { status: 500 }
           );
         }

@@ -57,9 +57,13 @@ export async function GET(request: Request) {
 
     connection = await pool.getConnection();
     
-    // Get user info directly by ID
+    // Get user info directly by ID; older schemas use membership_type instead of user_category.
+    const [categoryColumns] = await connection.query(
+      "SHOW COLUMNS FROM users LIKE 'user_category'"
+    ) as RowDataPacket[];
+    const categoryColumn = categoryColumns.length ? 'user_category' : 'membership_type';
     const [userRows] = await connection.query(
-      'SELECT id, user_category FROM users WHERE id = ?',
+      `SELECT id, ${categoryColumn} AS user_category FROM users WHERE id = ?`,
       [decoded.id]
     ) as RowDataPacket[];
 
@@ -88,7 +92,8 @@ export async function GET(request: Request) {
     }
 
     const userId = userRows[0].id;
-    const userCategory = userRows[0].user_category as 'librarian' | 'organization' | 'regular';
+    const rawCategory = String(userRows[0].user_category || 'regular');
+    const userCategory = rawCategory === 'librarian' || rawCategory === 'organization' ? rawCategory : 'regular';
 
     // Get current cycle year
     const now = new Date();
@@ -304,10 +309,7 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error('Membership status error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error', 
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   } finally {
     if (connection) connection.release();
   }

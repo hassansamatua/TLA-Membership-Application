@@ -95,7 +95,7 @@ export async function generateMembershipCardPDFExact(cardData: MembershipCardDat
     pdf.addImage(imgData, 'PNG', 0, 0, 336, 212);
 
     // Generate filename
-    const fileName = `TLA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `ZaLIKA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(fileName);
     
     console.log('EXACT PDF generated successfully!');
@@ -171,7 +171,7 @@ export async function generateMembershipCardPDFDirect(cardData: MembershipCardDa
     pdf.addImage(imgData, 'PNG', 0, 0, 336, 212);
 
     // Generate filename
-    const fileName = `TLA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `ZaLIKA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(fileName);
     
     console.log('Direct PDF generated successfully!');

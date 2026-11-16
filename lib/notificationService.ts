@@ -213,7 +213,7 @@ export async function sendApprovalNotification(
   const feeText = `${baseAmount.toLocaleString()} TZS`;
 
   const htmlContent = `
-    <h2>Welcome to Tanzania Library Association!</h2>
+    <h2>Welcome to Zanzibar Library and Knowledge Association!</h2>
     <p>Dear ${userName},</p>
     <p>Congratulations! Your membership application has been approved.</p>
     <p><strong>Membership Type:</strong> ${membershipType}</p>
@@ -222,11 +222,11 @@ export async function sendApprovalNotification(
     <p>You now have a grace period until March 31 to make your payment without any penalties.</p>
     <p>After March 31, if payment is not received, a penalty of 1,000 TZS per month will apply.</p>
     <p><a href="http://localhost:3000/dashboard/payment">Pay Now</a></p>
-    <p>Best regards,<br>Tanzania Library Association</p>
+    <p>Best regards,<br>Zanzibar Library and Knowledge Association</p>
   `;
 
   const textContent = `
-Welcome to Tanzania Library Association!
+Welcome to Zanzibar Library and Knowledge Association!
 
 Dear ${userName},
 
@@ -285,7 +285,7 @@ export async function sendUpcomingCycleReminder(
   const feeText = `${baseAmount.toLocaleString()} TZS`;
   const penaltyPerMonth = ENHANCED_MEMBERSHIP_CONFIG.PENALTY_PER_MONTH.toLocaleString();
 
-  const subject = `Reminder: TLA ${upcomingCycleYear} membership cycle starts in one month`;
+  const subject = `Reminder: ZaLIKA ${upcomingCycleYear} membership cycle starts in one month`;
   const htmlContent = `
     <h2>Your next membership cycle is one month away</h2>
     <p>Dear ${userName},</p>
@@ -296,7 +296,7 @@ export async function sendUpcomingCycleReminder(
     <p>If payment is not received by March 31, a penalty of ${penaltyPerMonth} TZS per month
        will apply from April 1 onwards.</p>
     <p><a href="http://localhost:3000/dashboard/payment">Pay Now</a></p>
-    <p>Best regards,<br>Tanzania Library Association</p>
+    <p>Best regards,<br>Zanzibar Library and Knowledge Association</p>
   `;
   const textContent = `
 Your next membership cycle is one month away
@@ -318,7 +318,7 @@ Pay online: http://localhost:3000/dashboard/payment
   const smsSent = (channel === 'sms' || channel === 'both')
     ? await sendSmsNotification(
         preferences.phone || '',
-        `TLA reminder: ${upcomingCycleYear} cycle starts Feb 1. Pay ${feeText} by Mar 31 to avoid penalties.`
+        `ZaLIKA reminder: ${upcomingCycleYear} cycle starts Feb 1. Pay ${feeText} by Mar 31 to avoid penalties.`
       )
     : true;
 
@@ -344,7 +344,7 @@ export async function sendRejectionNotification(
     <p>Unfortunately, your membership application has been rejected.</p>
     ${rejectionReason ? `<p><strong>Reason:</strong> ${rejectionReason}</p>` : ''}
     <p>If you believe this is a mistake or would like more information, please contact us.</p>
-    <p>Tanzania Library Association<br>
+    <p>Zanzibar Library and Knowledge Association<br>
     Email: hanscovd5@gmail.com</p>
   `;
   
@@ -358,7 +358,7 @@ ${rejectionReason ? `Reason: ${rejectionReason}` : ''}
 
 If you believe this is a mistake or would like more information, please contact us.
 
-Tanzania Library Association
+Zanzibar Library and Knowledge Association
 Email: hanscovd5@gmail.com
   `;
 
@@ -401,7 +401,7 @@ export async function sendGracePeriodReminder(
     <p><strong>Penalty After Grace Period:</strong> 1,000 TZS per month</p>
     <p>Please complete your payment before March 31 to avoid penalties.</p>
     <p><a href="http://localhost:3000/dashboard/payment">Pay Now</a></p>
-    <p>Best regards,<br>Tanzania Library Association</p>
+    <p>Best regards,<br>Zanzibar Library and Knowledge Association</p>
   `;
   
   const textContent = `
@@ -456,7 +456,7 @@ export async function sendPenaltyWarning(
     <p><strong>Total Amount Due:</strong> ${totalAmount.toLocaleString()} TZS</p>
     <p>Please complete your payment as soon as possible. The penalty will increase by 1,000 TZS for each additional month.</p>
     <p><a href="http://localhost:3000/dashboard/payment">Pay Now</a></p>
-    <p>Best regards,<br>Tanzania Library Association</p>
+    <p>Best regards,<br>Zanzibar Library and Knowledge Association</p>
   `;
   
   const textContent = `
@@ -508,7 +508,7 @@ export async function sendPaymentConfirmation(
     <p><strong>Cycle:</strong> ${cycleYear}</p>
     <p>Your membership is now active for this cycle.</p>
     <p><a href="http://localhost:3000/dashboard/membership-card">View Your Membership Card</a></p>
-    <p>Best regards,<br>Tanzania Library Association</p>
+    <p>Best regards,<br>Zanzibar Library and Knowledge Association</p>
   `;
   
   const textContent = `
@@ -534,7 +534,7 @@ Your membership is now active.
   const smsSent = preferences.phone
     ? await sendSmsNotification(
         preferences.phone,
-        `TLA: Payment received. Ref ${paymentReference}, TZS ${amount.toLocaleString()} for cycle ${cycleYear}. Membership active.`
+        `ZaLIKA: Payment received. Ref ${paymentReference}, TZS ${amount.toLocaleString()} for cycle ${cycleYear}. Membership active.`
       )
     : false;
 

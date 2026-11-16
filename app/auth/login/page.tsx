@@ -89,7 +89,7 @@ function LoginContent() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-white/10">
             <Image
               src="/logo.png"
-              alt="Tanzania Library Association"
+              alt="Zanzibar Library and Knowledge Association"
               width={48}
               height={48}
               className="h-12 w-auto"
@@ -97,7 +97,7 @@ function LoginContent() {
             />
           </div>
           <p className="text-[11px] font-medium uppercase tracking-wide text-emerald-700">
-            Tanzania Library Association
+            Zanzibar Library and Knowledge Association
           </p>
           <h1 className="mt-1 text-2xl font-semibold text-gray-900 sm:text-3xl">
             Welcome 
@@ -176,7 +176,7 @@ function LoginContent() {
 
           <div className="my-6 flex items-center gap-3 text-xs text-gray-400">
             <span className="h-px flex-1 bg-gray-200" />
-            New to TLA?
+            New to ZaLIKA?
             <span className="h-px flex-1 bg-gray-200" />
           </div>
 
@@ -189,7 +189,7 @@ function LoginContent() {
         </div>
 
         <p className="mt-6 text-center text-xs text-gray-500">
-          By signing in you agree to TLA's terms of service and privacy policy.
+          By signing in you agree to ZaLIKA's terms of service and privacy policy.
         </p>
       </div>
     </div>

@@ -90,7 +90,7 @@ export async function createMembershipCardTemplate(): Promise<string> {
     roundRect(ctx, 0, 0, 336, 50, 16);
     ctx.fill();
     
-    // 6. Draw TLA logo area - Load actual logo
+    // 6. Draw ZaLIKA logo area - Load actual logo
     try {
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
@@ -109,31 +109,31 @@ export async function createMembershipCardTemplate(): Promise<string> {
         // EXACT match to SVG: x=9, y=4, width=70, height=70
         ctx.drawImage(logoImg, 9, 4, 70, 70);
       } else {
-        // Fallback: Draw TLA text logo
+        // Fallback: Draw ZaLIKA text logo
         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('TLA', 65, 65);
+        ctx.fillText('ZaLIKA', 65, 65);
       }
     } catch (logoError) {
       console.warn('Logo loading error:', logoError);
-      // Fallback: Draw TLA text logo
+      // Fallback: Draw ZaLIKA text logo
       ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
       ctx.font = 'bold 24px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('TLA', 65, 65);
+      ctx.fillText('ZaLIKA', 65, 65);
     }
     
     // 7. Organization name text - EXACT match to SVG
     ctx.fillStyle = 'white';
     ctx.font = '900 12px Arial'; // font-weight 900 matches SVG font-weight="900"
     ctx.textAlign = 'center';
-    ctx.fillText('TANZANIA LIBRARY AND', 190, 30);
-    ctx.fillText('INFORMATION ASSOCIATION', 190, 50);
+    ctx.fillText('ZANZIBAR LIBRARY AND', 190, 30);
+    ctx.fillText('KNOWLEDGE ASSOCIATION', 190, 50);
     
     ctx.font = '600 10px Arial'; // font-weight 600 matches SVG font-weight="600"
     ctx.fillStyle = '#10b981';
-    ctx.fillText('(TLA)', 175, 70);
+    ctx.fillText('(ZaLIKA)', 175, 70);
     
     // 8. Profile picture placeholder area
     //    SVG uses fill="none" with NO stroke/border, so we draw nothing here.
@@ -153,7 +153,7 @@ export async function createMembershipCardTemplate(): Promise<string> {
     
     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.font = '8px Arial';
-    ctx.fillText('Authorized Membership Card • TLA', 16, 205);
+    ctx.fillText('Authorized Membership Card • ZaLIKA', 16, 205);
     
     // Convert to data URL at MAXIMUM quality
     const templateDataURL = canvas.toDataURL('image/png', 1.0);
@@ -364,7 +364,7 @@ export async function generateMembershipCardPDFFromTemplate(cardData: Membership
     pdf.addImage(roundedCardDataURL, 'PNG', 0, 0, 336, 212);
     
     // Generate filename
-    const fileName = `TLA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `ZaLIKA_Membership_Card_${cardData.membershipNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(fileName);
     
     console.log('ULTIMATE TOP QUALITY PDF with rounded corners generated successfully!');

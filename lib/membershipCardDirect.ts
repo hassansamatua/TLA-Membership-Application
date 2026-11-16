@@ -126,7 +126,7 @@ export async function generateMembershipCardPDFDirect(
   const imgData = canvas.toDataURL('image/png', 1.0);
   pdf.addImage(imgData, 'PNG', 0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  const fileName = `TLA_Membership_Card_${cardData.membershipNumber}_${new Date()
+  const fileName = `ZaLIKA_Membership_Card_${cardData.membershipNumber}_${new Date()
     .toISOString()
     .split('T')[0]}.pdf`;
   pdf.save(fileName);
@@ -147,7 +147,7 @@ export async function printMembershipCardDirect(
   printWindow.document.write(`<!DOCTYPE html>
 <html>
   <head>
-    <title>TLA Membership Card - ${cardData.membershipNumber}</title>
+    <title>ZaLIKA Membership Card - ${cardData.membershipNumber}</title>
     <style>
       @page { size: 86mm 54mm; margin: 0; }
       html, body { margin: 0; padding: 0; background: #fff; }
@@ -156,7 +156,7 @@ export async function printMembershipCardDirect(
     </style>
   </head>
   <body>
-    <img src="${dataUrl}" alt="TLA Membership Card" />
+    <img src="${dataUrl}" alt="ZaLIKA Membership Card" />
     <script>
       window.onload = function () {
         setTimeout(function () { window.print(); window.close(); }, 250);

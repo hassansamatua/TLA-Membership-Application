@@ -35,33 +35,24 @@ export async function POST(request: Request) {
     connection = await pool.getConnection();
 
     try {
-      console.log('Checking payment with reference:', reference);
-      console.log('User ID from token:', decoded.id);
-      
       const [paymentRows] = await connection.query(
         'SELECT * FROM payments WHERE reference = ? AND user_id = ?',
         [reference, decoded.id]
       ) as any[];
 
-      console.log('Payment query result:', {
-        rowCount: paymentRows.length,
-        rows: paymentRows
-      });
-
       if (!paymentRows.length) {
-        console.error('Payment not found with reference:', reference);
+        console.error('Payment lookup did not match the current account');
         return NextResponse.json(
           { 
             success: false, 
             message: 'Payment not found',
-            details: `No payment found with reference: ${reference} for user: ${decoded.id}`
+            details: 'No matching payment was found for the current account'
           },
           { status: 404 }
         );
       }
 
       const payment = paymentRows[0];
-      console.log('Payment found:', payment);
 
       return NextResponse.json({
         success: true,
@@ -81,7 +72,7 @@ export async function POST(request: Request) {
         { 
           success: false, 
           message: 'Failed to check payment',
-          details: error instanceof Error ? error.message : 'Unknown error'
+          details: 'Payment status lookup failed'
         },
         { status: 500 }
       );
@@ -96,7 +87,7 @@ export async function POST(request: Request) {
       { 
         success: false, 
         message: 'Failed to process payment check',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: 'Payment status lookup failed'
       },
       { status: 500 }
     );

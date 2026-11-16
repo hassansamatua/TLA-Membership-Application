@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
         amount,
         currency: 'TZS',
         paymentInstructions: {
-          message: 'Please contact TLA office to complete payment',
+          message: 'Please contact ZaLIKA office to complete payment',
           phone: '+255 22 211 3456',
           email: 'membership@tla.or.tz',
           reference: orderId,

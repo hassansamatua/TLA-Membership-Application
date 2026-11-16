@@ -16,8 +16,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const connection = await pool.getConnection();
     try {
       await connection.query(
-        'DELETE FROM messages WHERE id = ?',
-        [messageId]
+        'DELETE FROM messages WHERE id = ? AND (sender_id = ? OR receiver_id = ?)',
+        [messageId, decoded.id, decoded.id]
       );
 
       return NextResponse.json({ success: true });

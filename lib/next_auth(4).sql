@@ -69,8 +69,8 @@ CREATE TABLE `about_content` (
 --
 
 INSERT INTO `about_content` (`id`, `section_key`, `section_type`, `content`, `order_index`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'about_main_heading', 'heading', 'About Tanzania Library Association', 1, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
-(2, 'about_description', 'text', 'The Tanzania Library Association (TLA) is the leading professional organization dedicated to advancing library and information services throughout Tanzania.', 2, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
+(1, 'about_main_heading', 'heading', 'About Zanzibar Library and Knowledge Association', 1, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
+(2, 'about_description', 'text', 'The Zanzibar Library and Knowledge Association (TLA) is the leading professional organization dedicated to advancing library and information services throughout Tanzania.', 2, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
 (3, 'about_mission', 'mission', 'To promote library development, support information professionals, and advocate for access to knowledge for all Tanzanians.', 3, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
 (4, 'about_vision', 'vision', 'To be the catalyst for a knowledge-driven society where every Tanzanian has access to quality information services.', 4, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
 (5, 'about_values_1', 'values', 'Professional Excellence - Maintaining high standards in library and information services.', 5, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
@@ -417,7 +417,7 @@ CREATE TABLE `footer_content` (
 
 INSERT INTO `footer_content` (`id`, `section_key`, `section_type`, `content`, `url`, `order_index`, `is_active`, `created_at`, `updated_at`) VALUES
 (1, 'footer_about_heading', 'heading', 'About TLA', NULL, 1, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
-(2, 'footer_about_text', 'text', 'Tanzania Library Association is dedicated to promoting library services, supporting professionals, and advocating for access to knowledge throughout Tanzania.', NULL, 2, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
+(2, 'footer_about_text', 'text', 'Zanzibar Library and Knowledge Association is dedicated to promoting library services, supporting professionals, and advocating for access to knowledge throughout Tanzania.', NULL, 2, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
 (3, 'footer_quick_links_heading', 'heading', 'Quick Links', NULL, 3, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
 (4, 'footer_link_about', 'link', 'About Us', '/about-us', 4, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
 (5, 'footer_link_contact', 'link', 'Contact', '/contact', 5, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
@@ -427,7 +427,7 @@ INSERT INTO `footer_content` (`id`, `section_key`, `section_type`, `content`, `u
 (9, 'footer_contact_email', 'contact_info', 'Email: info@tla.or.tz', NULL, 9, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
 (10, 'footer_contact_phone', 'contact_info', 'Phone: +255 XXX XXX XXX', NULL, 10, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
 (11, 'footer_contact_address', 'contact_info', 'Address: Dar es Salaam, Tanzania', NULL, 11, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49'),
-(12, 'footer_copyright', 'copyright', '© 2026 Tanzania Library Association (TLA). All rights reserved.', NULL, 12, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49');
+(12, 'footer_copyright', 'copyright', '© 2026 Zanzibar Library and Knowledge Association (TLA). All rights reserved.', NULL, 12, 1, '2026-01-02 08:24:49', '2026-01-02 08:24:49');
 
 -- --------------------------------------------------------
 
@@ -451,7 +451,7 @@ CREATE TABLE `home_content` (
 --
 
 INSERT INTO `home_content` (`id`, `section_key`, `section_type`, `content`, `order_index`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'home_main_heading', 'heading', 'Welcome to Tanzania Library Association', 1, 1, '2026-01-02 08:24:48', '2026-01-02 08:24:48'),
+(1, 'home_main_heading', 'heading', 'Welcome to Zanzibar Library and Knowledge Association', 1, 1, '2026-01-02 08:24:48', '2026-01-02 08:24:48'),
 (2, 'home_main_subheading', 'subheading', 'Empowering Knowledge, Connecting Communities', 2, 1, '2026-01-02 08:24:48', '2026-01-02 08:24:48'),
 (3, 'home_membership_heading', 'heading', 'Membership Benefits', 3, 1, '2026-01-02 08:24:48', '2026-01-02 08:24:48'),
 (4, 'home_membership_item_1', 'list_item', 'Access Books - Borrow books online and offline with easy tracking.', 4, 1, '2026-01-02 08:24:48', '2026-01-02 08:24:48'),
@@ -812,9 +812,9 @@ CREATE TABLE `pages` (
 --
 
 INSERT INTO `pages` (`id`, `title`, `slug`, `content`, `excerpt`, `status`, `page_type`, `meta_title`, `meta_description`, `meta_keywords`, `featured_image`, `template`, `author_id`, `created_at`, `updated_at`) VALUES
-(1, 'Home', 'home', '<h1>Welcome to TLA</h1><p>Tanzania Library and Information Association is dedicated to promoting library and information services in Tanzania.</p>jn', NULL, 'published', 'page', 'Home - TLA', 'Welcome to Tanzania Library and Information Association', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-09 08:04:01'),
-(2, 'About Us', 'about-us', '<h1>About TLA</h1><p>The Tanzania Library and Information Association (TLA) is a professional organization...</p>', NULL, 'published', 'page', 'About Us - TLA', 'Learn about Tanzania Library and Information Association', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
-(3, 'Contact', 'contact', '<h1>Contact Us</h1><p>Get in touch with TLA for more information...</p>', NULL, 'published', 'page', 'Contact - TLA', 'Contact Tanzania Library and Information Association', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
+(1, 'Home', 'home', '<h1>Welcome to TLA</h1><p>Zanzibar Library and Knowledge Association is dedicated to promoting library and information services in Tanzania.</p>jn', NULL, 'published', 'page', 'Home - TLA', 'Welcome to Zanzibar Library and Knowledge Association', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-09 08:04:01'),
+(2, 'About Us', 'about-us', '<h1>About TLA</h1><p>The Zanzibar Library and Knowledge Association (TLA) is a professional organization...</p>', NULL, 'published', 'page', 'About Us - TLA', 'Learn about Zanzibar Library and Knowledge Association', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
+(3, 'Contact', 'contact', '<h1>Contact Us</h1><p>Get in touch with TLA for more information...</p>', NULL, 'published', 'page', 'Contact - TLA', 'Contact Zanzibar Library and Knowledge Association', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (4, 'Membership', 'membership', '<h1>Membership</h1><p>Join TLA and become part of our professional community...</p>', NULL, 'published', 'page', 'Membership - TLA', 'TLA Membership Information', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (5, 'Events', 'events', '<h1>Events</h1><p>Upcoming events and activities organized by TLA...</p>', NULL, 'published', 'page', 'Events - TLA', 'TLA Events and Activities', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (6, 'Resources', 'resources', '<h1>Resources</h1><p>Library and information resources for our members...</p>', NULL, 'published', 'page', 'Resources - TLA', 'TLA Resources and Materials', NULL, NULL, 'default', NULL, '2026-01-02 08:24:23', '2026-01-02 08:24:23');
@@ -984,14 +984,14 @@ CREATE TABLE `site_settings` (
 
 INSERT INTO `site_settings` (`id`, `setting_key`, `setting_value`, `setting_type`, `setting_group`, `description`, `is_public`, `created_at`, `updated_at`) VALUES
 (1, 'site_name', 'TLA Organization', 'string', 'general', 'Site name', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
-(2, 'site_description', 'Tanzania Library and Information Association', 'string', 'general', 'Site description', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
+(2, 'site_description', 'Zanzibar Library and Knowledge Association', 'string', 'general', 'Site description', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (3, 'site_url', 'https://tla.or.tz', 'string', 'general', 'Site URL', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (4, 'admin_email', 'admin@tla.or.tz', 'string', 'general', 'Admin email', 0, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (5, 'contact_email', 'info@tla.or.tz', 'string', 'general', 'Contact email', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (6, 'contact_phone', '+255 22 211 1234', 'string', 'general', 'Contact phone', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (7, 'contact_address', 'Dar es Salaam, Tanzania', 'string', 'general', 'Contact address', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (8, 'social_media', '{\"facebook\": \"https://facebook.com/tla\", \"twitter\": \"https://twitter.com/tla\", \"linkedin\": \"https://linkedin.com/company/tla\", \"instagram\": \"https://instagram.com/tla\"}', 'json', 'general', 'Social media links', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
-(9, 'seo_settings', '{\"meta_title\": \"TLA - Tanzania Library and Information Association\", \"meta_description\": \"Official website of TLA\", \"keywords\": \"tla, library, information, association, tanzania\"}', 'json', 'seo', 'SEO settings', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
+(9, 'seo_settings', '{\"meta_title\": \"TLA - Zanzibar Library and Knowledge Association\", \"meta_description\": \"Official website of TLA\", \"keywords\": \"tla, library, information, association, tanzania\"}', 'json', 'seo', 'SEO settings', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (10, 'theme_settings', '{\"primary_color\": \"#10b981\", \"secondary_color\": \"#6b7280\", \"font_family\": \"Inter\", \"logo_url\": \"/logo.png\"}', 'json', 'theme', 'Theme settings', 0, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (11, 'footer_settings', '{\"copyright_text\": \"© 2025 TLA. All rights reserved.\", \"show_social_links\": true, \"show_contact_info\": true}', 'json', 'footer', 'Footer settings', 1, '2026-01-02 08:24:23', '2026-01-02 08:24:23'),
 (12, 'membership_settings', '{\"enable_registration\": true, \"require_approval\": true, \"default_membership_type\": \"personal\", \"membership_duration\": \"1 year\"}', 'json', 'membership', 'Membership settings', 0, '2026-01-02 08:24:23', '2026-01-02 08:24:23');

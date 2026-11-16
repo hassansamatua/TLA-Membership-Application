@@ -16,8 +16,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const connection = await pool.getConnection();
     try {
       await connection.query(
-        'UPDATE messages SET read_at = NOW() WHERE id = ?',
-        [messageId]
+        'UPDATE messages SET read_at = NOW() WHERE id = ? AND receiver_id = ?',
+        [messageId, decoded.id]
       );
 
       return NextResponse.json({ success: true });

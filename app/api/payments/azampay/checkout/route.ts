@@ -1,248 +1,214 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
+import type { RowDataPacket } from 'mysql2/promise';
+import { verifyToken } from '@/lib/auth';
+import { azampaySandboxEnabled } from '@/lib/api-access';
 import { azampayService } from '@/lib/azampay';
-import { getUserById } from '@/lib/auth';
+import { pool } from '@/lib/db';
+import { listFutureUnpaidCycles } from '@/lib/enhancedMembershipCycles';
 
-export async function POST(request: NextRequest) {
+async function authToken(request: Request) {
+  const header = request.headers.get('authorization');
+  if (header?.startsWith('Bearer ')) return header.slice(7);
+  const cookieStore = await cookies();
+  return cookieStore.get('token')?.value || null;
+}
+
+export async function POST(request: Request) {
+  if (!azampaySandboxEnabled()) {
+    return NextResponse.json({ error: 'Operation unavailable during security containment' }, { status: 503 });
+  }
+
+  const token = await authToken(request);
+  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  let userId: number;
   try {
-    const body = await request.json();
-    const {
-      membershipType,
-      amount,
-      userId,
-      paymentMethod,
-      phoneNumber,
-      customerName,
-      customerEmail,
-      // New multi-cycle fields from the redesigned checkout. Both are
-      // optional so legacy callers (single-cycle current payment) keep
-      // working. cycleCount is hard-capped at 3 per business rules.
-      targetCycleYear: rawTargetCycle,
-      cycleCount: rawCycleCount,
-    } = body;
+    const decoded = verifyToken(token);
+    userId = Number(decoded.id);
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!Number.isSafeInteger(userId) || userId <= 0) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-    if (!membershipType || !amount || !userId || !paymentMethod || !phoneNumber) {
-      return NextResponse.json(
-        { error: 'Missing required fields: membershipType, amount, userId, paymentMethod, phoneNumber' },
-        { status: 400 }
-      );
+  let body: {
+    cycleYear?: unknown;
+    cycleYears?: unknown;
+    paymentMethod?: unknown;
+    phoneNumber?: unknown;
+  };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid payment request' }, { status: 400 });
+  }
+
+  const years = Array.isArray(body.cycleYears)
+    ? body.cycleYears.map(Number)
+    : [Number(body.cycleYear)];
+  if (years.length !== 1 || !Number.isSafeInteger(years[0])) {
+    return NextResponse.json({ error: 'Sandbox checkout supports exactly one cycle' }, { status: 400 });
+  }
+  const cycleYear = Number(years[0]);
+  const paymentMethod = String(body.paymentMethod || '');
+  const rawPhone = String(body.phoneNumber || '').replace(/\D/g, '');
+  const phoneNumber = rawPhone.startsWith('255')
+    ? rawPhone
+    : rawPhone.startsWith('0')
+      ? `255${rawPhone.slice(1)}`
+      : rawPhone;
+  if (!paymentMethod || !/^255\d{9}$/.test(phoneNumber)) {
+    return NextResponse.json({ error: 'Payment method and a valid Tanzanian phone number are required' }, { status: 400 });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    const [users] = await connection.query<RowDataPacket[]>(
+      'SELECT id,email,membership_type,is_approved FROM users WHERE id=? LIMIT 1',
+      [userId]
+    );
+    const user = users[0];
+    if (!user || Number(user.is_approved) !== 1) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const targetCycleYear = Number.isFinite(Number(rawTargetCycle))
-      ? Number(rawTargetCycle)
-      : null;
-    const cycleCount = Math.min(
-      3,
-      Math.max(1, Number.isFinite(Number(rawCycleCount)) ? Number(rawCycleCount) : 1)
+    const quotes = await listFutureUnpaidCycles({ userId, maxFuture: 2 });
+    const quote = quotes.find(cycle => cycle.cycleYear === cycleYear);
+    if (!quote || quote.isPaid) {
+      return NextResponse.json({ error: 'Selected cycle is not eligible for payment' }, { status: 409 });
+    }
+
+    const amount = Number(quote.totalDue);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return NextResponse.json({ error: 'Selected cycle is not payable' }, { status: 409 });
+    }
+
+    const membershipType = String(user.membership_type || '') === 'organization' ? 'organization' : 'personal';
+    const reference = `TLA-PAY-${randomUUID()}`;
+    await connection.query(
+      `INSERT INTO payments
+       (reference,user_id,membership_type,amount,currency,status,payment_method,phone_number,cycle_year,created_at,updated_at)
+       VALUES(?,?,?,?, 'TZS','pending',?,?,?,NOW(),NOW())`,
+      [reference, userId, membershipType, amount, paymentMethod, phoneNumber, cycleYear]
     );
 
-    // Get user details
-    const user = await getUserById(userId);
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    // Generate unique order ID
-    const orderId = `TLA-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-    // Extract phone number from user profile
-    let userPhone = '+255000000000'; // Default fallback
-    if (user.profile) {
-      const profile = user.profile as any;
-      userPhone = profile.phone || 
-                  JSON.parse(profile.contact_info || '{}')?.phone || 
-                  '+255000000000';
-    }
-
-    // Try AzamPay checkout FIRST to get the reference
-    let checkoutResponse;
-    try {
-      checkoutResponse = await azampayService.createMembershipPayment({
-        userId,
-        membershipType,
-        amount,
-        userEmail: customerEmail || user.email,
-        userPhone: phoneNumber,
-        orderId,
-        paymentMethod, // Pass the selected mobile money provider
-      });
-    } catch (checkoutError: any) {
-      console.error('AzamPay checkout error:', checkoutError);
-      console.error('AzamPay checkout error details:', {
-        message: checkoutError?.message || 'Unknown error',
-        stack: checkoutError?.stack
-      });
-      return NextResponse.json(
-        { 
-          error: checkoutError?.message || 'Failed to create payment checkout',
-          details: process.env.NODE_ENV === 'development' ? {
-            originalError: checkoutError?.message,
-            stack: checkoutError?.stack
-          } : undefined
-        },
-        { status: 500 }
-      );
-    }
-
-    // Now create payment record with the checkout reference
-    const paymentReference = checkoutResponse.data.reference;
-    const { pool } = await import('@/lib/db');
-    const connection = await pool.getConnection();
-    
-    try {
-      // Create payment record with the checkout reference
-      await connection.query(
-        `INSERT INTO payments
-           (reference, user_id, membership_type, amount, currency, status,
-            payment_method, phone_number, checkout_url,
-            cycle_year, target_cycle_year, cycle_count, created_at)
-         VALUES (?, ?, ?, ?, 'TZS', 'pending', ?, ?, ?, ?, ?, ?, NOW())`,
-        [
-          paymentReference, userId, membershipType, amount,
-          paymentMethod, phoneNumber, checkoutResponse.data.checkoutUrl,
-          targetCycleYear, targetCycleYear, cycleCount,
-        ]
-      );
-      
-      console.log('Payment record created with reference:', paymentReference, '(cycles:', cycleCount, 'starting', targetCycleYear, ')');
-      
-    } catch (dbError: any) {
-      console.error('Database error:', dbError);
-      
-      // If table doesn't exist, create it with phone_number column
-      if (dbError.code === 'ER_NO_SUCH_TABLE') {
-        console.log('Creating payments table...');
-        try {
-          await connection.query(`
-            CREATE TABLE payments (
-              id INT AUTO_INCREMENT PRIMARY KEY,
-              reference VARCHAR(100) UNIQUE NOT NULL,
-              user_id INT NOT NULL,
-              membership_type VARCHAR(50) NOT NULL,
-              amount DECIMAL(10,2) NOT NULL,
-              currency VARCHAR(3) DEFAULT 'TZS',
-              status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
-              payment_method VARCHAR(50),
-              phone_number VARCHAR(20),
-              transaction_id VARCHAR(100),
-              checkout_url TEXT,
-              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-              paid_at TIMESTAMP NULL DEFAULT NULL,
-              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-              
-              FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-              INDEX idx_user_id (user_id),
-              INDEX idx_reference (reference),
-              INDEX idx_status (status),
-              INDEX idx_created_at (created_at)
-            )
-          `);
-          
-          // Try inserting again with the new cycle metadata
-          await connection.query(
-            `INSERT INTO payments
-               (reference, user_id, membership_type, amount, currency, status,
-                payment_method, phone_number, checkout_url,
-                cycle_year, target_cycle_year, cycle_count, created_at)
-             VALUES (?, ?, ?, ?, 'TZS', 'pending', ?, ?, ?, ?, ?, ?, NOW())`,
-            [
-              paymentReference, userId, membershipType, amount,
-              paymentMethod, phoneNumber, checkoutResponse.data.checkoutUrl,
-              targetCycleYear, targetCycleYear, cycleCount,
-            ]
-          );
-        } catch (createError) {
-          console.error('Failed to create table:', createError);
-          throw new Error('Database setup failed. Please contact administrator.');
-        }
-      } else {
-        throw dbError;
-      }
-    } finally {
-      connection.release();
-    }
-
-    // If in test mode, immediately complete the payment
-    if (checkoutResponse.data.reference.startsWith('TEST-')) {
-      console.log('Test mode detected: Immediately completing payment');
-      
-      // Update payment status to completed
-      const { updateMembershipPayment } = await import('@/lib/membership');
-      console.log('Updating membership payment with:', {
-        reference: paymentReference,
-        transactionId: checkoutResponse.data.transactionId,
-        amount,
-        paymentMethod: 'Test Payment',
-        status: 'completed',
-        paidAt: new Date(),
-      });
-      await updateMembershipPayment({
-        reference: paymentReference,
-        transactionId: checkoutResponse.data.transactionId,
-        amount,
-        paymentMethod: 'Test Payment',
-        status: 'completed',
-        paidAt: new Date(),
-      });
-      console.log('Membership payment updated successfully');
+    // Sandbox-only demo mode: skip the real AzamPay call and settle through the
+    // real callback path after a short delay, so the UI shows processing -> success.
+    const simulateSandboxCallback =
+      process.env.AZAMPAY_ENVIRONMENT === 'sandbox'
+      && process.env.AZAMPAY_SIMULATE_CALLBACK === 'true';
+    if (simulateSandboxCallback) {
+      const operatorMap: Record<string, string> = {
+        azampesa: 'azampesa', mpesa: 'mpesa', airtelmoney: 'airtel',
+        tigopesa: 'tigo', mixxbyyas: 'tigo', halopesa: 'halopesa',
+      };
+      const simulatedTransactionId = `SIM-${randomUUID().replace(/-/g, '').slice(0, 32)}`;
+      const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
+      setTimeout(() => {
+        fetch(`${baseUrl}/api/payments/azampay/callback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            utilityref: reference,
+            externalreference: simulatedTransactionId,
+            transactionstatus: 'success',
+            operator: operatorMap[paymentMethod] || paymentMethod,
+            amount: amount.toString(),
+            msisdn: phoneNumber,
+            transid: simulatedTransactionId,
+            mnoreference: simulatedTransactionId,
+          }),
+        }).catch(() => undefined);
+      }, 4000);
 
       return NextResponse.json({
         success: true,
-        checkoutUrl: checkoutResponse.data.checkoutUrl,
-        reference: checkoutResponse.data.reference,
-        transactionId: checkoutResponse.data.transactionId,
-        orderId,
+        checkoutUrl: null,
+        requiresMobileApproval: true,
+        reference,
+        providerReference: simulatedTransactionId,
+        status: 'pending',
+        message: 'Simulated sandbox payment — settling automatically.',
         amount,
         currency: 'TZS',
-        testMode: true,
-        immediatelyCompleted: true,
+        cycleYear,
       });
     }
 
+    let checkout;
+    try {
+      checkout = await azampayService.createMembershipPayment({
+        userId: String(userId),
+        membershipType,
+        amount,
+        userEmail: String(user.email),
+        userPhone: phoneNumber,
+        orderId: reference,
+        paymentMethod,
+      });
+    } catch (error) {
+      // A timeout/abort means the provider may still have received the push —
+      // keep the payment pending so a late provider callback can settle it.
+      // Only a real provider response (rejection/error) marks it failed.
+      const name = error instanceof Error ? error.name : '';
+      const timedOut = name === 'TimeoutError' || name === 'AbortError';
+      if (!timedOut) {
+        await connection.query(
+          "UPDATE payments SET status='failed',updated_at=NOW() WHERE reference=? AND status='pending'",
+          [reference]
+        );
+      }
+      if (timedOut) {
+        return NextResponse.json({
+          success: true,
+          checkoutUrl: null,
+          requiresMobileApproval: true,
+          reference,
+          status: 'pending',
+          message: 'Provider confirmation is taking longer than usual. If you received a payment prompt, approve it — we will confirm automatically.',
+          amount,
+          currency: 'TZS',
+          cycleYear,
+        });
+      }
+      throw error;
+    }
+
+    const providerPayload = checkout.data && typeof checkout.data === 'object' ? checkout.data : {};
+    const providerReference = String(
+      providerPayload.reference
+      || providerPayload.transactionId
+      || providerPayload.pgReferenceId
+      || providerPayload.referenceId
+      || checkout.reference
+      || checkout.transactionId
+      || checkout.pgReferenceId
+      || checkout.referenceId
+      || ''
+    ) || null;
+    const checkoutUrl = String(providerPayload.checkoutUrl || checkout.checkoutUrl || '') || null;
+    await connection.query(
+      'UPDATE payments SET checkout_url=?,transaction_id=?,updated_at=NOW() WHERE reference=? AND status=\'pending\'',
+      [checkoutUrl, providerReference, reference]
+    );
+
     return NextResponse.json({
       success: true,
-      checkoutUrl: checkoutResponse.data.checkoutUrl,
-      reference: checkoutResponse.data.reference,
-      transactionId: checkoutResponse.data.transactionId,
-      orderId,
+      checkoutUrl,
+      requiresMobileApproval: !checkoutUrl,
+      reference,
+      providerReference,
       amount,
       currency: 'TZS',
-    });
-
-  } catch (error) {
-    console.error('Payment checkout error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create payment checkout' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const reference = searchParams.get('reference');
-
-  if (!reference) {
-    return NextResponse.json(
-      { error: 'Reference parameter is required' },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const paymentStatus = await azampayService.checkPaymentStatus(reference);
-    
-    return NextResponse.json({
-      success: true,
-      status: paymentStatus,
+      cycleYear,
     });
   } catch (error) {
-    console.error('AzamPay status check error:', error);
-    return NextResponse.json(
-      { error: 'Failed to check payment status' },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Payment checkout failed';
+    return NextResponse.json({ error: message }, { status: 502 });
+  } finally {
+    connection.release();
   }
 }

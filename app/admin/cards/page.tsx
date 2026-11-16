@@ -172,7 +172,7 @@ export default function AdminCardsPage() {
           },
         ],
         {
-          fileName: `TLA_Membership_Card_${card.membershipNumber}.pdf`,
+          fileName: `ZaLIKA_Membership_Card_${card.membershipNumber}.pdf`,
         }
       );
       toast.success('Card downloaded successfully');
@@ -230,7 +230,7 @@ export default function AdminCardsPage() {
           </head>
           <body>
             <div class="card">
-              <h2>Tanzania Library Association</h2>
+              <h2>Zanzibar Library and Knowledge Association</h2>
               <h3>Membership Card</h3>
               
               <div class="card-field">
@@ -315,7 +315,7 @@ export default function AdminCardsPage() {
         })),
         {
           onProgress: (p) => setBulkProgress({ done: p.done, total: p.total }),
-          fileName: `TLA_Membership_Cards_${new Date().toISOString().split('T')[0]}_x${cardsToDownload.length}.pdf`,
+          fileName: `ZaLIKA_Membership_Cards_${new Date().toISOString().split('T')[0]}_x${cardsToDownload.length}.pdf`,
         }
       );
       toast.success(`${cardsToDownload.length} membership card(s) exported to PDF`);

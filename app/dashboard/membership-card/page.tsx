@@ -154,7 +154,7 @@ export default function MembershipCardPage() {
       ctx.roundRect(0, 0, canvasWidth, canvasHeight * 0.23, 16);
       ctx.fill();
       
-      // Draw TLA logo image
+      // Draw ZaLIKA logo image
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
       logoImg.src = '/logo.png';
@@ -177,12 +177,12 @@ export default function MembershipCardPage() {
         ctx.fillStyle = 'white';
         ctx.font = `bold ${Math.round(12 * (canvasWidth / 336))}px Arial, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText('TANZANIA LIBRARY AND', 190 * (canvasWidth / 336), 30 * (canvasHeight / 212));
-        ctx.fillText('INFORMATION ASSOCIATION', 190 * (canvasWidth / 336), 50 * (canvasHeight / 212));
+        ctx.fillText('ZANZIBAR LIBRARY AND', 190 * (canvasWidth / 336), 30 * (canvasHeight / 212));
+        ctx.fillText('KNOWLEDGE ASSOCIATION', 190 * (canvasWidth / 336), 50 * (canvasHeight / 212));
         
         ctx.fillStyle = '#10b981';
         ctx.font = `bold ${Math.round(10 * (canvasWidth / 336))}px Arial, sans-serif`;
-        ctx.fillText('(TLA)', 175 * (canvasWidth / 336), 70 * (canvasHeight / 212));
+        ctx.fillText('(ZaLIKA)', 175 * (canvasWidth / 336), 70 * (canvasHeight / 212));
         
         // Draw member name section matching displayed SVG exactly
         ctx.fillStyle = '#10b981';
@@ -232,7 +232,7 @@ export default function MembershipCardPage() {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.font = `${Math.round(8 * (canvasWidth / 336))}px Arial, sans-serif`;
         ctx.textAlign = 'left';
-        ctx.fillText('Authorized Membership Card • TLA', 16 * (canvasWidth / 336), 205 * (canvasHeight / 212));
+        ctx.fillText('Authorized Membership Card • ZaLIKA', 16 * (canvasWidth / 336), 205 * (canvasHeight / 212));
         
         // Convert canvas to PDF and download
         console.log('💾 Converting canvas to PDF...');
@@ -309,6 +309,11 @@ export default function MembershipCardPage() {
         // Draw logo image
         if (logoImg.complete) {
           ctx.save();
+          // White badge behind the logo so it reads on the dark card
+          ctx.fillStyle = 'rgba(255,255,255,0.95)';
+          ctx.beginPath();
+          ctx.roundRect(4 * (canvasWidth / 336), 3 * (canvasHeight / 212), 70 * (canvasWidth / 336), 64 * (canvasHeight / 212), 10 * (canvasWidth / 336));
+          ctx.fill();
           ctx.globalAlpha = 0.9;
           // Match the displayed SVG exactly: x=9, y=5, width=60, height=60
           ctx.drawImage(logoImg, 9 * (canvasWidth / 336), 5 * (canvasHeight / 212), 60 * (canvasWidth / 336), 60 * (canvasHeight / 212));
@@ -407,7 +412,7 @@ export default function MembershipCardPage() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>TLA Membership Card</title>
+        <title>ZaLIKA Membership Card</title>
         <style>
           @page {
             size: auto;
@@ -478,6 +483,7 @@ export default function MembershipCardPage() {
             <rect width="336" height="50" fill="rgba(16, 185, 129, 0.2)" rx="16" ry="16"/>
             
             <!-- Logo Image - EXACT MATCH -->
+            <rect x="4" y="3" width="70" height="64" rx="10" fill="rgba(255,255,255,0.95)"/>
             <image
               href="/logo.png"
               x="9"
@@ -488,9 +494,9 @@ export default function MembershipCardPage() {
             />
             
             <!-- Organization name - EXACT MATCH -->
-            <text x="190" y="30" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">TANZANIA LIBRARY AND</text>
-            <text x="190" y="50" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">INFORMATION ASSOCIATION</text>
-            <text x="175" y="70" font-family="Arial" font-size="10" fill="#10b981" text-anchor="middle" font-weight="600">(TLA)</text>
+            <text x="190" y="30" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">ZANZIBAR LIBRARY AND</text>
+            <text x="190" y="50" font-family="Arial" font-size="12" font-weight="900" fill="white" text-anchor="middle">KNOWLEDGE ASSOCIATION</text>
+            <text x="175" y="70" font-family="Arial" font-size="10" fill="#10b981" text-anchor="middle" font-weight="600">(ZaLIKA)</text>
             
             <!-- Profile picture - EXACT MATCH -->
             <g>
@@ -541,7 +547,7 @@ export default function MembershipCardPage() {
             
             <!-- Bottom accent bar with green - EXACT MATCH -->
             <rect y="192" width="336" height="20" fill="rgba(16, 185, 129, 0.15)"/>
-            <text x="16" y="205" font-family="Arial, sans-serif" font-size="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • TLA</text>
+            <text x="16" y="205" font-family="Arial, sans-serif" font-size="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • ZaLIKA</text>
           </svg>
         </div>
         
@@ -580,8 +586,8 @@ export default function MembershipCardPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'TLA Membership Card',
-          text: `Check out my Tanzania Library Association membership card! Member #${membershipStatus?.membership?.membershipNumber}`,
+          title: 'ZaLIKA Membership Card',
+          text: `Check out my Zanzibar Library and Knowledge Association membership card! Member #${membershipStatus?.membership?.membershipNumber}`,
           url: window.location.href
         });
       } catch (err) {
@@ -805,7 +811,7 @@ export default function MembershipCardPage() {
                 ) : 'Refresh Status'}
               </button>
             </div>
-            <p className="mt-2 text-gray-600 dark:text-gray-400 dark:text-gray-500">Your official Tanzania Library Association membership card</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400 dark:text-gray-500">Your official Zanzibar Library and Knowledge Association membership card</p>
           </div>
 
           {/* Membership Card */}
@@ -857,7 +863,8 @@ export default function MembershipCardPage() {
                   {/* Top header bar with green */}
                   <rect width="336" height="50" fill="rgba(16, 185, 129, 0.2)" rx="16" ry="16"/>
                   
-                  {/* Logo Image without background */}
+                  {/* Logo Image on a white badge so it reads on the dark card */}
+                  <rect x="4" y="3" width="70" height="64" rx="10" fill="rgba(255,255,255,0.95)"/>
                   <image
                     href="/logo.png"
                     x="9"
@@ -868,9 +875,9 @@ export default function MembershipCardPage() {
                   />
                   
                   {/* Organization name */}
-                  <text x="190" y="30" fontFamily="Arial" fontSize="12" fontWeight="900" fill="white" textAnchor="middle">TANZANIA LIBRARY AND</text>
-                  <text x="190" y="50" fontFamily="Arial" fontSize="12" fontWeight="900" fill="white" textAnchor="middle">INFORMATION ASSOCIATION</text>
-                  <text x="175" y="70" fontFamily="Arial" fontSize="10" fill="#10b981" textAnchor="middle" fontWeight="600">(TLA)</text>
+                  <text x="190" y="30" fontFamily="Arial" fontSize="12" fontWeight="900" fill="white" textAnchor="middle">ZANZIBAR LIBRARY AND</text>
+                  <text x="190" y="50" fontFamily="Arial" fontSize="12" fontWeight="900" fill="white" textAnchor="middle">KNOWLEDGE ASSOCIATION</text>
+                  <text x="175" y="70" fontFamily="Arial" fontSize="10" fill="#10b981" textAnchor="middle" fontWeight="600">(ZaLIKA)</text>
                   
                   {/* Profile picture with square frame and clipping */}
                   <g>
@@ -930,7 +937,7 @@ export default function MembershipCardPage() {
                   
                   {/* Bottom accent bar with green */}
                   <rect y="192" width="336" height="20" fill="rgba(16, 185, 129, 0.15)"/>
-                  <text x="16" y="205" fontFamily="Arial, sans-serif" fontSize="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • TLA</text>
+                  <text x="16" y="205" fontFamily="Arial, sans-serif" fontSize="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • ZaLIKA</text>
                 </svg>
               </div>
 

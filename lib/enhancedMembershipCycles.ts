@@ -1,4 +1,4 @@
-import { pool } from './db';
+import { pool } from './db.ts';
 import type { RowDataPacket } from 'mysql2';
 
 /**
@@ -67,7 +67,7 @@ export function getMembershipFee(args: {
 }
 
 /**
- * Generate membership number in TLAYYXXXXX format
+ * Generate membership number in ZaLIKAYYXXXXX format
  */
 export async function generateMembershipNumber(year: number = new Date().getFullYear()): Promise<string> {
     const connection = await pool.getConnection();

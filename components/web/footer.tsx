@@ -14,9 +14,9 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8">
         {/* About Section */}
         <div>
-          <h3 className="text-emerald-400 text-lg font-semibold mb-2">About TLA</h3>
+          <h3 className="text-emerald-400 text-lg font-semibold mb-2">About ZaLIKA</h3>
           <p className="text-gray-300 text-sm">
-            Tanzania Library Association is dedicated to promoting library services,
+            Zanzibar Library and Knowledge Association is dedicated to promoting library services,
             supporting professionals, and advocating for access to knowledge
             throughout Tanzania.
           </p>
@@ -43,7 +43,7 @@ export function Footer() {
       </div>
 
       <div className="mt-8 border-t border-emerald-700 pt-4 text-center text-gray-400 text-sm">
-        &copy; {currentYear} Tanzania Library Association (TLA). All rights reserved.
+        &copy; {currentYear} Zanzibar Library and Knowledge Association (ZaLIKA). All rights reserved.
       </div>
     </footer>
   );

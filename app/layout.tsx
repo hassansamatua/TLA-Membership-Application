@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tanzania Library Association",
-  description: "Tanzania Library and Information Association - Official Website",
+  title: "Zanzibar Library and Knowledge Association",
+  description: "Zanzibar Library and Knowledge Association - Official Website",
 };
 
 export default function RootLayout({

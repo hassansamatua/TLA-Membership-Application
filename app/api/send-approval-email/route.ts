@@ -6,6 +6,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 export async function POST(request: Request) {
   try {
+    if (!resend) return NextResponse.json({ error: 'Email service unavailable' }, { status: 503 });
     const { email, name, membershipNumber } = await request.json();
 
     if (!email || !name) {

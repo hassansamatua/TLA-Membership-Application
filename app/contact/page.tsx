@@ -275,7 +275,7 @@ export default function ContactPage() {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Tanzania Library Association Location"
+                    title="Zanzibar Library and Knowledge Association Location"
                   />
                 ) : (
                   // Default OpenStreetMap for Dar es Salaam
@@ -285,7 +285,7 @@ export default function ContactPage() {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Tanzania Library Association Location - Dar es Salaam"
+                    title="Zanzibar Library and Knowledge Association Location - Dar es Salaam"
                   />
                 )}
               </div>

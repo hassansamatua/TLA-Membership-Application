@@ -66,7 +66,7 @@ export async function generateBulkMembershipCardsPDF(
 
   const fileName =
     opts.fileName ??
-    `TLA_Membership_Cards_${new Date().toISOString().split('T')[0]}.pdf`;
+    `ZaLIKA_Membership_Cards_${new Date().toISOString().split('T')[0]}.pdf`;
   pdf.save(fileName);
 }
 
@@ -114,7 +114,7 @@ export async function printBulkMembershipCards(
     .map(
       ({ card, dataUrl }) => `
         <div class="card">
-          <img src="${dataUrl}" alt="TLA Membership Card ${escapeHtml(card.membershipNumber)}" />
+          <img src="${dataUrl}" alt="ZaLIKA Membership Card ${escapeHtml(card.membershipNumber)}" />
         </div>`
     )
     .join('');
@@ -122,7 +122,7 @@ export async function printBulkMembershipCards(
   printWindow.document.write(`<!DOCTYPE html>
 <html>
   <head>
-    <title>TLA Membership Cards (${rendered.length})</title>
+    <title>ZaLIKA Membership Cards (${rendered.length})</title>
     <style>
       @page { size: A4 portrait; margin: 12mm; }
       * { box-sizing: border-box; }

@@ -116,7 +116,7 @@ export default function AdminPage() {
             <div>
               <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
               <p className="text-white-100 text-lg">Welcome back, {user.name}!</p>
-              <p className="text-white-200 text-sm mt-1">Here's what's happening with your TLA membership system today</p>
+              <p className="text-white-200 text-sm mt-1">Here's what's happening with your ZaLIKA membership system today</p>
             </div>
             <div className="hidden lg:block">
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 text-center">

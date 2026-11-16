@@ -223,7 +223,8 @@ export default function MembershipCard({
         {/* Top header bar with green */}
         <rect width="336" height="50" fill="rgba(16, 185, 129, 0.2)" rx="16" ry="16"/>
         
-        {/* Logo Image without background */}
+        {/* Logo Image on a white badge so it reads on the dark card */}
+        <rect x="4" y="3" width="80" height="72" rx="12" fill="rgba(255,255,255,0.95)"/>
         <image
           href="/logo.png"
           x="9"
@@ -234,9 +235,9 @@ export default function MembershipCard({
         />
         
         {/* Organization name */}
-        <text x="190" y="30" fontFamily="Arial" fontSize="12" fontWeight="900" fill="white" textAnchor="middle">TANZANIA LIBRARY AND</text>
-        <text x="190" y="50" fontFamily="Arial" fontSize="12" fontWeight="900" fill="white" textAnchor="middle">INFORMATION ASSOCIATION</text>
-        <text x="175" y="70" fontFamily="Arial" fontSize="10" fill="#10b981" textAnchor="middle" fontWeight="600">(TLA)</text>
+        <text x="190" y="30" fontFamily="Arial" fontSize="12" fontWeight="900" fill="white" textAnchor="middle">ZANZIBAR LIBRARY AND</text>
+        <text x="190" y="50" fontFamily="Arial" fontSize="12" fontWeight="900" fill="white" textAnchor="middle">KNOWLEDGE ASSOCIATION</text>
+        <text x="175" y="70" fontFamily="Arial" fontSize="10" fill="#10b981" textAnchor="middle" fontWeight="600">(ZaLIKA)</text>
         
         {/* Profile picture with square frame and clipping */}
         <g>
@@ -298,7 +299,7 @@ export default function MembershipCard({
         
         {/* Bottom accent bar with green */}
         <rect y="192" width="336" height="20" fill="rgba(16, 185, 129, 0.15)"/>
-        <text x="16" y="205" fontFamily="Arial, sans-serif" fontSize="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • TLA</text>
+        <text x="16" y="205" fontFamily="Arial, sans-serif" fontSize="8" fill="rgba(255, 255, 255, 0.7)">Authorized Membership Card • ZaLIKA</text>
       </svg>
     </div>
 

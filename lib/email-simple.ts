@@ -16,7 +16,7 @@ export const emailConfig: EmailConfig = {
   port: parseInt(process.env.EMAIL_PORT || '587'),
   username: process.env.EMAIL_USER || '',
   password: process.env.EMAIL_PASS || '',
-  from: process.env.EMAIL_FROM || 'hanscovd5@gmail.com'
+  from: process.env.EMAIL_FROM || ''
 };
 
 export const sendPasswordResetEmail = async (email: string, resetCode: string): Promise<boolean> => {
@@ -32,7 +32,7 @@ export const sendPasswordResetEmail = async (email: string, resetCode: string): 
         pass: emailConfig.password
       },
       tls: {
-        rejectUnauthorized: false // Allow self-signed certificates
+        rejectUnauthorized: true // Allow self-signed certificates
       }
     });
 
@@ -82,24 +82,11 @@ export const sendPasswordResetEmail = async (email: string, resetCode: string): 
     // Send email using NodeMailer
     const info = await transporter.sendMail(mailOptions);
     
-    console.log('=== EMAIL DEBUG ===');
-    console.log('To:', email);
-    console.log('Subject:', subject);
-    console.log('Reset Code:', resetCode);
-    console.log('Message ID:', info.messageId);
-    console.log('Response:', info.response);
-    console.log('==================');
 
-    if (info.accepted) {
-      console.log('Email sent successfully to:', email);
-      return true;
-    } else {
-      console.error('Failed to send email to:', email);
-      console.error('Error:', info.error);
-      return false;
-    }
-  } catch (error) {
-    console.error('Error sending password reset email:', error);
+
+    return Boolean(info.accepted);
+  } catch {
+    console.error('Password reset email delivery failed');
     return false;
   }
 };

@@ -96,7 +96,7 @@ const dayOfWeekLabel = (n: number) =>
 /*                              Chart palette                                 */
 /* -------------------------------------------------------------------------- */
 
-/** Emerald-led palette used across every chart so the TLA brand carries through. */
+/** Emerald-led palette used across every chart so the ZaLIKA brand carries through. */
 const EMERALD_SERIES = ['#10b981', '#34d399', '#6ee7b7', '#059669', '#047857', '#065f46'];
 /** Status-aware palette for distributions (active = emerald, expired = red, etc.). */
 const STATUS_PALETTE: Record<string, string> = {
@@ -265,7 +265,7 @@ export default function ReportsPage() {
     if (format === 'json') {
       const data = {
         generatedAt: new Date().toISOString(),
-        organisation: 'Tanzania Library Association',
+        organisation: 'Zanzibar Library and Knowledge Association',
         period,
         summary: reportData,
         membership: membershipAnalytics,
@@ -288,7 +288,7 @@ export default function ReportsPage() {
     };
     const row = (...cells: unknown[]) => lines.push(cells.map(esc).join(','));
 
-    row('Tanzania Library Association — Membership Report');
+    row('Zanzibar Library and Knowledge Association — Membership Report');
     row('Generated at', new Date().toISOString());
     row('Period', period);
     row();
@@ -516,7 +516,7 @@ export default function ReportsPage() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">Loading TLA analytics…</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Loading ZaLIKA analytics…</p>
       </div>
     );
   }
@@ -545,9 +545,9 @@ export default function ReportsPage() {
       </button>
 
       <PageHeader
-        eyebrow="Tanzania Library Association"
+        eyebrow="Zanzibar Library and Knowledge Association"
         title="Membership analytics"
-        description="Track membership growth, cycle revenue, payment performance, and engagement across TLA — all in real time."
+        description="Track membership growth, cycle revenue, payment performance, and engagement across ZaLIKA — all in real time."
         icon={<FiBarChart2 className="h-5 w-5" />}
         actions={
           <div className="flex flex-wrap items-center gap-2">
@@ -689,7 +689,7 @@ export default function ReportsPage() {
           <div className="lg:col-span-2">
             <ChartCard
               title="Membership growth"
-              description={`New TLA members per month · ${periodLabel[period]} view`}
+              description={`New ZaLIKA members per month · ${periodLabel[period]} view`}
               icon={<FiTrendingUp className="h-4 w-4" />}
               empty={monthlySignupsData.length === 0}
             >
@@ -765,7 +765,7 @@ export default function ReportsPage() {
                     Cycle-fee snapshot
                   </h3>
                   <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    Fee structure used by every TLA membership cycle (Feb 1 → Jan 31).
+                    Fee structure used by every ZaLIKA membership cycle (Feb 1 → Jan 31).
                   </p>
                 </div>
                 <StatusBadge tone="emerald">Current rates</StatusBadge>
@@ -1320,7 +1320,7 @@ export default function ReportsPage() {
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
             <ChartCard
               title="Revenue by membership type"
-              description="Where TLA income comes from"
+              description="Where ZaLIKA income comes from"
               icon={<FiBarChart2 className="h-4 w-4" />}
               empty={revenueByTypeData.length === 0}
             >
@@ -1457,7 +1457,7 @@ export default function ReportsPage() {
 
             <ChartCard
               title="Daily active users"
-              description="Last 30 days of TLA platform activity"
+              description="Last 30 days of ZaLIKA platform activity"
               icon={<FiTrendingUp className="h-4 w-4" />}
               empty={dailyActiveData.length === 0}
             >
@@ -1489,7 +1489,7 @@ export default function ReportsPage() {
 
           <ChartCard
             title="Feature usage"
-            description="How often each TLA service was used during this window"
+            description="How often each ZaLIKA service was used during this window"
             icon={<FiBarChart2 className="h-4 w-4" />}
             empty={!(activityAnalytics.featureUsage?.length > 0)}
           >

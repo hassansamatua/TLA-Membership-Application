@@ -1,0 +1,35 @@
+# Security Audit
+
+Severity scale: Critical / High / Medium / Low. "Runtime" = reproduced locally against `next dev` + disposable DB. No secrets are reproduced here.
+
+| ID | Sev | Location | Evidence | Impact / scenario | Remediation |
+|---|---|---|---|---|---|
+| S1 | **Critical** | `app/api/auth/forgot-password/route.ts` `POST` | Response JSON includes `resetCode` and `expiryTime` when email send succeeds (source). Runtime: with SMTP unset it returns "Failed to send", so leak path confirmed in source only | Anyone who knows an email (incl. admin) requests a reset, reads code from response, calls `PUT` → full account takeover | Never return the code; generic response; rate-limit; hash reset tokens; attempt limit |
+| S2 | **Critical** | `app/api/setup/ensure-admin/route.ts` | No auth and no `NODE_ENV` guard; creates admin with hardcoded credentials and returns them | Anyone can create/know an admin account in production | Delete route; seed admins out-of-band |
+| S3 | **Critical** | `app/api/payments/cleanup/route.ts` | No auth (runtime: unauth POST reaches action dispatch → 400 "Invalid action") ; actions UPDATE/DELETE payments & memberships | Unauthenticated deletion/alteration of financial records | Remove from production |
+| S4 | **Critical** | `app/api/payments/complete/route.ts` | No auth (runtime: unauth POST → lookup 404); completes any pending payment by `reference` via `lib/membership.ts#updateMembershipPayment` | Activate membership without paying | Only complete via verified gateway callback |
+| S5 | **Critical** | `app/api/import-*`, `app/api/migrate-*` (10 routes), `app/api/fix-membership`, `app/api/membership/next-number` | No auth; CREATE TABLE / INSERT / ALTER / UPDATE; `migrate-simple`, `import-tables` insert admin user id 35 with hardcoded hash | Schema tampering, admin injection, data corruption | Remove from deployable app |
+| S6 | **High** | `app/api/reports/generate/route.ts`, `app/api/admin/reports/{summary,membership,payments,activities,extended}` | No auth. Runtime: unauth `GET /api/reports/generate?type=membership` → 200 with member names, emails, membership numbers, payment status; summary/membership → 200 | Bulk PII and financial data disclosure | Require admin |
+| S7 | **High** | `app/api/reports/send-email`, `app/api/send-approval-email` | No auth; sends report / emails to caller-supplied address | Data exfiltration, spam from TLA domain | Require admin |
+| S8 | **High** | `app/api/admin/payment` GET/POST, `app/api/admin/payments`, `app/api/admin/news` | `verifyToken` only, no admin check. Runtime: non-admin member read another user's (admin id 35) record → 200; member POST reached DB write (failed only due to D2 schema bug) ; POST sets `users.is_approved=1` | Privilege escalation: members record payments, approve themselves, manage news | Central `requireAdmin()` |
+| S9 | **High** | `app/api/membership/pay/route.ts` | Authenticated member inserts a `payments` row with `status='completed'` and activates membership without any gateway; fee category from body `newUser` | Free membership activation | Remove; activate only from verified gateway status |
+| S10 | **High** | `app/api/membership/payment-success`, `app/api/membership/complete-payment` | Mark caller's pending payment completed by reference / client `amount` without querying gateway | Payment bypass | Verify with AzamPay status API server-side |
+| S11 | **High** | `app/api/payments/azampay/checkout`, `app/api/payments/mobile-money` | No auth; `userId`, `amount`, `membershipType` from body | Create payments for other users, arbitrary amounts | Derive user from token; compute amount server-side |
+| S12 | **High** | `app/api/payments/azampay/callback/route.ts` | Signature verification only if `NODE_ENV==='production'` | Forged callbacks on any non-prod-flagged deployment (preview/staging) | Always verify; idempotency |
+| S13 | **High** | `lib/auth.ts` `JWT_SECRET` fallback `'your-secret-key'`; `app/api/auth/refresh` fallbacks | source | If env missing, anyone can forge admin JWTs (`isAdmin` claim) | Fail fast when secret missing |
+| S14 | **High** | `app/api/admin/create-admin`, `fix-admin`, `reset-admin` | Guarded only by `NODE_ENV !== 'production'`, no auth, return credentials | Admin takeover on any misconfigured/staging deployment | Delete |
+| S15 | High | `lib/auth.ts#comparePasswords` | Accepts unsalted MD5/SHA1/SHA256; logs first 5 password chars and hash prefixes; `forgot-password PUT` stores **unsalted SHA-256** | Weak hashes; credentials in logs | bcrypt/argon2 only; rehash on login; remove logs |
+| S16 | Medium | `app/api/auth/login` | Distinct "No account found" / "Incorrect password" (runtime verified); no rate limit/lockout; cookie `secure:false` hardcoded; forgot-password 404 for unknown email | Enumeration, brute force, cookie over HTTP | Generic message, rate limit, `secure` in prod |
+| S17 | Medium | `middleware.ts` | All `/api/*` bypass; authZ is per-route and inconsistent (48/121 route files have no token check) | Systemic cause of S2–S11 | Default-deny API guard |
+| S18 | Medium | Error handling (`test-db`, `admin/payment`, many routes) | Runtime: stack traces and SQL errors returned to client | Information disclosure | Generic errors |
+| S19 | Medium | Committed PII: `public/uploads/**` (19 files: documents, profile pictures), `lib/next_auth(4).sql`, `_archive/aiven_ready.sql` (user rows, emails, NIDA, bcrypt hashes), `users_backup` | git tree | Personal data breach; offline hash cracking | Remove + purge history; rotate passwords |
+| S20 | Medium | `lib/db.ts` | Non-local DB falls back to **unencrypted** connection if CA file missing; default `root`/empty password | Credentials/data in clear | Require TLS |
+| S21 | Medium | Registration/profile logging | `auth/register` logs full request body incl. password; payment routes log rows | Secrets in logs | Remove |
+| S22 | Medium | `app/api/debug/*`, `app/api/test-*`, `app/fix-auth`, `app/test-membership-card` | Shipped debug surface; `debug/send-email` sends emails, reveals EMAIL config state | Abuse/disclosure | Remove from prod |
+| S23 | Low | SQL injection | Most queries parameterised. Interpolation found: `migrate-single`, `migrate-data` (`SHOW TABLES LIKE '${tableName}'` from internal list), `reports/generate` (column whitelist) | Low exploitability as observed | Keep whitelists; remove migrate routes |
+| S24 | Low | CSRF | Cookie `sameSite` lax/default + JSON APIs; no CSRF tokens | Limited | SameSite=Strict for admin, origin check |
+| S25 | Info | Audit logging | `audit_logs`, `login_logs` tables never written | No forensic trail for approvals/payments | Implement |
+| S26 | Info | Dependencies | `npm audit --omit=dev`: 68 vulns (5 critical, 41 high), mostly via `vercel` CLI in dependencies | Supply chain | Move CLI to devDeps, update |
+
+File uploads: profile picture/document upload writes into `public/` (served statically); type/size validation was not fully verified — treat as **Unknown/needs runtime test**.
+CORS: no custom CORS on Next routes (same-origin default); PHP legacy sets `localhost:3000` with credentials (not deployed).

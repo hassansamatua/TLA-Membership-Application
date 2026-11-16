@@ -129,7 +129,7 @@ export default function EventsPage() {
 
         <PageHeader
           eyebrow="Events"
-          title="TLA Events"
+          title="ZaLIKA Events"
           description={
             upcomingCount > 0
               ? `${upcomingCount} upcoming event${upcomingCount === 1 ? '' : 's'} — register now to secure your seat.`

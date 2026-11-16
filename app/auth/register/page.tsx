@@ -206,13 +206,13 @@ export default function RegisterPage() {
         {/* Brand + intro */}
         <div className="mb-8 flex flex-col items-center text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-sm">
-            <span className="text-sm font-bold">TLA</span>
+            <span className="text-sm font-bold">ZaLIKA</span>
           </div>
           <p className="text-[11px] font-medium uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
             Membership application
           </p>
           <h1 className="mt-1 text-2xl font-semibold text-gray-900 sm:text-3xl dark:text-gray-50">
-            Create your TLA account
+            Create your ZaLIKA account
           </h1>
           <p className="mt-2 max-w-xl text-sm text-gray-600 dark:text-gray-400">
             Fill in the form below. Fields marked with{' '}

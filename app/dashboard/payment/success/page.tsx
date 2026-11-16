@@ -1,167 +1,66 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FiCheckCircle, FiAlertCircle, FiLoader, FiHome, FiCreditCard } from 'react-icons/fi';
+import { FiAlertCircle, FiCheckCircle, FiCreditCard, FiHome } from 'react-icons/fi';
 
 export default function PaymentSuccessPage() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'failed' | 'error'>('loading');
-  const [message, setMessage] = useState<string>('Processing your payment...');
-  const [reference, setReference] = useState<string>('');
+  const referenceParam = searchParams.get('reference') || '';
+  const gatewayParam = searchParams.get('gateway') === 'evpay' ? 'evpay' : 'azampay';
+  const testMode = searchParams.get('test');
+  const [status, setStatus] = useState<'loading' | 'success' | 'failed' | 'error'>(() =>
+    !referenceParam ? 'error' : testMode === 'true' || referenceParam.startsWith('TEST-') ? 'failed' : 'loading'
+  );
+  const [message, setMessage] = useState(() =>
+    !referenceParam ? 'No payment reference found' : testMode === 'true' || referenceParam.startsWith('TEST-') ? 'Unverified test payments cannot activate membership.' : 'Processing your payment...'
+  );
+  const [reference] = useState(referenceParam);
 
   useEffect(() => {
-    const referenceParam = searchParams.get('reference');
-    const testMode = searchParams.get('test');
-    
-    if (referenceParam) {
-      setReference(referenceParam);
-      
-      // If test mode, immediately show success and activate membership
-      if (testMode === 'true' || referenceParam.startsWith('TEST-')) {
-        setStatus('success');
-        setMessage('Payment successful! Your membership has been activated.');
-        
-        // For test payments, activate membership via server action
-        activateTestMembership(referenceParam);
-        
-        // Ensure the payment status is marked as completed
-        // The API will handle updating the membership status
-      } else {
-        // Real payment - check status
-        checkPaymentStatus(referenceParam);
-      }
-    } else {
-      setStatus('error');
-      setMessage('No payment reference found');
-    }
-  }, [searchParams]);
+    if (!referenceParam || testMode === 'true' || referenceParam.startsWith('TEST-')) return;
 
-  const activateTestMembership = async (ref: string, retryCount: number = 0): Promise<void> => {
-    console.log(`Starting test membership activation for reference: ${ref} (attempt ${retryCount + 1})`);
-    
-    try {
-      // First, create a test payment record
-      console.log('Creating test payment record...');
-      const createResponse = await fetch('/api/payments/create-test', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
-        },
-        body: JSON.stringify({ reference: ref }),
-        credentials: 'include',
-      });
+    let cancelled = false;
+    async function checkPaymentStatus(ref: string, gateway: string) {
+      try {
+        const response = await fetch(`/api/payments/${gateway}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reference: ref }),
+          credentials: 'include',
+        });
+        const data = await response.json();
+        if (cancelled) return;
 
-      const createData = await createResponse.json();
-      console.log('Create test payment response:', {
-        status: createResponse.status,
-        ok: createResponse.ok,
-        data: createData
-      });
-
-      if (!createResponse.ok) {
-        console.error('Failed to create test payment:', createData.error || 'Unknown error');
-        return;
-      }
-
-      // Wait for database to commit and then try activation
-      console.log('Waiting for payment to be committed...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Now activate the membership
-      console.log('Activating membership via payment-success API...');
-      
-      const response = await fetch('/api/membership/payment-success', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
-        },
-        body: JSON.stringify({ paymentReference: ref }),
-        credentials: 'include',
-      });
-      
-      console.log('Payment success response status:', response.status);
-      
-      const data = await response.json().catch(async (e) => {
-        console.error('Failed to parse JSON response:', e);
-        const text = await response.text().catch(() => 'Could not read response text');
-        console.error('Raw response text:', text);
-        return { error: 'Invalid JSON response', rawText: text };
-      });
-      
-      console.log('Payment success response:', {
-        status: response.status,
-        ok: response.ok,
-        data: data
-      });
-      
-      if (response.ok && data.success) {
-        console.log('Test membership activated for reference:', ref);
-        setStatus('success');
-        setMessage('Payment successful! Your membership has been activated.');
-      } else {
-        const serverMessage =
-          data?.message || data?.error || data?.details || 'Unknown error';
-        console.error('Failed to activate test membership:', serverMessage);
-        console.error('Response status:', response.status);
-        console.error('Response data:', data);
-
-        // Retry logic
-        if (retryCount < 3) {
-          console.log(`Activation failed, retrying... (${retryCount + 1}/3)`);
-          await activateTestMembership(ref, retryCount + 1);
+        if (response.ok && data.success) {
+          if (data.status === 'completed') {
+            setStatus('success');
+            setMessage('Payment successful! Your membership has been activated.');
+          } else if (data.status === 'failed') {
+            setStatus('failed');
+            setMessage('Payment failed. Please try again or contact support.');
+          } else {
+            setMessage('Payment is still pending. Checking again...');
+            setTimeout(() => void checkPaymentStatus(ref, gateway), 3000);
+          }
         } else {
-          setStatus('error');
-          setMessage(
-            `Payment activation failed after multiple attempts: ${serverMessage}`
-          );
-        }
-      }
-    } catch (error: any) {
-      console.error('Error activating test membership:', error);
-      setStatus('error');
-      setMessage('Payment activation failed. Please try again.');
-    }
-  };
-
-  const checkPaymentStatus = async (ref: string) => {
-    try {
-      const response = await fetch(`/api/payments/azampay/checkout?reference=${ref}`);
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        const paymentStatus = data.status;
-        
-        if (paymentStatus.data.status === 'SUCCESS') {
-          setStatus('success');
-          setMessage('Payment successful! Your membership has been activated.');
-          
-          // Don't auto-redirect - let user choose when to view card
-          // setTimeout(() => {
-          //   router.push('/dashboard/membership-card');
-          // }, 3000);
-        } else if (paymentStatus.data.status === 'FAILED') {
           setStatus('failed');
-          setMessage('Payment failed. Please try again or contact support.');
-        } else {
-          // Still pending, check again in a few seconds
-          setTimeout(() => checkPaymentStatus(ref), 3000);
+          setMessage(data.error || 'Unable to verify payment status');
         }
-      } else {
-        setStatus('failed');
-        setMessage('Unable to verify payment status');
+      } catch {
+        if (!cancelled) {
+          setStatus('failed');
+          setMessage('Error verifying payment status');
+        }
       }
-    } catch (error) {
-      console.error('Payment status check error:', error);
-      setStatus('failed');
-      setMessage('Error verifying payment status');
     }
-  };
+
+    void checkPaymentStatus(referenceParam, gatewayParam);
+    return () => { cancelled = true; };
+  }, [referenceParam, gatewayParam, testMode]);
 
   if (!user) {
     return (
@@ -174,7 +73,6 @@ export default function PaymentSuccessPage() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center py-8">
       <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
-        {/* Status Icon */}
         <div className="flex justify-center mb-6">
           {status === 'loading' && (
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
@@ -184,34 +82,30 @@ export default function PaymentSuccessPage() {
               <FiCheckCircle className="h-8 w-8 text-emerald-600" />
             </div>
           )}
-          {status === 'failed' && (
+          {(status === 'failed' || status === 'error') && (
             <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center">
               <FiAlertCircle className="h-8 w-8 text-red-600" />
             </div>
           )}
         </div>
 
-        {/* Status Message */}
         <div className="text-center mb-6">
           <h1 className={`text-2xl font-bold mb-2 ${
-            status === 'success' ? 'text-emerald-600' : 
-            status === 'failed' ? 'text-red-600' : 'text-blue-600'
+            status === 'success' ? 'text-emerald-600' :
+            status === 'loading' ? 'text-blue-600' : 'text-red-600'
           }`}>
             {status === 'loading' && 'Processing Payment'}
             {status === 'success' && 'Payment Successful!'}
-            {status === 'failed' && 'Payment Failed'}
+            {(status === 'failed' || status === 'error') && 'Payment Failed'}
           </h1>
-          
-          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-4">{message}</p>
-          
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{message}</p>
           {reference && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Reference: {reference}
             </p>
           )}
         </div>
 
-        {/* Action Buttons */}
         <div className="space-y-3">
           {status === 'success' && (
             <>
@@ -222,18 +116,17 @@ export default function PaymentSuccessPage() {
                 <FiCreditCard className="mr-2 h-4 w-4" />
                 View Membership Card
               </button>
-              
               <button
                 onClick={() => router.push('/dashboard')}
-                className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-white/20 dark:bg-white/10 transition-colors"
+                className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-white/20 transition-colors"
               >
                 <FiHome className="mr-2 h-4 w-4" />
                 Dashboard
               </button>
             </>
           )}
-          
-          {status === 'failed' && (
+
+          {(status === 'failed' || status === 'error') && (
             <>
               <button
                 onClick={() => router.push('/dashboard/payment')}
@@ -242,28 +135,26 @@ export default function PaymentSuccessPage() {
                 <FiCreditCard className="mr-2 h-4 w-4" />
                 Try Again
               </button>
-              
               <button
                 onClick={() => router.push('/dashboard')}
-                className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-white/20 dark:bg-white/10 transition-colors"
+                className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-white/20 transition-colors"
               >
                 <FiHome className="mr-2 h-4 w-4" />
                 Dashboard
               </button>
             </>
           )}
-          
+
           {status === 'loading' && (
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
+            <div className="text-center text-sm text-gray-500 dark:text-gray-400">
               <p>Please wait while we verify your payment...</p>
               <p>This may take a few seconds.</p>
             </div>
           )}
         </div>
 
-        {/* Help Information */}
         <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
             <p className="mb-2">Need help? Contact us:</p>
             <p>Email: membership@tla.or.tz</p>
             <p>Phone: +255 22 211 3456</p>

@@ -33,6 +33,8 @@ const STEPS = [
   { id: 'review', label: 'Review & pay', description: 'Confirm and authorise' },
 ];
 
+const MAX_SANDBOX_CYCLES = 1;
+
 // Lightweight payment history list reused at the bottom of the page.
 function PaymentHistory() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -113,6 +115,8 @@ export default function PaymentPage() {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [authorized, setAuthorized] = useState(false);
+  const [enabledGateways, setEnabledGateways] = useState<string[] | null>(null);
+  const [gateway, setGateway] = useState<string>('azampay');
 
   // Derived: cycle pricing rows + helper booleans.
   const cycles: CyclePricingRow[] = useMemo(
@@ -151,6 +155,29 @@ export default function PaymentPage() {
       }
     })();
   }, [user, router]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const results = await Promise.all(
+          ['azampay', 'evpay'].map(async (id) => {
+            try {
+              const res = await fetch(`/api/payments/${id}/config`, { credentials: 'include' });
+              const data = await res.json();
+              return data?.enabled ? id : null;
+            } catch {
+              return null;
+            }
+          })
+        );
+        const enabled = results.filter((g): g is string => Boolean(g));
+        setEnabledGateways(enabled);
+        if (enabled.length > 0) setGateway(enabled[0]);
+      } catch {
+        setEnabledGateways([]);
+      }
+    })();
+  }, []);
 
   // Prefill phone from user profile when we hit the phone step.
   useEffect(() => {
@@ -234,19 +261,14 @@ export default function PaymentPage() {
     }
     setPaymentLoading(true);
     try {
-      const res = await fetch('/api/payments/azampay/checkout', {
+      const res = await fetch(`/api/payments/${gateway}/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          membershipType,
-          amount: totalAmount,
-          userId: (user as any).id,
+          cycleYear: targetCycleYear,
+          cycleYears: selectedCycleYears,
           paymentMethod: selectedMethod,
           phoneNumber,
-          customerName: (user as any).name,
-          customerEmail: (user as any).email,
-          targetCycleYear,
-          cycleCount,
         }),
       });
       const data = await res.json();
@@ -257,7 +279,11 @@ export default function PaymentPage() {
         window.location.href = data.checkoutUrl;
         return;
       }
-      throw new Error('No checkout URL returned from gateway.');
+      if (data.requiresMobileApproval && data.reference) {
+        router.push(`/dashboard/payment/success?reference=${encodeURIComponent(data.reference)}&gateway=${gateway}`);
+        return;
+      }
+      throw new Error('No checkout URL or mobile approval request returned from gateway.');
     } catch (e: any) {
       setError(e?.message || 'Payment failed.');
     } finally {
@@ -265,10 +291,44 @@ export default function PaymentPage() {
     }
   };
 
-  if (!user || loading) {
+  if (!user || loading || enabledGateways === null) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-gray-950 flex items-center justify-center">
         <FiLoader className="animate-spin h-10 w-10 text-emerald-600" />
+      </div>
+    );
+  }
+
+  if (enabledGateways.length === 0) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-gray-950 px-4 py-8">
+        <div className="mx-auto max-w-2xl">
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="mb-6 inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-100"
+          >
+            <FiArrowLeft className="mr-2 h-4 w-4" />
+            Back to dashboard
+          </button>
+          <section className="rounded-2xl border border-amber-200 bg-white dark:border-amber-900/40 dark:bg-gray-900 p-6 shadow-sm">
+            <div className="flex items-start gap-4">
+              <FiAlertCircle className="mt-1 h-8 w-8 text-amber-500" />
+              <div>
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  Membership payments are temporarily unavailable
+                </h1>
+                <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                  Online payment operations are disabled during security
+                  containment while provider verification and reconciliation
+                  controls are reviewed. No payment attempt was submitted.
+                </p>
+                <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                  Please contact the administrator for manual payment guidance.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     );
   }
@@ -301,7 +361,7 @@ export default function PaymentPage() {
             Back to dashboard
           </button>
           <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
-            Tanzania Library Association · Membership checkout
+            Zanzibar Library and Knowledge Association · Membership checkout
           </span>
         </div>
 
@@ -346,7 +406,7 @@ export default function PaymentPage() {
                   cycles={cycles}
                   selectedYears={selectedCycleYears}
                   onToggle={toggleCycle}
-                  maxSelectable={statusData?.maxCycleCount || 3}
+                  maxSelectable={MAX_SANDBOX_CYCLES}
                 />
                 <div className="mt-6 flex justify-end">
                   <button
@@ -361,6 +421,27 @@ export default function PaymentPage() {
 
             {stepIndex === 1 && (
               <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-6 shadow-sm">
+                {enabledGateways.length > 1 && (
+                  <div className="mb-5">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment gateway</p>
+                    <div className="flex gap-2">
+                      {enabledGateways.map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => setGateway(g)}
+                          className={`rounded-xl border px-4 py-2 text-sm font-medium ${
+                            gateway === g
+                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                              : 'border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
+                          }`}
+                        >
+                          {g === 'azampay' ? 'AzamPay' : 'EvPay'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <PaymentMethodSelector
                   selectedMethod={selectedMethod}
                   onMethodSelect={setSelectedMethod}
@@ -441,7 +522,7 @@ export default function PaymentPage() {
                     className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-white/15 text-emerald-600 focus:ring-emerald-500"
                   />
                   <span className="text-gray-700 dark:text-gray-200">
-                    I authorise Tanzania Library Association to debit TZS{' '}
+                    I authorise Zanzibar Library and Knowledge Association to debit TZS{' '}
                     <span className="font-semibold">
                       {totalAmount.toLocaleString()}
                     </span>{' '}

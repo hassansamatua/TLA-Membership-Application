@@ -36,7 +36,7 @@ async function handleEmailTest(request: NextRequest) {
     console.log('[DEBUG-EMAIL] Attempting to send test email to:', email);
 
     const htmlContent = `
-      <h2>Test Email from Tanzania Library Association</h2>
+      <h2>Test Email from Zanzibar Library and Knowledge Association</h2>
       <p>Hello ${userName},</p>
       <p>This is a test email to verify that email notifications are working correctly.</p>
       <p>If you received this email, the email configuration is working!</p>
@@ -44,7 +44,7 @@ async function handleEmailTest(request: NextRequest) {
     `;
 
     const textContent = `
-Test Email from Tanzania Library Association
+Test Email from Zanzibar Library and Knowledge Association
 
 Hello ${userName},
 

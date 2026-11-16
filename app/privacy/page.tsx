@@ -12,7 +12,7 @@ export default function PrivacyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">1. Introduction</h2>
           <p className="mb-4">
-            At Tanzania Library Association, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services.
+            At Zanzibar Library and Knowledge Association, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services.
           </p>
         </section>
 
@@ -87,7 +87,7 @@ export default function PrivacyPage() {
             If you have any questions about this Privacy Policy, please contact us at:
           </p>
           <p className="mt-2">
-            Tanzania Library Association<br />
+            Zanzibar Library and Knowledge Association<br />
             Email: privacy@tanzanialibrary.org<br />
             Phone: +255 XXX XXX XXX
           </p>

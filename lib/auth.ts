@@ -1,8 +1,14 @@
-import { RowDataPacket } from 'mysql2';
+import type { RowDataPacket } from 'mysql2';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+export function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || Buffer.byteLength(secret) < 32 || secret === 'your-secret-key') {
+    throw new Error('Authentication configuration unavailable');
+  }
+  return secret;
+}
 
 export async function hashPassword(password: string) {
   return await bcrypt.hash(password, 10);
@@ -11,10 +17,7 @@ export async function hashPassword(password: string) {
 export async function comparePasswords(plainPassword: string, hashedPassword: string) {
   try {
     console.log('Comparing passwords...');
-    console.log('Plain password (first 5 chars):', plainPassword.substring(0, 5) + '...');
-    console.log('Hashed password (first 10 chars):', hashedPassword.substring(0, 10) + '...');
-    console.log('Hash format:', hashedPassword.substring(0, 3));
-    
+
     // Check hash format and use appropriate comparison method
     if (hashedPassword.startsWith('$2a$') || hashedPassword.startsWith('$2b$')) {
       // bcrypt hash format
@@ -48,7 +51,7 @@ export async function comparePasswords(plainPassword: string, hashedPassword: st
       console.log('SHA-256 comparison result:', result);
       return result;
     } else {
-      console.error('Unknown hash format:', hashedPassword.substring(0, 20));
+      console.error('Unsupported password hash format');
       // Try bcrypt as fallback
       const result = await bcrypt.compare(plainPassword, hashedPassword);
       console.log('Fallback bcrypt.compare result:', result);
@@ -63,7 +66,7 @@ export async function comparePasswords(plainPassword: string, hashedPassword: st
 export function generateToken(user: any) {
   return jwt.sign(
     { id: user.id, email: user.email, isAdmin: user.is_admin },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: '7d' } // Extended from 1d to 7d
   );
 }
@@ -75,12 +78,7 @@ export function verifyToken(token: string) {
       throw new Error('Authentication token is required');
     }
 
-    if (!JWT_SECRET) {
-      console.error('JWT_SECRET is not defined');
-      throw new Error('Server configuration error');
-    }
-
-    const decoded = jwt.verify(token, JWT_SECRET) as { 
+    const decoded = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] }) as {
       id: number; 
       email: string; 
       isAdmin: boolean;
@@ -88,6 +86,9 @@ export function verifyToken(token: string) {
       exp?: number;
     };
 
+    if (!Number.isSafeInteger(Number(decoded.id)) || Number(decoded.id) <= 0 || !decoded.exp || !decoded.iat) {
+      throw new Error('Invalid or expired token');
+    }
     // Log token expiration for debugging
     if (decoded.exp) {
       const now = Math.floor(Date.now() / 1000);

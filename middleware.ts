@@ -1,10 +1,25 @@
 // middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { authorizeApi } from './lib/api-security';
 
 // In middleware.ts
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname === '/fix-auth' || pathname === '/test-membership-card') {
+    return new NextResponse(null, { status: 404 });
+  }
+  if (pathname.startsWith('/api/')) {
+    const denied = await authorizeApi(request);
+    if (denied) return denied;
+    const headers = new Headers(request.headers);
+    headers.delete('x-user-id');
+    headers.delete('x-user-role');
+    const response = NextResponse.next({ request: { headers } });
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
+  }
 
   // Skip middleware for static files and Chrome DevTools
   if (pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|css|js)$/) || 
@@ -45,7 +60,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     console.log('[Middleware] Verifying token...');
-    console.log('[Middleware] Token (first 20 chars):', token ? token.substring(0, 20) + '...' : 'null');
+
     // Verify token by making a request to the /api/auth/me endpoint
     const meUrl = new URL('/api/auth/me', request.url);
     console.log(`[Middleware] Calling ${meUrl.toString()}`);
@@ -125,6 +140,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  runtime: 'nodejs',
   matcher: [
     '/((?!_next/static|_next/image|favicon\\.ico).*)',
   ],

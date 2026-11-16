@@ -36,8 +36,8 @@ export default function AboutPage() {
 
   // Fallback static content
   const staticContent = {
-    mainHeading: "About Tanzania Library Association",
-    description: "The Tanzania Library Association (TLA) is the leading professional organization dedicated to advancing library and information services throughout Tanzania.",
+    mainHeading: "About Zanzibar Library and Knowledge Association",
+    description: "The Zanzibar Library and Knowledge Association (ZaLIKA) is the leading professional organization dedicated to advancing library and information services throughout Tanzania.",
     mission: "To promote library development, support information professionals, and advocate for access to knowledge for all Tanzanians.",
     vision: "To be the catalyst for a knowledge-driven society where every Tanzanian has access to quality information services.",
     values: [
@@ -150,7 +150,7 @@ export default function AboutPage() {
             Become part of Tanzania's leading library association and help us promote library services and information access throughout the country.
           </p>
           <button className="bg-white text-emerald-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-            Join TLA Today
+            Join ZaLIKA Today
           </button>
         </div>
       </section>
